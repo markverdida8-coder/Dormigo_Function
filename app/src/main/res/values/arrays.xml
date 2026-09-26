@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="school_campus_options">
+        <item>University of Cebu</item>
+        <item>Cebu Institute of Technology University</item>
+        <item>University of San Jose-Recoletos</item>
+        <item>Cebu Technological University</item>
+        <item>Cebu Normal University</item>
+        <item>Asian College of Technology</item>
+        <item>University of San Carlos</item>
+        <item>University of the Philippines Cebu</item>
+        <item>Southwestern University PHINMA</item>
+        <item>University of Visayas</item>
+    </string-array>
+</resources>
