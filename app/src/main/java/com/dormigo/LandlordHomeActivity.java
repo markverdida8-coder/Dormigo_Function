@@ -148,6 +148,33 @@ public class LandlordHomeActivity extends AppCompatActivity {
                 } catch (Exception ignored) {}
             }
         });
+        loadNotificationsBadge(landlordId);
+    }
+
+    private void loadNotificationsBadge(int userId) {
+        apiClient.getNotifications(userId, new Callback() {
+            @Override public void onFailure(Call call, IOException e) {}
+            @Override public void onResponse(Call call, Response response) throws IOException {
+                if (!response.isSuccessful()) return;
+                try {
+                    JSONObject json = new JSONObject(response.body().string());
+                    if (json.optBoolean("success", false)) {
+                        int unreadCount = json.optInt("unread_count", 0);
+                        runOnUiThread(() -> {
+                            TextView badge = findViewById(R.id.notificationBadge);
+                            if (badge != null) {
+                                if (unreadCount > 0) {
+                                    badge.setText(unreadCount > 9 ? "9+" : String.valueOf(unreadCount));
+                                    badge.setVisibility(View.VISIBLE);
+                                } else {
+                                    badge.setVisibility(View.GONE);
+                                }
+                            }
+                        });
+                    }
+                } catch (Exception ignored) {}
+            }
+        });
     }
 
     private void displayHouseAtIndex(int index) {
@@ -548,7 +575,9 @@ public class LandlordHomeActivity extends AppCompatActivity {
         View btnNotifications = findViewById(R.id.btnNotifications);
         if (btnNotifications != null) {
             btnNotifications.setOnClickListener(v -> {
-                Intent intent = new Intent(this, LandlordNotificationsActivity.class);
+                TextView badge = findViewById(R.id.notificationBadge);
+                if (badge != null) badge.setVisibility(View.GONE);
+                Intent intent = new Intent(this, NotificationsActivity.class);
                 startActivity(intent);
             });
         }

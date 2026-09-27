@@ -1,0 +1,5 @@
+- [ ] Update backend `rooms.php` and `boarding_houses.php` to handle payment configuration fields for rooms
+- [ ] Update `AddBoardingHouseActivity.java` & `activity_add_boarding_house.xml` for multiple room management, 6 room types dropdown, and payment configuration with auto-calculation
+- [ ] Update `ViewBoardingHouseActivity.java` & `view_boarding_houses.xml` to display room payment breakdown
+- [ ] Update `BoardingHouseListingsActivity.java` & `boarding_house_listings.xml` for 6 room type filter chips and live database filtering
+- [ ] Build and verify compilation with gradle

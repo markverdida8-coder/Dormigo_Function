@@ -66,6 +66,7 @@ public class ViewBoardingHouseActivity extends AppCompatActivity {
     private final List<RoomItem> houseRooms = new ArrayList<>();
     private int selectedAdvanceMonths = 1;
     private int selectedDepositMonths = 1;
+    private double selectedUtilityDeposit = 0;
     private double selectedOtherFees = 0;
     private String selectedOtherFeesDesc = "";
     private String selectedRefundPolicy = "";
@@ -80,6 +81,7 @@ public class ViewBoardingHouseActivity extends AppCompatActivity {
         String status;
         int advanceMonths = 1;
         int depositMonths = 1;
+        double utilityDeposit = 0;
         double otherFees = 0;
         String otherFeesDescription = "";
         String depositRefundPolicy = "";
@@ -557,6 +559,7 @@ public class ViewBoardingHouseActivity extends AppCompatActivity {
 
                                 room.advanceMonths = object.optInt("advance_months", 1);
                                 room.depositMonths = object.optInt("deposit_months", 1);
+                                room.utilityDeposit = object.optDouble("utility_deposit", 0);
                                 room.otherFees = object.optDouble("other_fees", 0);
                                 room.otherFeesDescription = object.optString("other_fees_description", "");
                                 room.depositRefundPolicy = object.optString("deposit_refund_policy", "");
@@ -863,6 +866,7 @@ public class ViewBoardingHouseActivity extends AppCompatActivity {
 
         selectedAdvanceMonths = room.advanceMonths;
         selectedDepositMonths = room.depositMonths;
+        selectedUtilityDeposit = room.utilityDeposit;
         selectedOtherFees = room.otherFees;
         selectedOtherFeesDesc = room.otherFeesDescription != null ? room.otherFeesDescription : "";
         selectedRefundPolicy = room.depositRefundPolicy != null ? room.depositRefundPolicy : "";
@@ -1692,16 +1696,18 @@ public class ViewBoardingHouseActivity extends AppCompatActivity {
 
         TextView tvAdvance = view.findViewById(R.id.textAdvanceBreakdown);
         TextView tvDeposit = view.findViewById(R.id.textDepositBreakdown);
+        TextView tvUtility = view.findViewById(R.id.textUtilityBreakdown);
         TextView tvOther = view.findViewById(R.id.textOtherFeesBreakdown);
         TextView tvTotal = view.findViewById(R.id.textTotalInitialPayment);
         TextView tvPolicy = view.findViewById(R.id.textRefundPolicy);
 
         double advAmt = monthlyRent * selectedAdvanceMonths;
         double depAmt = monthlyRent * selectedDepositMonths;
-        double totalInitial = advAmt + depAmt + selectedOtherFees;
+        double totalInitial = monthlyRent + advAmt + depAmt + selectedUtilityDeposit + selectedOtherFees;
 
         if (tvAdvance != null) tvAdvance.setText(formatRent(advAmt) + " (" + selectedAdvanceMonths + " mo)");
         if (tvDeposit != null) tvDeposit.setText(formatRent(depAmt) + " (" + selectedDepositMonths + " mo)");
+        if (tvUtility != null) tvUtility.setText(formatRent(selectedUtilityDeposit));
         if (tvOther != null) tvOther.setText(formatRent(selectedOtherFees) + (!selectedOtherFeesDesc.isEmpty() ? " (" + selectedOtherFeesDesc + ")" : ""));
         if (tvTotal != null) tvTotal.setText(formatRent(totalInitial));
         if (tvPolicy != null) tvPolicy.setText("Refund Policy: " + (selectedRefundPolicy.isEmpty() ? "As specified by landlord." : selectedRefundPolicy));

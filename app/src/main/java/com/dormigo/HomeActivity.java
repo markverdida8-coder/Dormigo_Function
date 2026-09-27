@@ -38,6 +38,9 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -109,6 +112,40 @@ public class HomeActivity extends AppCompatActivity {
             greetingLabel.setText("Kumusta, " + firstName);
         }
         loadStudentRentStatus();
+        loadNotificationsBadge();
+    }
+
+    private void loadNotificationsBadge() {
+        SharedPreferences prefs = getSharedPreferences("DormigoPrefs", MODE_PRIVATE);
+        int userId = prefs.getInt("userId", -1);
+        if (userId <= 0) return;
+
+        apiClient.getNotifications(userId, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {}
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (!response.isSuccessful()) return;
+                try {
+                    JSONObject json = new JSONObject(response.body().string());
+                    if (json.optBoolean("success", false)) {
+                        int unreadCount = json.optInt("unread_count", 0);
+                        runOnUiThread(() -> {
+                            TextView badge = findViewById(R.id.notificationBadge);
+                            if (badge != null) {
+                                if (unreadCount > 0) {
+                                    badge.setText(unreadCount > 9 ? "9+" : String.valueOf(unreadCount));
+                                    badge.setVisibility(View.VISIBLE);
+                                } else {
+                                    badge.setVisibility(View.GONE);
+                                }
+                            }
+                        });
+                    }
+                } catch (Exception ignored) {}
+            }
+        });
     }
 
     private void loadStudentRentStatus() {
@@ -117,68 +154,84 @@ public class HomeActivity extends AppCompatActivity {
         if (userId <= 0) return;
 
         TextView rentAmountView = findViewById(R.id.textRentAmount);
-        if (rentAmountView == null) return;
+        TextView houseRoomLabel = findViewById(R.id.textHouseRoomLabel);
+        TextView dueDateStatus = findViewById(R.id.textDueDateAndStatus);
+        TextView btnPayNow = findViewById(R.id.btnPayNow);
 
         apiClient.getBookings(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {}
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (!response.isSuccessful()) return;
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                if (!response.isSuccessful() || response.body() == null) return;
                 try {
-                    String body = response.body() != null ? response.body().string() : "";
-                    JSONObject json = new JSONObject(body);
+                    JSONObject json = new JSONObject(response.body().string());
                     if (json.optBoolean("success", false)) {
                         JSONArray data = json.optJSONArray("data");
                         if (data != null) {
-                            int activeRoomId = 0;
-                            double activeRent = 0;
+                            JSONObject targetBooking = null;
+                            String targetStatus = "";
                             for (int i = 0; i < data.length(); i++) {
                                 JSONObject b = data.getJSONObject(i);
                                 int bUserId = b.optInt("user_id", 0);
                                 String status = b.optString("status", "").trim().toUpperCase();
-                                if (bUserId == userId && ("APPROVED".equals(status) || "PENDING".equals(status) || "CONFIRMED".equals(status))) {
-                                    activeRoomId = b.optInt("room_id", 0);
-                                    double total = b.optDouble("total_amount", 0);
-                                    if (total <= 0) {
-                                        total = b.optDouble("monthly_rent", 0);
+                                if (bUserId == userId && ("ACTIVE".equals(status) || "APPROVED".equals(status))) {
+                                    targetBooking = b;
+                                    targetStatus = status;
+                                    if ("ACTIVE".equals(status)) {
+                                        break;
                                     }
-                                    if (total > 0) {
-                                        activeRent = total;
-                                    }
-                                    break;
                                 }
                             }
 
-                            if (activeRent > 0) {
-                                final double rent = activeRent;
-                                runOnUiThread(() -> rentAmountView.setText("₱" + String.format(Locale.getDefault(), "%.2f", rent)));
-                            } else if (activeRoomId > 0) {
-                                final int finalRoomId = activeRoomId;
-                                apiClient.getRooms(new Callback() {
-                                    @Override
-                                    public void onFailure(Call call, IOException e) {}
+                            if (targetBooking != null) {
+                                double monthlyRent = targetBooking.optDouble("agreed_monthly_rent", 0);
+                                String houseName = targetBooking.optString("house_name", "Boarding House");
+                                String roomNumber = targetBooking.optString("room_number", "Room");
+                                int advanceMonths = targetBooking.optInt("advance_months", 1);
+                                int depositMonths = targetBooking.optInt("security_deposit_months", 1);
+                                double otherFees = targetBooking.optDouble("other_fees", 0);
+                                int paymentDueDay = targetBooking.optInt("payment_due_day", 1);
+                                String moveInDate = targetBooking.optString("move_in_date", "");
+                                boolean initialCompleted = targetBooking.optBoolean("initial_payment_completed", false);
+                                String dbNextDueDate = targetBooking.optString("next_due_date", "");
 
-                                    @Override
-                                    public void onResponse(Call call, Response resp2) throws IOException {
-                                        if (!resp2.isSuccessful() || resp2.body() == null) return;
-                                        try {
-                                            JSONObject rJson = new JSONObject(resp2.body().string());
-                                            JSONArray rData = rJson.optJSONArray("data");
-                                            if (rData != null) {
-                                                for (int j = 0; j < rData.length(); j++) {
-                                                    JSONObject r = rData.getJSONObject(j);
-                                                    if (r.optInt("room_id", 0) == finalRoomId) {
-                                                        double rRent = r.optDouble("monthly_rent", 0);
-                                                        if (rRent > 0) {
-                                                            runOnUiThread(() -> rentAmountView.setText("₱" + String.format(Locale.getDefault(), "%.2f", rRent)));
-                                                            break;
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        } catch (Exception ignored) {}
+                                double displayAmount = monthlyRent;
+                                if ("APPROVED".equals(targetStatus) && !initialCompleted) {
+                                    displayAmount = monthlyRent + (monthlyRent * advanceMonths) + (monthlyRent * depositMonths) + otherFees;
+                                }
+
+                                String nextDue;
+                                if (initialCompleted && dbNextDueDate != null && !dbNextDueDate.isEmpty() && !"null".equals(dbNextDueDate)) {
+                                    try {
+                                        SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+                                        SimpleDateFormat sdf2 = new SimpleDateFormat("MMMM d, yyyy", Locale.US);
+                                        nextDue = sdf2.format(sdf1.parse(dbNextDueDate));
+                                    } catch (Exception e) {
+                                        nextDue = dbNextDueDate;
+                                    }
+                                } else {
+                                    nextDue = calculateNextFutureDueDate(moveInDate, paymentDueDay);
+                                }
+
+                                final String finalNextDue = nextDue;
+                                final double finalDisplayAmount = displayAmount;
+                                final String finalTargetStatus = targetStatus;
+                                String dueStatus = calculateDueStatus(finalNextDue);
+
+                                runOnUiThread(() -> {
+                                    if (rentAmountView != null) {
+                                        rentAmountView.setText("₱" + String.format(Locale.getDefault(), "%.2f", finalDisplayAmount));
+                                    }
+                                    if (houseRoomLabel != null) {
+                                        houseRoomLabel.setText(houseName + " · Room " + roomNumber);
+                                    }
+                                    if (dueDateStatus != null) {
+                                        dueDateStatus.setText("Next Due Date: " + finalNextDue + " (" + dueStatus + ")");
+                                    }
+                                    if (btnPayNow != null) {
+                                        btnPayNow.setText("APPROVED".equals(finalTargetStatus) ? "Pay Initial Payment" : "Pay Monthly Rent");
                                     }
                                 });
                             }
@@ -187,6 +240,63 @@ public class HomeActivity extends AppCompatActivity {
                 } catch (Exception ignored) {}
             }
         });
+    }
+
+    public static String calculateNextFutureDueDate(String moveInDateStr, int dueDay) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+            Calendar moveInCal = Calendar.getInstance();
+            if (moveInDateStr != null && !moveInDateStr.isEmpty() && !moveInDateStr.equals("Not specified")) {
+                moveInCal.setTime(sdf.parse(moveInDateStr));
+            }
+            Calendar now = Calendar.getInstance();
+            Calendar target = (Calendar) now.clone();
+            target.set(Calendar.DAY_OF_MONTH, Math.min(dueDay, 28));
+
+            if (target.before(now) || target.equals(now)) {
+                target.add(Calendar.MONTH, 1);
+            }
+            while (target.before(moveInCal)) {
+                target.add(Calendar.MONTH, 1);
+            }
+            return new SimpleDateFormat("MMMM d, yyyy", Locale.US).format(target.getTime());
+        } catch (Exception e) {
+            return "Every " + dueDay + getOrdinalSuffix(dueDay) + " of the month";
+        }
+    }
+
+    public static String calculateDueStatus(String dueDateStr) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("MMMM d, yyyy", Locale.US);
+            Date dueDate = sdf.parse(dueDateStr);
+            if (dueDate == null) return "Due soon";
+
+            long diffMillis = dueDate.getTime() - System.currentTimeMillis();
+            long diffDays = diffMillis / (1000 * 60 * 60 * 24);
+
+            if (diffDays < 0) {
+                long overdueDays = Math.abs(diffDays);
+                return "Overdue by " + overdueDays + (overdueDays == 1 ? " day" : " days");
+            } else if (diffDays == 0) {
+                return "Due Today";
+            } else if (diffDays == 1) {
+                return "Due Tomorrow";
+            } else {
+                return "Due in " + diffDays + " days";
+            }
+        } catch (Exception e) {
+            return "Due soon";
+        }
+    }
+
+    private static String getOrdinalSuffix(int day) {
+        if (day >= 11 && day <= 13) return "th";
+        switch (day % 10) {
+            case 1: return "st";
+            case 2: return "nd";
+            case 3: return "rd";
+            default: return "th";
+        }
     }
 
     // =========================================================
@@ -309,6 +419,9 @@ public class HomeActivity extends AppCompatActivity {
         }
 
         btnNotifications.setOnClickListener(v -> {
+            
+            TextView badge = findViewById(R.id.notificationBadge);
+            if (badge != null) badge.setVisibility(View.GONE);
 
             Intent intent =
                     new Intent(
@@ -526,6 +639,94 @@ public class HomeActivity extends AppCompatActivity {
                                     } catch (Exception ignored) {}
                                 }
                             });
+                        } else if (i == 2) {
+                            TextView name3 = findViewById(R.id.textHouseName3);
+                            TextView addr3 = findViewById(R.id.textHouseAddress3);
+                            TextView rent3 = findViewById(R.id.textHouseRent3);
+                            ImageView img3 = findViewById(R.id.imgHouse3);
+                            if (name3 != null) name3.setText(hName);
+                            if (addr3 != null) addr3.setText(hAddress);
+                            if (rent3 != null) rent3.setText("Available");
+
+                            String pPath = getFirstPhotoPath(h);
+                            if (img3 != null && !pPath.isEmpty()) {
+                                String imgUrl = "http://10.129.224.109/Dormigo_Backend/" + pPath;
+                                Glide.with(this)
+                                        .load(imgUrl)
+                                        .placeholder(R.drawable.bg_image_placeholder)
+                                        .into(img3);
+                            }
+
+                            TextView rating3 = findViewById(R.id.textHouseRating3);
+                            apiClient.getReviewsForHouse(hId, new Callback() {
+                                @Override
+                                public void onFailure(Call call, IOException e) {}
+
+                                @Override
+                                public void onResponse(Call call, Response response) throws IOException {
+                                    if (!response.isSuccessful()) return;
+                                    try {
+                                        JSONObject rJson = new JSONObject(response.body().string());
+                                        if (rJson.optBoolean("success", false)) {
+                                            double avg = rJson.optDouble("average_rating", 0.0);
+                                            int count = rJson.optInt("review_count", 0);
+                                            runOnUiThread(() -> {
+                                                if (rating3 != null) {
+                                                    if (count > 0) {
+                                                        rating3.setText("★ " + String.format(Locale.US, "%.1f", avg));
+                                                    } else {
+                                                        rating3.setText("No ratings yet");
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    } catch (Exception ignored) {}
+                                }
+                            });
+                        } else if (i == 3) {
+                            TextView name4 = findViewById(R.id.textHouseName4);
+                            TextView addr4 = findViewById(R.id.textHouseAddress4);
+                            TextView rent4 = findViewById(R.id.textHouseRent4);
+                            ImageView img4 = findViewById(R.id.imgHouse4);
+                            if (name4 != null) name4.setText(hName);
+                            if (addr4 != null) addr4.setText(hAddress);
+                            if (rent4 != null) rent4.setText("Available");
+
+                            String pPath = getFirstPhotoPath(h);
+                            if (img4 != null && !pPath.isEmpty()) {
+                                String imgUrl = "http://10.129.224.109/Dormigo_Backend/" + pPath;
+                                Glide.with(this)
+                                        .load(imgUrl)
+                                        .placeholder(R.drawable.bg_image_placeholder)
+                                        .into(img4);
+                            }
+
+                            TextView rating4 = findViewById(R.id.textHouseRating4);
+                            apiClient.getReviewsForHouse(hId, new Callback() {
+                                @Override
+                                public void onFailure(Call call, IOException e) {}
+
+                                @Override
+                                public void onResponse(Call call, Response response) throws IOException {
+                                    if (!response.isSuccessful()) return;
+                                    try {
+                                        JSONObject rJson = new JSONObject(response.body().string());
+                                        if (rJson.optBoolean("success", false)) {
+                                            double avg = rJson.optDouble("average_rating", 0.0);
+                                            int count = rJson.optInt("review_count", 0);
+                                            runOnUiThread(() -> {
+                                                if (rating4 != null) {
+                                                    if (count > 0) {
+                                                        rating4.setText("★ " + String.format(Locale.US, "%.1f", avg));
+                                                    } else {
+                                                        rating4.setText("No ratings yet");
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    } catch (Exception ignored) {}
+                                }
+                            });
                         }
 
                         card.setOnClickListener(v -> {
@@ -690,7 +891,7 @@ public class HomeActivity extends AppCompatActivity {
                                     return;
                                 }
 
-                                JSONObject approvedBooking =
+                                JSONObject targetBooking =
                                         null;
 
                                 int highestBookingId =
@@ -730,23 +931,27 @@ public class HomeActivity extends AppCompatActivity {
 
                                     if (
                                             bookingUserId == userId
-                                                    && "APPROVED".equals(
+                                                    && ("APPROVED".equals(
                                                     status
-                                            )
+                                            ) || "ACTIVE".equals(status))
                                                     && currentBookingId
                                                     > highestBookingId
                                     ) {
 
-                                        approvedBooking =
+                                        targetBooking =
                                                 booking;
 
                                         highestBookingId =
                                                 currentBookingId;
+
+                                        if ("ACTIVE".equals(status)) {
+                                            break;
+                                        }
                                     }
                                 }
 
                                 if (
-                                        approvedBooking == null
+                                        targetBooking == null
                                 ) {
 
                                     button.setEnabled(
@@ -754,20 +959,20 @@ public class HomeActivity extends AppCompatActivity {
                                     );
 
                                     showToast(
-                                            "You do not have an approved booking to pay."
+                                            "You do not have an active or approved booking to pay."
                                     );
 
                                     return;
                                 }
 
                                 int bookingId =
-                                        approvedBooking.optInt(
+                                        targetBooking.optInt(
                                                 "booking_id",
                                                 0
                                         );
 
                                 int roomId =
-                                        approvedBooking.optInt(
+                                        targetBooking.optInt(
                                                 "room_id",
                                                 0
                                         );
@@ -791,7 +996,8 @@ public class HomeActivity extends AppCompatActivity {
                                 loadRoomForPayment(
                                         bookingId,
                                         roomId,
-                                        button
+                                        button,
+                                        targetBooking.optString("status", "").toUpperCase().contains("APPROVED") ? "INITIAL" : "MONTHLY"
                                 );
 
                             } catch (Exception e) {
@@ -817,7 +1023,8 @@ public class HomeActivity extends AppCompatActivity {
     private void loadRoomForPayment(
             int bookingId,
             int roomId,
-            View button
+            View button,
+            String paymentType
     ) {
 
         apiClient.getRooms(
@@ -838,7 +1045,8 @@ public class HomeActivity extends AppCompatActivity {
                             openPaymentActivity(
                                     bookingId,
                                     "Boarding House",
-                                    "Room"
+                                    "Room",
+                                    paymentType
                             );
                         });
                     }
@@ -948,7 +1156,8 @@ public class HomeActivity extends AppCompatActivity {
                                     openPaymentActivity(
                                             bookingId,
                                             "Boarding House",
-                                            finalRoomName
+                                            finalRoomName,
+                                            paymentType
                                     );
 
                                     return;
@@ -958,7 +1167,8 @@ public class HomeActivity extends AppCompatActivity {
                                         bookingId,
                                         finalHouseId,
                                         finalRoomName,
-                                        button
+                                        button,
+                                        paymentType
                                 );
                             });
 
@@ -973,7 +1183,8 @@ public class HomeActivity extends AppCompatActivity {
                                 openPaymentActivity(
                                         bookingId,
                                         "Boarding House",
-                                        "Room"
+                                        "Room",
+                                        paymentType
                                 );
                             });
                         }
@@ -990,7 +1201,8 @@ public class HomeActivity extends AppCompatActivity {
             int bookingId,
             int houseId,
             String roomName,
-            View button
+            View button,
+            String paymentType
     ) {
 
         apiClient.getBoardingHouses(
@@ -1011,7 +1223,8 @@ public class HomeActivity extends AppCompatActivity {
                             openPaymentActivity(
                                     bookingId,
                                     "Boarding House",
-                                    roomName
+                                    roomName,
+                                    paymentType
                             );
                         });
                     }
@@ -1070,7 +1283,7 @@ public class HomeActivity extends AppCompatActivity {
                                                 house.optString(
                                                         "house_name",
                                                         "Boarding House"
-                                                );
+                                                ).trim();
 
                                         break;
                                     }
@@ -1089,7 +1302,8 @@ public class HomeActivity extends AppCompatActivity {
                                 openPaymentActivity(
                                         bookingId,
                                         finalHouseName,
-                                        roomName
+                                        roomName,
+                                        paymentType
                                 );
                             });
 
@@ -1104,7 +1318,8 @@ public class HomeActivity extends AppCompatActivity {
                                 openPaymentActivity(
                                         bookingId,
                                         "Boarding House",
-                                        roomName
+                                        roomName,
+                                        paymentType
                                 );
                             });
                         }
@@ -1120,7 +1335,8 @@ public class HomeActivity extends AppCompatActivity {
     private void openPaymentActivity(
             int bookingId,
             String houseName,
-            String roomName
+            String roomName,
+            String paymentType
     ) {
 
         Intent intent =
@@ -1142,6 +1358,11 @@ public class HomeActivity extends AppCompatActivity {
         intent.putExtra(
                 "ROOM_NAME",
                 roomName
+        );
+
+        intent.putExtra(
+                "payment_type",
+                paymentType
         );
 
         startActivity(

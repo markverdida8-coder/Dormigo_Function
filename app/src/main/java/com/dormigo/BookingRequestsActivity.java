@@ -25,6 +25,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -938,6 +940,28 @@ public class BookingRequestsActivity extends AppCompatActivity {
                 )
         );
 
+        int advanceMonths = booking.optInt("advance_months", 1);
+        int depositMonths = booking.optInt("security_deposit_months", 1);
+        double utilityDeposit = parseAmount(booking.optString("utility_deposit", "0"));
+        double otherFees = parseAmount(booking.optString("other_fees", "0"));
+        int paymentDueDay = booking.optInt("payment_due_day", 1);
+        boolean initialCompleted = booking.optBoolean("initial_payment_completed", false);
+        String dbNextDueDate = booking.optString("next_due_date", "");
+
+        double initialPayment = monthlyRent + (monthlyRent * advanceMonths) + (monthlyRent * depositMonths) + utilityDeposit + otherFees;
+        String nextDueDate;
+        if (initialCompleted && dbNextDueDate != null && !dbNextDueDate.isEmpty() && !"null".equals(dbNextDueDate)) {
+            try {
+                SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+                SimpleDateFormat sdf2 = new SimpleDateFormat("MMMM d, yyyy", Locale.US);
+                nextDueDate = sdf2.format(sdf1.parse(dbNextDueDate));
+            } catch (Exception e) {
+                nextDueDate = dbNextDueDate;
+            }
+        } else {
+            nextDueDate = calculateNextDueDate(moveInDate, paymentDueDay);
+        }
+
         addInfoText(
                 card,
                 "Monthly rent: "
@@ -948,10 +972,16 @@ public class BookingRequestsActivity extends AppCompatActivity {
 
         addInfoText(
                 card,
-                "Total amount: "
+                "Initial payment: "
                         + formatMoney(
-                        totalAmount
+                        initialPayment
                 )
+        );
+
+        addInfoText(
+                card,
+                "Next due date: "
+                        + nextDueDate
         );
 
         // =====================================================
@@ -1101,7 +1131,7 @@ public class BookingRequestsActivity extends AppCompatActivity {
 
                 TextView payButton =
                         createTextView(
-                                "Pay Now",
+                                "Proceed to Move-in Payment",
                                 15,
                                 Color.WHITE
                         );
@@ -1756,5 +1786,29 @@ public class BookingRequestsActivity extends AppCompatActivity {
                     return true;
                 }
         );
+    }
+
+    private String calculateNextDueDate(String moveInDate, int dueDay) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+            Calendar cal = Calendar.getInstance();
+            if (moveInDate != null && !moveInDate.isEmpty() && !moveInDate.equals("Not specified")) {
+                cal.setTime(sdf.parse(moveInDate));
+            }
+            cal.set(Calendar.DAY_OF_MONTH, Math.min(dueDay, 28));
+            return new SimpleDateFormat("MMMM d, yyyy", Locale.US).format(cal.getTime());
+        } catch (Exception e) {
+            return "Every " + dueDay + getOrdinalSuffix(dueDay) + " of the month";
+        }
+    }
+
+    private String getOrdinalSuffix(int day) {
+        if (day >= 11 && day <= 13) return "th";
+        switch (day % 10) {
+            case 1: return "st";
+            case 2: return "nd";
+            case 3: return "rd";
+            default: return "th";
+        }
     }
 }

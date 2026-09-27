@@ -937,6 +937,7 @@ public class ApiClient {
             String paymentDate,
             String status,
             String transactionRef,
+            String paymentDescription,
             Callback callback
     ) {
 
@@ -1011,6 +1012,11 @@ public class ApiClient {
                 );
             }
 
+            json.put(
+                    "payment_description",
+                    paymentDescription != null ? paymentDescription : "Monthly Rent"
+            );
+
             RequestBody body =
                     RequestBody.create(
                             json.toString(),
@@ -1033,6 +1039,20 @@ public class ApiClient {
 
             e.printStackTrace();
         }
+    }
+
+    public void createPayment(
+            int bookingId,
+            int paymentPeriod,
+            String dueDate,
+            double amount,
+            String paymentMethod,
+            String paymentDate,
+            String status,
+            String transactionRef,
+            Callback callback
+    ) {
+        createPayment(bookingId, paymentPeriod, dueDate, amount, paymentMethod, paymentDate, status, transactionRef, "Monthly Rent", callback);
     }
 
     // =========================================================
@@ -1680,6 +1700,93 @@ public class ApiClient {
             Request request = new Request.Builder()
                     .url(BASE_URL + "boarding_houses.php")
                     .delete(body)
+                    .build();
+            client.newCall(request).enqueue(callback);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void getNotifications(int userId, Callback callback) {
+        String url = BASE_URL + "notifications.php?user_id=" + userId;
+        Request request = new Request.Builder().url(url).get().build();
+        client.newCall(request).enqueue(callback);
+    }
+
+    public void markNotificationAsRead(int notificationId, Callback callback) {
+        try {
+            JSONObject json = new JSONObject();
+            json.put("notification_id", notificationId);
+            RequestBody body = RequestBody.create(json.toString(), JSON);
+            Request request = new Request.Builder()
+                    .url(BASE_URL + "notifications.php")
+                    .patch(body)
+                    .build();
+            client.newCall(request).enqueue(callback);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void markAllNotificationsAsRead(int userId, Callback callback) {
+        try {
+            JSONObject json = new JSONObject();
+            json.put("user_id", userId);
+            RequestBody body = RequestBody.create(json.toString(), JSON);
+            Request request = new Request.Builder()
+                    .url(BASE_URL + "notifications.php")
+                    .patch(body)
+                    .build();
+            client.newCall(request).enqueue(callback);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteNotification(int notificationId, Callback callback) {
+        try {
+            JSONObject json = new JSONObject();
+            json.put("notification_id", notificationId);
+            RequestBody body = RequestBody.create(json.toString(), JSON);
+            Request request = new Request.Builder()
+                    .url(BASE_URL + "notifications.php")
+                    .delete(body)
+                    .build();
+            client.newCall(request).enqueue(callback);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateBookingInitialPaymentCompleted(int bookingId, String nextDueDate, Callback callback) {
+        try {
+            JSONObject json = new JSONObject();
+            json.put("booking_id", bookingId);
+            json.put("initial_payment_completed", true);
+            json.put("status", "ACTIVE");
+            if (nextDueDate != null && !nextDueDate.isEmpty()) {
+                json.put("next_due_date", nextDueDate);
+            }
+            RequestBody body = RequestBody.create(json.toString(), JSON);
+            Request request = new Request.Builder()
+                    .url(BASE_URL + "bookings.php")
+                    .patch(body)
+                    .build();
+            client.newCall(request).enqueue(callback);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateBookingNextDueDate(int bookingId, String nextDueDate, Callback callback) {
+        try {
+            JSONObject json = new JSONObject();
+            json.put("booking_id", bookingId);
+            json.put("next_due_date", nextDueDate);
+            RequestBody body = RequestBody.create(json.toString(), JSON);
+            Request request = new Request.Builder()
+                    .url(BASE_URL + "bookings.php")
+                    .patch(body)
                     .build();
             client.newCall(request).enqueue(callback);
         } catch (Exception e) {

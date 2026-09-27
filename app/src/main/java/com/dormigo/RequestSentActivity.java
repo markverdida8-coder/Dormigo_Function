@@ -7,12 +7,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class RequestSentActivity extends AppCompatActivity {
 
@@ -28,17 +27,24 @@ public class RequestSentActivity extends AppCompatActivity {
             ViewCompat.setOnApplyWindowInsetsListener(mainLayout, (v, insets) -> {
                 Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
                 v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
-                
-                View bottomNav = findViewById(R.id.bottomNav);
-                if (bottomNav != null) {
-                    bottomNav.setPadding(0, 0, 0, systemBars.bottom);
-                }
                 return insets;
             });
         }
 
         setupUI();
-        setupBottomNavigation();
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                navigateToHome();
+            }
+        });
+    }
+
+    private void navigateToHome() {
+        Intent intent = new Intent(this, HomeActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 
     private void setupUI() {
@@ -76,17 +82,7 @@ public class RequestSentActivity extends AppCompatActivity {
 
         View btnBack = findViewById(R.id.btnBack);
         if (btnBack != null) {
-            btnBack.setOnClickListener(v -> finish());
-        }
-
-        View btnPay = findViewById(R.id.btnPayFee);
-        if (btnPay != null) {
-            btnPay.setOnClickListener(v -> {
-                Intent payIntent = new Intent(this, PaymentActivity.class);
-                payIntent.putExtra("HOUSE_NAME", houseName);
-                payIntent.putExtra("ROOM_NAME", roomName);
-                startActivity(payIntent);
-            });
+            btnBack.setOnClickListener(v -> navigateToHome());
         }
 
         View btnViewRequests = findViewById(R.id.btnViewRequests);
@@ -94,34 +90,14 @@ public class RequestSentActivity extends AppCompatActivity {
             btnViewRequests.setOnClickListener(v -> {
                 Intent requestsIntent = new Intent(this, BookingRequestsActivity.class);
                 startActivity(requestsIntent);
+                finish();
             });
         }
-    }
 
-    @SuppressWarnings("deprecation")
-    private void setupBottomNavigation() {
-        BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
-        bottomNav.setSelectedItemId(R.id.nav_explore); // Highlight Explore for now
-
-        bottomNav.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
-            if (id == R.id.nav_home) {
-                Intent intent = new Intent(this, HomeActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                startActivity(intent);
-                finish();
-                return true;
-            } else if (id == R.id.nav_profile) {
-                Intent intent = new Intent(this, ProfileActivity.class);
-                startActivity(intent);
-                finish();
-                return true;
-            }
-            if (item.getTitle() != null) {
-                showToast(item.getTitle().toString());
-            }
-            return true;
-        });
+        View btnBackHome = findViewById(R.id.btnBackHome);
+        if (btnBackHome != null) {
+            btnBackHome.setOnClickListener(v -> navigateToHome());
+        }
     }
 
     private void showToast(String message) {

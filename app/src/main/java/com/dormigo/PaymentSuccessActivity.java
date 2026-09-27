@@ -48,10 +48,19 @@ public class PaymentSuccessActivity extends AppCompatActivity {
         Intent intent = getIntent();
         String amount = intent.getStringExtra("AMOUNT");
         String displayAmount = (amount != null) ? amount : getString(R.string.total_due_amount);
+        String paymentDesc = intent.getStringExtra("PAYMENT_DESC");
+        if (paymentDesc == null || paymentDesc.isEmpty()) {
+            paymentDesc = "Initial Move-in Payment";
+        }
+
+        TextView titleTypeLabel = findViewById(R.id.titleTypeLabel);
+        if (titleTypeLabel != null) {
+            titleTypeLabel.setText(paymentDesc);
+        }
 
         TextView amountSentLabel = findViewById(R.id.amountSentLabel);
         if (amountSentLabel != null) {
-            amountSentLabel.setText(getString(R.string.amount_sent, displayAmount));
+            amountSentLabel.setText(displayAmount);
         }
 
         // Generate dummy reference

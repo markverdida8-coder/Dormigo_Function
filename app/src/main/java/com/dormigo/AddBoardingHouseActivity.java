@@ -11,10 +11,8 @@ import org.json.JSONArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.view.Gravity;
@@ -37,6 +35,9 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ArrayAdapter;
+import android.text.TextWatcher;
+import android.text.Editable;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -67,6 +68,8 @@ public class AddBoardingHouseActivity extends AppCompatActivity {
         EditText inputRoomCapacity;
         AutoCompleteTextView inputAdvance;
         AutoCompleteTextView inputDeposit;
+        CheckBox checkboxOtherFees;
+        View layoutOtherFeesContainer;
         EditText inputOtherFees;
         EditText inputOtherFeesDesc;
         EditText inputRefundPolicy;
@@ -74,6 +77,7 @@ public class AddBoardingHouseActivity extends AppCompatActivity {
 
         int getAdvanceMonths() {
             String val = inputAdvance.getText().toString();
+            if (val.contains("3")) return 3;
             if (val.contains("2")) return 2;
             if (val.contains("1")) return 1;
             return 0;
@@ -81,6 +85,7 @@ public class AddBoardingHouseActivity extends AppCompatActivity {
 
         int getDepositMonths() {
             String val = inputDeposit.getText().toString();
+            if (val.contains("3")) return 3;
             if (val.contains("2")) return 2;
             if (val.contains("1")) return 1;
             return 0;
@@ -92,12 +97,13 @@ public class AddBoardingHouseActivity extends AppCompatActivity {
                 BigDecimal rent = rentStr.isEmpty() ? BigDecimal.ZERO : new BigDecimal(rentStr);
                 int adv = getAdvanceMonths();
                 int dep = getDepositMonths();
-                String feesStr = inputOtherFees.getText().toString().trim();
+                boolean hasFees = checkboxOtherFees.isChecked();
+                String feesStr = hasFees ? inputOtherFees.getText().toString().trim() : "0";
                 BigDecimal fees = feesStr.isEmpty() ? BigDecimal.ZERO : new BigDecimal(feesStr);
 
                 BigDecimal advTotal = rent.multiply(new BigDecimal(adv));
                 BigDecimal depTotal = rent.multiply(new BigDecimal(dep));
-                BigDecimal total = advTotal.add(depTotal).add(fees);
+                BigDecimal total = rent.add(advTotal).add(depTotal).add(fees);
 
                 textCalculatedTotal.setText("Total Move-in Payment: ₱" + total.setScale(2, RoundingMode.HALF_UP));
             } catch (Exception e) {
@@ -179,11 +185,48 @@ public class AddBoardingHouseActivity extends AppCompatActivity {
 
         setupUtilitySwitch(R.id.switchFreeElectricity, R.id.inputElectricityRate);
         setupUtilitySwitch(R.id.switchFreeWater, R.id.inputWaterRate);
+        setupPaymentSettingsUI();
 
         View btnPublish = findViewById(R.id.btnPublish);
         if (btnPublish != null) {
             ((TextView) btnPublish).setText("Save listing");
             btnPublish.setOnClickListener(v -> confirmSave());
+        }
+    }
+
+    private void setupPaymentSettingsUI() {
+        AutoCompleteTextView dueDay = findViewById(R.id.inputPaymentDueDay);
+        if (dueDay != null) {
+            String[] days = new String[28];
+            for (int i = 1; i <= 28; i++) days[i - 1] = String.valueOf(i);
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                    this, android.R.layout.simple_dropdown_item_1line, days
+            );
+            dueDay.setAdapter(adapter);
+            dueDay.setText("1", false);
+            dueDay.setOnClickListener(v -> dueDay.showDropDown());
+            dueDay.setOnFocusChangeListener((v, hasFocus) -> {
+                if (hasFocus) dueDay.showDropDown();
+            });
+            dueDay.setOnItemClickListener((parent, view, position, id) -> updateDueDayHelper(days[position]));
+        }
+    }
+
+    private void updateDueDayHelper(String dayStr) {
+        TextView helper = findViewById(R.id.textDueDayHelper);
+        if (helper != null) {
+            int day = Integer.parseInt(dayStr);
+            helper.setText("Monthly rent is due every " + day + getOrdinalSuffix(day) + " day of the month.");
+        }
+    }
+
+    private String getOrdinalSuffix(int day) {
+        if (day >= 11 && day <= 13) return "th";
+        switch (day % 10) {
+            case 1: return "st";
+            case 2: return "nd";
+            case 3: return "rd";
+            default: return "th";
         }
     }
 
@@ -202,6 +245,8 @@ public class AddBoardingHouseActivity extends AppCompatActivity {
         holder.inputRoomCapacity = card.findViewById(R.id.inputRoomCapacity);
         holder.inputAdvance = card.findViewById(R.id.inputAdvance);
         holder.inputDeposit = card.findViewById(R.id.inputDeposit);
+        holder.checkboxOtherFees = card.findViewById(R.id.checkboxOtherFees);
+        holder.layoutOtherFeesContainer = card.findViewById(R.id.layoutOtherFeesContainer);
         holder.inputOtherFees = card.findViewById(R.id.inputOtherFees);
         holder.inputOtherFeesDesc = card.findViewById(R.id.inputOtherFeesDesc);
         holder.inputRefundPolicy = card.findViewById(R.id.inputRefundPolicy);
@@ -219,36 +264,40 @@ public class AddBoardingHouseActivity extends AppCompatActivity {
         });
 
         // Setup Advance Options
-        String[] advanceOptions = new String[]{"No Advance Payment", "1 Month Advance", "2 Months Advance"};
+        String[] advanceOptions = new String[]{"1 Month", "2 Months", "3 Months"};
         ArrayAdapter<String> advAdapter = new ArrayAdapter<>(
                 this, android.R.layout.simple_dropdown_item_1line, advanceOptions
         );
         holder.inputAdvance.setAdapter(advAdapter);
-        holder.inputAdvance.setText(advanceOptions[1], false);
+        holder.inputAdvance.setText("1 Month", false);
         holder.inputAdvance.setOnClickListener(v -> holder.inputAdvance.showDropDown());
         holder.inputAdvance.setOnFocusChangeListener((v, hasFocus) -> {
             if (hasFocus) holder.inputAdvance.showDropDown();
         });
 
         // Setup Deposit Options
-        String[] depositOptions = new String[]{"No Security Deposit", "1 Month Deposit", "2 Months Deposit"};
+        String[] depositOptions = new String[]{"1 Month", "2 Months", "3 Months"};
         ArrayAdapter<String> depAdapter = new ArrayAdapter<>(
                 this, android.R.layout.simple_dropdown_item_1line, depositOptions
         );
         holder.inputDeposit.setAdapter(depAdapter);
-        holder.inputDeposit.setText(depositOptions[1], false);
+        holder.inputDeposit.setText("1 Month", false);
         holder.inputDeposit.setOnClickListener(v -> holder.inputDeposit.showDropDown());
         holder.inputDeposit.setOnFocusChangeListener((v, hasFocus) -> {
             if (hasFocus) holder.inputDeposit.showDropDown();
         });
 
+        holder.checkboxOtherFees.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (holder.layoutOtherFeesContainer != null) {
+                holder.layoutOtherFeesContainer.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+            }
+            holder.updateCalculation();
+        });
+
         TextWatcher watcher = new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
-            @Override
-            public void afterTextChanged(Editable s) {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override public void afterTextChanged(Editable s) {
                 holder.updateCalculation();
             }
         };
@@ -264,11 +313,16 @@ public class AddBoardingHouseActivity extends AppCompatActivity {
             holder.inputRoomCapacity.setText(String.valueOf(savedData.optInt("capacity", 1)));
             holder.inputRoomRent.setText(savedData.optString("monthly_rent", ""));
             int adv = savedData.optInt("advance_months", 1);
-            holder.inputAdvance.setText(adv == 2 ? "2 Months Advance" : (adv == 1 ? "1 Month Advance" : "No Advance Payment"), false);
+            holder.inputAdvance.setText(adv + " Month" + (adv > 1 ? "s" : ""), false);
             int dep = savedData.optInt("deposit_months", 1);
-            holder.inputDeposit.setText(dep == 2 ? "2 Months Deposit" : (dep == 1 ? "1 Month Deposit" : "No Security Deposit"), false);
-            holder.inputOtherFees.setText(savedData.optString("other_fees", "0"));
-            holder.inputOtherFeesDesc.setText(savedData.optString("other_fees_description", ""));
+            holder.inputDeposit.setText(dep + " Month" + (dep > 1 ? "s" : ""), false);
+            double fees = savedData.optDouble("other_fees", 0);
+            if (fees > 0) {
+                holder.checkboxOtherFees.setChecked(true);
+                holder.layoutOtherFeesContainer.setVisibility(View.VISIBLE);
+                holder.inputOtherFees.setText(String.valueOf(fees));
+                holder.inputOtherFeesDesc.setText(savedData.optString("other_fees_description", ""));
+            }
             holder.inputRefundPolicy.setText(savedData.optString("deposit_refund_policy", ""));
         }
 
@@ -466,7 +520,9 @@ public class AddBoardingHouseActivity extends AppCompatActivity {
             payload.put("electricity_rate", freeElectricity ? "0.00" : inputText(R.id.inputElectricityRate));
             payload.put("free_water", freeWater);
             payload.put("water_rate", freeWater ? "0.00" : inputText(R.id.inputWaterRate));
-            
+
+            payload.put("payment_due_day", inputText(R.id.inputPaymentDueDay).isEmpty() ? 1 : Integer.parseInt(inputText(R.id.inputPaymentDueDay)));
+
             JSONArray rooms = new JSONArray();
             for (RoomViewHolder h : roomHolders) {
                 JSONObject room = new JSONObject();
@@ -476,9 +532,10 @@ public class AddBoardingHouseActivity extends AppCompatActivity {
                 room.put("monthly_rent", h.inputRoomRent.getText().toString().trim());
                 room.put("advance_months", h.getAdvanceMonths());
                 room.put("deposit_months", h.getDepositMonths());
-                String fees = h.inputOtherFees.getText().toString().trim();
+                boolean hasFees = h.checkboxOtherFees.isChecked();
+                String fees = hasFees ? h.inputOtherFees.getText().toString().trim() : "0.00";
                 room.put("other_fees", fees.isEmpty() ? "0.00" : fees);
-                room.put("other_fees_description", h.inputOtherFeesDesc.getText().toString().trim());
+                room.put("other_fees_description", hasFees ? h.inputOtherFeesDesc.getText().toString().trim() : "");
                 room.put("deposit_refund_policy", h.inputRefundPolicy.getText().toString().trim());
                 room.put("status", "AVAILABLE");
                 rooms.put(room);

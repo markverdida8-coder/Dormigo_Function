@@ -88,6 +88,7 @@ public class LandlordPropertyDetailsActivity extends AppCompatActivity {
         readIntentData();
         setupUI();
         loadVerificationStatus();
+        loadPaymentSettingsSummary();
     }
 
     @Override
@@ -96,6 +97,7 @@ public class LandlordPropertyDetailsActivity extends AppCompatActivity {
         if (houseId > 0) {
             loadRooms();
             loadVerificationStatus();
+            loadPaymentSettingsSummary();
         }
     }
 
@@ -695,5 +697,59 @@ public class LandlordPropertyDetailsActivity extends AppCompatActivity {
 
     private int dp(int value) {
         return Math.round(value * getResources().getDisplayMetrics().density);
+    }
+
+    private void loadPaymentSettingsSummary() {
+        if (houseId <= 0) return;
+        apiClient.getBoardingHouses(new Callback() {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {}
+
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                if (!response.isSuccessful()) return;
+                try {
+                    String body = response.body() != null ? response.body().string() : "";
+                    JSONObject json = new JSONObject(body);
+                    if (json.optBoolean("success", false)) {
+                        JSONArray data = json.optJSONArray("data");
+                        if (data != null) {
+                            for (int i = 0; i < data.length(); i++) {
+                                JSONObject h = data.getJSONObject(i);
+                                if (h.optInt("house_id", 0) == houseId) {
+                                    int adv = h.optInt("advance_months", 1);
+                                    int dep = h.optInt("security_deposit_months", 1);
+                                    double util = h.optDouble("utility_deposit", 0);
+                                    double fees = h.optDouble("other_fees", 0);
+                                    int dueDay = h.optInt("payment_due_day", 1);
+
+                                    String summary = "Advance: " + adv + " Month" + (adv > 1 ? "s" : "") + "\n" +
+                                                     "Security Deposit: " + dep + " Month" + (dep > 1 ? "s" : "") + "\n" +
+                                                     "Utility Deposit: ₱" + String.format(Locale.US, "%.2f", util) + "\n" +
+                                                     "Other Fees: ₱" + String.format(Locale.US, "%.2f", fees) + "\n" +
+                                                     "Monthly Due Day: Every " + dueDay + getOrdinalSuffix(dueDay) + " day";
+
+                                    runOnUiThread(() -> {
+                                        TextView tv = findViewById(R.id.textPaymentSettingsSummary);
+                                        if (tv != null) tv.setText(summary);
+                                    });
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                } catch (Exception ignored) {}
+            }
+        });
+    }
+
+    private String getOrdinalSuffix(int day) {
+        if (day >= 11 && day <= 13) return "th";
+        switch (day % 10) {
+            case 1: return "st";
+            case 2: return "nd";
+            case 3: return "rd";
+            default: return "th";
+        }
     }
 }
