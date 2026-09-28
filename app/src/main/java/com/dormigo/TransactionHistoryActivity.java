@@ -2,23 +2,23 @@ package com.dormigo;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import org.json.JSONArray;
@@ -34,16 +34,20 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
-public class TransactionHistoryActivity extends AppCompatActivity {
+public class TransactionHistoryActivity extends AppCompatActivity implements TransactionAdapter.OnTransactionClickListener {
 
     private ApiClient apiClient;
     private int userId;
     private final List<JSONObject> transactionList = new ArrayList<>();
+    private final List<JSONObject> filteredList = new ArrayList<>();
     private String currentFilter = "ALL";
 
     private TextView totalPaidAmount;
+    private TextView textSummaryCount;
+    private TextView textSummaryLastDate;
     private TextView txStatus;
-    private LinearLayout transactionsContainer;
+    private RecyclerView recyclerView;
+    private TransactionAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +60,6 @@ public class TransactionHistoryActivity extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences("DormigoPrefs", MODE_PRIVATE);
         userId = prefs.getInt("userId", -1);
 
-        // Adjust for system bars
         View mainLayout = findViewById(R.id.mainLayout);
         if (mainLayout != null) {
             ViewCompat.setOnApplyWindowInsetsListener(mainLayout, (v, insets) -> {
@@ -71,14 +74,20 @@ public class TransactionHistoryActivity extends AppCompatActivity {
             });
         }
 
-        totalPaidAmount = findViewById(R.id.totalPaidAmount);
-        txStatus = findViewById(R.id.txStatus);
-        transactionsContainer = findViewById(R.id.transactionsContainer);
-
+        bindViews();
         setupUI();
+        setupRecyclerView();
         setupBottomNavigation();
         setupFilters();
         loadTransactions();
+    }
+
+    private void bindViews() {
+        totalPaidAmount = findViewById(R.id.totalPaidAmount);
+        textSummaryCount = findViewById(R.id.textSummaryCount);
+        textSummaryLastDate = findViewById(R.id.textSummaryLastDate);
+        txStatus = findViewById(R.id.txStatus);
+        recyclerView = findViewById(R.id.recyclerViewTransactions);
     }
 
     private void setupUI() {
@@ -91,6 +100,16 @@ public class TransactionHistoryActivity extends AppCompatActivity {
         if (btnDownload != null) {
             btnDownload.setOnClickListener(v -> showToast("Downloading report..."));
         }
+    }
+
+    private void setupRecyclerView() {
+        if (recyclerView == null) return;
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+
+        adapter = new TransactionAdapter(this, filteredList, this);
+        recyclerView.setAdapter(adapter);
     }
 
     private void setupFilters() {
@@ -151,7 +170,7 @@ public class TransactionHistoryActivity extends AppCompatActivity {
 
         apiClient.getPaymentsForUser(userId, new Callback() {
             @Override
-            public void onFailure(Call call, IOException e) {
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 runOnUiThread(() -> {
                     if (txStatus != null) {
                         txStatus.setVisibility(View.VISIBLE);
@@ -161,8 +180,8 @@ public class TransactionHistoryActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (!response.isSuccessful()) {
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                if (!response.isSuccessful() || response.body() == null) {
                     runOnUiThread(() -> {
                         if (txStatus != null) {
                             txStatus.setVisibility(View.VISIBLE);
@@ -180,26 +199,41 @@ public class TransactionHistoryActivity extends AppCompatActivity {
 
                     List<JSONObject> loaded = new ArrayList<>();
                     double totalPaid = 0.0;
+                    int successCount = 0;
+                    String lastDate = "";
 
                     if (success && data != null) {
                         for (int i = 0; i < data.length(); i++) {
                             JSONObject obj = data.getJSONObject(i);
                             loaded.add(obj);
 
-                            String status = obj.optString("status", "").toUpperCase();
+                            String status = obj.optString("status", "").toUpperCase(Locale.ROOT);
                             if ("PAID".equals(status) || "CONFIRMED".equals(status)) {
                                 totalPaid += obj.optDouble("amount", 0.0);
+                                successCount++;
+                                if (lastDate.isEmpty()) {
+                                    lastDate = obj.optString("payment_date", obj.optString("due_date", "Recent"));
+                                }
                             }
                         }
                     }
 
                     final double finalTotal = totalPaid;
+                    final int finalCount = successCount;
+                    final String finalLastDate = lastDate;
+
                     runOnUiThread(() -> {
                         transactionList.clear();
                         transactionList.addAll(loaded);
 
                         if (totalPaidAmount != null) {
                             totalPaidAmount.setText("₱" + NumberFormat.getNumberInstance(Locale.US).format(finalTotal));
+                        }
+                        if (textSummaryCount != null) {
+                            textSummaryCount.setText(finalCount + " successful payment" + (finalCount == 1 ? "" : "s"));
+                        }
+                        if (textSummaryLastDate != null) {
+                            textSummaryLastDate.setText("Last payment: " + (finalLastDate.isEmpty() ? "None" : TransactionAdapter.getRelativeTimeSpanString(finalLastDate)));
                         }
 
                         renderTransactions();
@@ -219,191 +253,111 @@ public class TransactionHistoryActivity extends AppCompatActivity {
     }
 
     private void renderTransactions() {
-        if (transactionsContainer == null) return;
-        transactionsContainer.removeAllViews();
+        filteredList.clear();
 
-        List<JSONObject> filtered = new ArrayList<>();
         for (JSONObject obj : transactionList) {
-            String status = obj.optString("status", "").toUpperCase();
+            String status = obj.optString("status", "").toUpperCase(Locale.ROOT);
             if ("ALL".equals(currentFilter)) {
-                filtered.add(obj);
+                filteredList.add(obj);
             } else if ("PAID".equals(currentFilter)) {
                 if ("PAID".equals(status) || "CONFIRMED".equals(status)) {
-                    filtered.add(obj);
+                    filteredList.add(obj);
                 }
             } else if ("PENDING".equals(currentFilter)) {
                 if ("PENDING".equals(status)) {
-                    filtered.add(obj);
+                    filteredList.add(obj);
                 }
             } else if ("FAILED".equals(currentFilter)) {
                 if ("FAILED".equals(status) || "CANCELLED".equals(status) || "REJECTED".equals(status)) {
-                    filtered.add(obj);
+                    filteredList.add(obj);
                 }
             }
         }
 
-        if (filtered.isEmpty()) {
+        if (adapter != null) {
+            adapter.notifyDataSetChanged();
+        }
+
+        if (filteredList.isEmpty()) {
             if (txStatus != null) {
                 txStatus.setVisibility(View.VISIBLE);
                 txStatus.setText("No transactions found.");
             }
-            return;
-        }
-
-        if (txStatus != null) {
-            txStatus.setVisibility(View.GONE);
-        }
-
-        for (JSONObject tx : filtered) {
-            View card = createTransactionCard(tx);
-            transactionsContainer.addView(card);
+        } else {
+            if (txStatus != null) {
+                txStatus.setVisibility(View.GONE);
+            }
         }
     }
 
-    private View createTransactionCard(JSONObject tx) {
-        LinearLayout card = new LinearLayout(this);
-        card.setOrientation(LinearLayout.VERTICAL);
-        card.setBackgroundResource(R.drawable.bg_card_rounded);
-        int pad = dpToPx(16);
-        card.setPadding(pad, pad, pad, pad);
-        LinearLayout.LayoutParams cardLp = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-        );
-        cardLp.bottomMargin = dpToPx(12);
-        card.setLayoutParams(cardLp);
+    @Override
+    public void onTransactionClick(JSONObject tx, int position) {
+        showPaymentDetailsDialog(tx);
+    }
 
-        // Header row: Title (left) & Amount (right)
-        LinearLayout headerRow = new LinearLayout(this);
-        headerRow.setOrientation(LinearLayout.HORIZONTAL);
-        headerRow.setGravity(Gravity.CENTER_VERTICAL);
+    private void showPaymentDetailsDialog(JSONObject tx) {
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
+        View view = getLayoutInflater().inflate(R.layout.dialog_payment_details, findViewById(R.id.mainLayout), false);
+        bottomSheetDialog.setContentView(view);
 
-        TextView tvTitle = new TextView(this);
-        String period = tx.optString("payment_period", "");
-        if (period.isEmpty() || period.matches("\\d+")) {
-            tvTitle.setText("Monthly Rent");
-        } else {
-            tvTitle.setText(period);
-        }
-        tvTitle.setTextColor(0xFF1A1A1A);
-        tvTitle.setTextSize(15);
-        tvTitle.setTypeface(null, Typeface.BOLD);
-        LinearLayout.LayoutParams titleLp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1.0f);
-        tvTitle.setLayoutParams(titleLp);
-        headerRow.addView(tvTitle);
+        TextView dialogAmountText = view.findViewById(R.id.dialogAmountText);
+        TextView dialogStatusBadge = view.findViewById(R.id.dialogStatusBadge);
+        TextView dialogTitleText = view.findViewById(R.id.dialogTitleText);
+        TextView dialogHouseRoomText = view.findViewById(R.id.dialogHouseRoomText);
+        TextView dialogMethodText = view.findViewById(R.id.dialogMethodText);
+        TextView dialogDateText = view.findViewById(R.id.dialogDateText);
+        TextView dialogRefText = view.findViewById(R.id.dialogRefText);
+        TextView btnCloseDialog = view.findViewById(R.id.btnCloseDialog);
 
-        TextView tvAmount = new TextView(this);
         double amt = tx.optDouble("amount", 0.0);
-        tvAmount.setText("₱" + NumberFormat.getNumberInstance(Locale.US).format(amt));
-        tvAmount.setTextColor(0xFF1A1A1A);
-        tvAmount.setTextSize(15);
-        tvAmount.setTypeface(null, Typeface.BOLD);
-        headerRow.addView(tvAmount);
-
-        card.addView(headerRow);
-
-        // House & Room Info
-        TextView tvHouse = new TextView(this);
+        String period = tx.optString("payment_description", tx.optString("payment_period", "Monthly Rent"));
         String houseName = tx.optString("house_name", "Boarding House");
         String roomNumber = tx.optString("room_number", "");
-        String roomType = tx.optString("room_type", "");
-        StringBuilder houseInfo = new StringBuilder(houseName);
-        if (!roomNumber.isEmpty()) {
-            houseInfo.append(" · Room ").append(roomNumber);
-        }
-        if (!roomType.isEmpty()) {
-            houseInfo.append(" (").append(roomType).append(")");
-        }
-        tvHouse.setText(houseInfo.toString());
-        tvHouse.setTextColor(0xFF9A9A9E);
-        tvHouse.setTextSize(13);
-        LinearLayout.LayoutParams houseLp = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-        );
-        houseLp.topMargin = dpToPx(4);
-        tvHouse.setLayoutParams(houseLp);
-        card.addView(tvHouse);
+        String method = tx.optString("payment_method", "Payment Method");
+        String dateStr = tx.optString("payment_date", tx.optString("due_date", "Recent"));
+        String ref = tx.optString("transaction_ref", "");
+        String status = tx.optString("status", "PENDING").toUpperCase(Locale.ROOT);
 
-        // Divider
-        View divider = new View(this);
-        divider.setBackgroundColor(0xFFEFEFEF);
-        LinearLayout.LayoutParams divLp = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                dpToPx(1)
-        );
-        divLp.topMargin = dpToPx(16);
-        divider.setLayoutParams(divLp);
-        card.addView(divider);
-
-        // Bottom row: Info (date & ref) + Status badge
-        LinearLayout bottomRow = new LinearLayout(this);
-        bottomRow.setOrientation(LinearLayout.HORIZONTAL);
-        bottomRow.setGravity(Gravity.CENTER_VERTICAL);
-        LinearLayout.LayoutParams bRowLp = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-        );
-        bRowLp.topMargin = dpToPx(16);
-        bottomRow.setLayoutParams(bRowLp);
-
-        // Left info column
-        LinearLayout infoCol = new LinearLayout(this);
-        infoCol.setOrientation(LinearLayout.VERTICAL);
-        LinearLayout.LayoutParams infoColLp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1.0f);
-        infoCol.setLayoutParams(infoColLp);
-
-        TextView tvDate = new TextView(this);
-        String date = tx.optString("payment_date", tx.optString("due_date", "Recent"));
-        String method = tx.optString("payment_method", "Payment");
-        tvDate.setText(date + " · " + method);
-        tvDate.setTextColor(0xFF9A9A9E);
-        tvDate.setTextSize(12);
-        infoCol.addView(tvDate);
-
-        TextView tvRef = new TextView(this);
-        String ref = tx.optString("transaction_ref", "BHF-" + tx.optInt("payment_id"));
-        tvRef.setText("Ref: " + ref);
-        tvRef.setTextColor(0xFF9A9A9E);
-        tvRef.setTextSize(12);
-        LinearLayout.LayoutParams refLp = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-        );
-        refLp.topMargin = dpToPx(2);
-        tvRef.setLayoutParams(refLp);
-        infoCol.addView(tvRef);
-
-        bottomRow.addView(infoCol);
-
-        // Right status badge
-        TextView tvStatusBadge = new TextView(this);
-        String status = tx.optString("status", "PENDING").toUpperCase();
-        tvStatusBadge.setText(status);
-        tvStatusBadge.setTextSize(11);
-        tvStatusBadge.setTypeface(null, Typeface.BOLD);
-        tvStatusBadge.setPadding(dpToPx(12), dpToPx(6), dpToPx(12), dpToPx(6));
-        tvStatusBadge.setCompoundDrawablePadding(dpToPx(6));
-
-        if ("PAID".equals(status) || "CONFIRMED".equals(status)) {
-            tvStatusBadge.setBackgroundColor(0xFFF2F9F7);
-            tvStatusBadge.setTextColor(0xFF1B5E4C);
-            tvStatusBadge.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_verified, 0, 0, 0);
-            tvStatusBadge.getCompoundDrawables()[0].setTint(0xFF1B5E4C);
-        } else if ("PENDING".equals(status)) {
-            tvStatusBadge.setBackgroundResource(R.drawable.bg_info_box);
-            tvStatusBadge.setTextColor(0xFF6E6E73);
-            tvStatusBadge.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_bell, 0, 0, 0);
-            tvStatusBadge.getCompoundDrawables()[0].setTint(0xFF6E6E73);
-        } else {
-            tvStatusBadge.setBackgroundColor(0xFFFEEAEA);
-            tvStatusBadge.setTextColor(0xFFC53030);
+        if (dialogAmountText != null) {
+            dialogAmountText.setText("₱" + NumberFormat.getNumberInstance(Locale.US).format(amt));
         }
 
-        bottomRow.addView(tvStatusBadge);
-        card.addView(bottomRow);
+        if (dialogStatusBadge != null) {
+            dialogStatusBadge.setText(status);
+            if ("PAID".equals(status) || "CONFIRMED".equals(status)) {
+                dialogStatusBadge.setBackgroundResource(R.drawable.bg_circle_green_light);
+                dialogStatusBadge.setTextColor(0xFF1B5E4C);
+            } else if ("PENDING".equals(status)) {
+                dialogStatusBadge.setBackgroundResource(R.drawable.bg_circle_orange);
+                dialogStatusBadge.setTextColor(0xFFFD7E14);
+            } else {
+                dialogStatusBadge.setBackgroundColor(0xFFFEEAEA);
+                dialogStatusBadge.setTextColor(0xFFC53030);
+            }
+        }
 
-        return card;
+        if (dialogTitleText != null) dialogTitleText.setText(period);
+        if (dialogHouseRoomText != null) {
+            dialogHouseRoomText.setText(houseName + (roomNumber.isEmpty() ? "" : " · Room " + roomNumber));
+        }
+        if (dialogMethodText != null) dialogMethodText.setText(method);
+        if (dialogDateText != null) dialogDateText.setText(dateStr);
+
+        if (dialogRefText != null) {
+            if (ref == null || ref.trim().isEmpty() || ref.equalsIgnoreCase("null")) {
+                dialogRefText.setText("Reference unavailable");
+                dialogRefText.setTextColor(0xFF9A9A9E);
+            } else {
+                dialogRefText.setText(ref.trim());
+                dialogRefText.setTextColor(0xFF1B5E4C);
+            }
+        }
+
+        if (btnCloseDialog != null) {
+            btnCloseDialog.setOnClickListener(v -> bottomSheetDialog.dismiss());
+        }
+
+        bottomSheetDialog.show();
     }
 
     private void setupBottomNavigation() {
@@ -432,10 +386,6 @@ public class TransactionHistoryActivity extends AppCompatActivity {
             }
             return true;
         });
-    }
-
-    private int dpToPx(int dp) {
-        return Math.round(dp * getResources().getDisplayMetrics().density);
     }
 
     private void showToast(String message) {

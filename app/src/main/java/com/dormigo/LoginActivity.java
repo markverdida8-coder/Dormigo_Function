@@ -313,6 +313,26 @@ public class LoginActivity extends AppCompatActivity {
                                             serverIsStudent
                                     );
 
+                                    editor.putBoolean(
+                                            "isLandlord",
+                                            !serverIsStudent && !isAdmin
+                                    );
+
+                                    editor.putString(
+                                            "userType",
+                                            userType
+                                    );
+
+                                    editor.putString(
+                                            "user_type",
+                                            userType
+                                    );
+
+                                    editor.putString(
+                                            "role",
+                                            userType
+                                    );
+
                                     editor.putInt(
                                             "userId",
                                             userId
@@ -333,7 +353,14 @@ public class LoginActivity extends AppCompatActivity {
                                             phone
                                     );
 
+                                    String authToken = json.optString("token", "").trim();
+                                    if (!authToken.isEmpty()) {
+                                        editor.putString("authToken", authToken);
+                                    }
+
                                     editor.apply();
+
+                                    ApiClient.init(getApplicationContext());
 
                                     // Navigate to the correct
                                     // existing home screen

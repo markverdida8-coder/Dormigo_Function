@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Dormigo</string>
+    <string name="app_version">Version 1.0.0-rc1</string>
     <string name="already_have_account">Already have an account? </string>
     <string name="sign_in">Sign in</string>
     <string name="new_here">New here? </string>

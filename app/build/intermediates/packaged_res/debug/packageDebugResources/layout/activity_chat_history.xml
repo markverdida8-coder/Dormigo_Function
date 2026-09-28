@@ -81,9 +81,10 @@
 
                 <EditText
                     android:id="@+id/chatSearchInput"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_marginStart="8dp"
+                    android:layout_weight="1"
                     android:background="@android:color/transparent"
                     android:hint="@string/search_landlord_house"
                     android:imeOptions="actionSearch"
@@ -93,16 +94,29 @@
                     android:textColorHint="#9A9A9E"
                     android:textSize="14sp"
                     android:autofillHints="none" />
+
+                <ImageView
+                    android:id="@+id/btnClearSearch"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="8dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:contentDescription="Clear search"
+                    android:focusable="true"
+                    android:src="@drawable/ic_close"
+                    android:visibility="gone"
+                    app:tint="#9A9A9E" />
             </LinearLayout>
 
-            <!-- Chat List Container -->
-            <LinearLayout
-                android:id="@+id/chatListContainer"
+            <!-- Chat List RecyclerView -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewChats"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:background="@drawable/bg_chat_list_container"
-                android:orientation="vertical" />
+                android:layout_marginTop="16dp"
+                android:clipToPadding="false"
+                android:nestedScrollingEnabled="false" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

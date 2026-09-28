@@ -273,12 +273,26 @@
                     android:focusable="true"
                     android:background="@drawable/bg_card_rounded">
 
-                    <ImageView
-                        android:layout_width="22dp"
-                        android:layout_height="22dp"
-                        android:src="@drawable/ic_inbox"
-                        app:tint="#1A1A1A"
-                        android:contentDescription="@string/desc_requests" />
+                    <FrameLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:src="@drawable/ic_inbox"
+                            app:tint="#1A1A1A"
+                            android:contentDescription="@string/desc_requests" />
+
+                        <View
+                            android:id="@+id/badgeRequests"
+                            android:layout_width="7dp"
+                            android:layout_height="7dp"
+                            android:layout_gravity="top|end"
+                            android:background="@drawable/bg_dot_orange"
+                            android:visibility="gone" />
+
+                    </FrameLayout>
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -290,6 +304,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/textRequestsCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
@@ -324,10 +339,12 @@
                             android:contentDescription="@string/desc_chats" />
 
                         <View
+                            android:id="@+id/badgeChats"
                             android:layout_width="7dp"
                             android:layout_height="7dp"
                             android:layout_gravity="top|end"
-                            android:background="@drawable/bg_dot_orange" />
+                            android:background="@drawable/bg_dot_orange"
+                            android:visibility="gone" />
 
                     </FrameLayout>
 
@@ -341,6 +358,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/textChatsCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
@@ -363,12 +381,26 @@
                     android:focusable="true"
                     android:background="@drawable/bg_card_rounded">
 
-                    <ImageView
-                        android:layout_width="22dp"
-                        android:layout_height="22dp"
-                        android:src="@drawable/ic_document"
-                        app:tint="#1A1A1A"
-                        android:contentDescription="@string/desc_history" />
+                    <FrameLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:src="@drawable/ic_document"
+                            app:tint="#1A1A1A"
+                            android:contentDescription="@string/desc_history" />
+
+                        <View
+                            android:id="@+id/badgeHistory"
+                            android:layout_width="7dp"
+                            android:layout_height="7dp"
+                            android:layout_gravity="top|end"
+                            android:background="@drawable/bg_dot_orange"
+                            android:visibility="gone" />
+
+                    </FrameLayout>
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -380,6 +412,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/textHistoryCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"

@@ -41,8 +41,13 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
+import android.graphics.Color;
+import android.view.Gravity;
+import android.widget.LinearLayout;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -71,6 +76,16 @@ public class BoardingHouseListingsActivity extends AppCompatActivity {
     private String currentMaxBudget = "";
     private String currentRoomType = "";
     private SwipeRefreshLayout swipeRefreshLayout;
+
+    private final Set<String> selectedFilterAmenities = new HashSet<>();
+    private static final String[] EXPANDED_AMENITIES = new String[]{
+            "Wi-Fi", "Air Conditioning", "Electric Fan", "Private Bathroom",
+            "Shared Bathroom", "Hot Shower", "Kitchen Access", "Refrigerator",
+            "Drinking Water", "Study Table", "Chair", "Cabinet / Closet",
+            "Laundry Area", "Parking", "CCTV", "24/7 Security",
+            "Visitors Allowed", "Pet Friendly", "Balcony", "Generator Backup"
+    };
+
     // ---------------------------------------------------------
     // Boarding House model
     // ---------------------------------------------------------
@@ -85,6 +100,7 @@ public class BoardingHouseListingsActivity extends AppCompatActivity {
         String houseRules;
         String status;
         String firstPhoto = "";
+        Set<String> houseAmenities = new HashSet<>();
     }
 
     // ---------------------------------------------------------
@@ -343,6 +359,7 @@ public class BoardingHouseListingsActivity extends AppCompatActivity {
                                 boardingHouses.add(
                                         house
                                 );
+                                loadHouseAmenities(house);
                             }
                         }
 
@@ -622,7 +639,7 @@ public class BoardingHouseListingsActivity extends AppCompatActivity {
 
             if (houseImages[index] != null) {
                 if (house.firstPhoto != null && !house.firstPhoto.isEmpty()) {
-                    String imgUrl = "http://10.129.224.109/Dormigo_Backend/" + house.firstPhoto;
+                    String imgUrl = "http://10.149.229.109/Dormigo_Backend/" + house.firstPhoto;
                     Glide.with(this)
                             .load(imgUrl)
                             .placeholder(R.drawable.bg_image_placeholder)
@@ -1067,10 +1084,21 @@ public class BoardingHouseListingsActivity extends AppCompatActivity {
                             currentRoomType
                     );
 
+            boolean amenityMatch = true;
+            if (!selectedFilterAmenities.isEmpty()) {
+                for (String reqAmenity : selectedFilterAmenities) {
+                    if (!houseContainsAmenity(house, reqAmenity)) {
+                        amenityMatch = false;
+                        break;
+                    }
+                }
+            }
+
             boolean visible =
                     searchMatch
                             && priceMatch
-                            && typeMatch;
+                            && typeMatch
+                            && amenityMatch;
 
             if (cards[i] != null) {
 
@@ -1566,6 +1594,7 @@ public class BoardingHouseListingsActivity extends AppCompatActivity {
                 currentMinBudget = "";
                 currentMaxBudget = "";
                 currentRoomType = "";
+                selectedFilterAmenities.clear();
 
                 int[] chipIds = {
                         R.id.chipSingle,
@@ -1573,10 +1602,7 @@ public class BoardingHouseListingsActivity extends AppCompatActivity {
                         R.id.chipStudio,
                         R.id.chip500m,
                         R.id.chip1km,
-                        R.id.chipAnyDistance,
-                        R.id.chipWifi,
-                        R.id.chipAircon,
-                        R.id.chipParking
+                        R.id.chipAnyDistance
                 };
 
                 for (int id : chipIds) {
@@ -1598,6 +1624,7 @@ public class BoardingHouseListingsActivity extends AppCompatActivity {
                     }
                 }
 
+                populateAmenitiesFilterContainer(view, updateFilters);
                 applyAllCurrentFilters();
 
                 showToast(
@@ -1622,15 +1649,94 @@ public class BoardingHouseListingsActivity extends AppCompatActivity {
                 R.id.chipAnyDistance
         );
 
-        setupMultiChipSelection(
-                view,
-                updateFilters,
-                R.id.chipWifi,
-                R.id.chipAircon,
-                R.id.chipParking
-        );
+        populateAmenitiesFilterContainer(view, updateFilters);
 
         dialog.show();
+    }
+
+    private void populateAmenitiesFilterContainer(View filterView, Runnable updateFilters) {
+        LinearLayout container = filterView.findViewById(R.id.filterAmenitiesContainer);
+        if (container == null) return;
+        container.removeAllViews();
+
+        LinearLayout currentRow = null;
+        for (int i = 0; i < EXPANDED_AMENITIES.length; i++) {
+            final String amenityName = EXPANDED_AMENITIES[i];
+
+            if (i % 2 == 0) {
+                currentRow = new LinearLayout(this);
+                currentRow.setOrientation(LinearLayout.HORIZONTAL);
+                LinearLayout.LayoutParams rParams = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                rParams.bottomMargin = dp(8);
+                currentRow.setLayoutParams(rParams);
+                container.addView(currentRow);
+            }
+
+            TextView chip = new TextView(this);
+            LinearLayout.LayoutParams cParams = new LinearLayout.LayoutParams(0, dp(40), 1f);
+            if (i % 2 == 1) cParams.setMarginStart(dp(8));
+            chip.setLayoutParams(cParams);
+            chip.setGravity(Gravity.CENTER);
+            chip.setText(amenityName);
+            chip.setTextSize(12);
+
+            boolean isSelected = selectedFilterAmenities.contains(amenityName.toLowerCase(Locale.ROOT));
+            chip.setSelected(isSelected);
+            chip.setBackgroundResource(R.drawable.bg_chip_selectable);
+            chip.setTextColor(isSelected ? Color.WHITE : Color.parseColor("#1A1A1A"));
+
+            chip.setOnClickListener(v -> {
+                boolean newSel = !chip.isSelected();
+                chip.setSelected(newSel);
+                chip.setTextColor(newSel ? Color.WHITE : Color.parseColor("#1A1A1A"));
+                if (newSel) {
+                    selectedFilterAmenities.add(amenityName.toLowerCase(Locale.ROOT));
+                } else {
+                    selectedFilterAmenities.remove(amenityName.toLowerCase(Locale.ROOT));
+                }
+                if (updateFilters != null) updateFilters.run();
+            });
+
+            if (currentRow != null) currentRow.addView(chip);
+        }
+    }
+
+    private void loadHouseAmenities(BoardingHouseItem house) {
+        if (house == null || house.houseId <= 0) return;
+        apiClient.getBoardingHouseAmenities(house.houseId, new Callback() {
+            @Override public void onFailure(@NonNull Call call, @NonNull IOException e) {}
+            @Override public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                if (!response.isSuccessful() || response.body() == null) return;
+                try {
+                    String body = response.body().string();
+                    JSONArray arr = extractDataArray(body);
+                    if (arr != null) {
+                        for (int i = 0; i < arr.length(); i++) {
+                            JSONObject obj = arr.optJSONObject(i);
+                            if (obj != null) {
+                                String aName = obj.optString("amenity_name", "").trim();
+                                if (!aName.isEmpty()) {
+                                    house.houseAmenities.add(aName.toLowerCase(Locale.ROOT));
+                                }
+                            }
+                        }
+                    }
+                    runOnUiThread(() -> applyAllCurrentFilters());
+                } catch (Exception ignored) {}
+            }
+        });
+    }
+
+    private boolean houseContainsAmenity(BoardingHouseItem house, String requiredAmenity) {
+        if (house == null || house.houseAmenities == null || requiredAmenity == null) return false;
+        String req = requiredAmenity.toLowerCase(Locale.ROOT).trim();
+        for (String a : house.houseAmenities) {
+            if (a.contains(req) || req.contains(a)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // ---------------------------------------------------------
@@ -2025,5 +2131,25 @@ public class BoardingHouseListingsActivity extends AppCompatActivity {
                 message,
                 Toast.LENGTH_SHORT
         ).show();
+    }
+
+    private int dp(int value) {
+        return Math.round(value * getResources().getDisplayMetrics().density);
+    }
+
+    private JSONArray extractDataArray(String body) throws Exception {
+        if (body == null || body.trim().isEmpty()) {
+            return new JSONArray();
+        }
+        String trimmed = body.trim();
+        if (trimmed.startsWith("[")) {
+            return new JSONArray(trimmed);
+        }
+        JSONObject json = new JSONObject(trimmed);
+        JSONArray data = json.optJSONArray("data");
+        if (data != null) {
+            return data;
+        }
+        return new JSONArray();
     }
 }

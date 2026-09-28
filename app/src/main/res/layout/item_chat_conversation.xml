@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/cardRoot"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingHorizontal="16dp"
+    android:paddingVertical="12dp">
+
+    <!-- Avatar with Online Indicator Frame -->
+    <FrameLayout
+        android:layout_width="52dp"
+        android:layout_height="52dp">
+
+        <!-- User Avatar Circle -->
+        <TextView
+            android:id="@+id/textAvatar"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center"
+            android:background="@drawable/bg_circle_green_light"
+            android:gravity="center"
+            android:text="ST"
+            android:textColor="#1B5E4C"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <!-- Online / Active Status Dot -->
+        <View
+            android:id="@+id/onlineIndicator"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="2dp"
+            android:layout_marginBottom="2dp"
+            android:background="@drawable/bg_dot_orange"
+            android:visibility="gone" />
+
+    </FrameLayout>
+
+    <!-- Text Column (Name, Last Message Preview) -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="14dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <!-- Contact Name -->
+        <TextView
+            android:id="@+id/textContactName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="#1A1A1A"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <!-- Last Message Preview -->
+        <TextView
+            android:id="@+id/textLastMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="#6E6E73"
+            android:textSize="13sp" />
+
+    </LinearLayout>
+
+    <!-- Right Metadata Column (Time, Unread Badge, Unread Dot) -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:gravity="end"
+        android:orientation="vertical">
+
+        <!-- Relative Time -->
+        <TextView
+            android:id="@+id/textRelativeTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#9A9A9E"
+            android:textSize="12sp" />
+
+        <!-- Unread Badge / Green Dot Row -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <!-- Unread Count Badge (e.g. "1") -->
+            <TextView
+                android:id="@+id/textUnreadBadge"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:background="@drawable/bg_dot_orange"
+                android:gravity="center"
+                android:textColor="#FFFFFF"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
+            <!-- Unread Green Dot -->
+            <View
+                android:id="@+id/unreadGreenDot"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:layout_marginStart="4dp"
+                android:background="@drawable/bg_dot_orange"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

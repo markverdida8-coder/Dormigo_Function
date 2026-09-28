@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.dormigo"
     android:versionCode="1"
-    android:versionName="1.0" >
+    android:versionName="1.0.0-rc1" >
 
     <uses-sdk
         android:minSdkVersion="24"
@@ -42,6 +42,7 @@
     <uses-permission android:name="com.dormigo.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
 
     <application
+        android:name="com.dormigo.DormigoApplication"
         android:allowBackup="true"
         android:appComponentFactory="androidx.core.app.CoreComponentFactory"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -70,6 +71,10 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
+            android:name="com.dormigo.AdminVerificationActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
             android:name="com.dormigo.AdminVerificationDetailActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
@@ -82,6 +87,14 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
+            android:name="com.dormigo.LandlordProfileViewActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name="com.dormigo.TenantProfileViewActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
             android:name="com.dormigo.CreateAccountActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
@@ -91,6 +104,14 @@
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name="com.dormigo.ForgotPasswordActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name="com.dormigo.VerifyOtpActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name="com.dormigo.ResetPasswordActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
@@ -146,6 +167,10 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
+            android:name="com.dormigo.LandlordReviewsActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
             android:name="com.dormigo.WriteReviewActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
@@ -195,6 +220,10 @@
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name="com.dormigo.LandlordPaymentMethodsActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name="com.dormigo.LandlordRentalChargesActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity

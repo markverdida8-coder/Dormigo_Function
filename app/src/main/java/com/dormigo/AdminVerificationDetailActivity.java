@@ -2,6 +2,7 @@ package com.dormigo;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -16,8 +17,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-
-import com.bumptech.glide.Glide;
 
 import org.json.JSONObject;
 
@@ -34,7 +33,6 @@ import okhttp3.Response;
 public class AdminVerificationDetailActivity extends AppCompatActivity {
 
     private int verificationId;
-    private int houseId;
     private int adminId;
 
     @Override
@@ -70,41 +68,28 @@ public class AdminVerificationDetailActivity extends AppCompatActivity {
     private void readIntentAndDisplay() {
         Intent intent = getIntent();
         verificationId = intent.getIntExtra("VERIFICATION_ID", 0);
-        houseId = intent.getIntExtra("HOUSE_ID", 0);
-        String houseName = intent.getStringExtra("HOUSE_NAME");
-        String address = intent.getStringExtra("HOUSE_ADDRESS");
         String landlordName = intent.getStringExtra("LANDLORD_NAME");
         String email = intent.getStringExtra("LANDLORD_EMAIL");
         String phone = intent.getStringExtra("LANDLORD_PHONE");
-        String validIdPath = intent.getStringExtra("VALID_ID_PATH");
         String proofPath = intent.getStringExtra("PROOF_PATH");
         String status = intent.getStringExtra("STATUS");
 
-        TextView tvHouse = findViewById(R.id.textHouseName);
-        TextView tvAddress = findViewById(R.id.textAddress);
         TextView tvLandlord = findViewById(R.id.textLandlordName);
         TextView tvContact = findViewById(R.id.textLandlordContact);
         TextView tvStatus = findViewById(R.id.textStatus);
-        ImageView imgValidId = findViewById(R.id.imgValidId);
         ImageView imgProof = findViewById(R.id.imgProof);
 
-        if (tvHouse != null) tvHouse.setText(houseName);
-        if (tvAddress != null) tvAddress.setText(address);
         if (tvLandlord != null) tvLandlord.setText("Landlord: " + landlordName);
         if (tvContact != null) tvContact.setText("Email: " + email + " | Phone: " + phone);
         if (tvStatus != null) tvStatus.setText("Status: " + status);
 
-        if (validIdPath != null && !validIdPath.isEmpty()) {
-            String url = "http://10.129.224.109/Dormigo_Backend/" + validIdPath;
-            if (imgValidId != null) {
-                Glide.with(this).load(url).placeholder(R.drawable.bg_image_placeholder).into(imgValidId);
-            }
-        }
-
         if (proofPath != null && !proofPath.isEmpty()) {
-            String url = "http://10.129.224.109/Dormigo_Backend/" + proofPath;
             if (imgProof != null) {
-                Glide.with(this).load(url).placeholder(R.drawable.bg_image_placeholder).into(imgProof);
+                imgProof.setOnClickListener(v -> {
+                    String url = "http://10.149.229.109/Dormigo_Backend/" + proofPath;
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                    startActivity(browserIntent);
+                });
             }
         }
     }
@@ -135,12 +120,11 @@ public class AdminVerificationDetailActivity extends AppCompatActivity {
         try {
             JSONObject json = new JSONObject();
             json.put("verification_id", verificationId);
-            json.put("house_id", houseId);
             json.put("admin_id", adminId);
 
             RequestBody body = RequestBody.create(json.toString(), MediaType.get("application/json; charset=utf-8"));
             Request request = new Request.Builder()
-                    .url("http://10.129.224.109/Dormigo_Backend/api/approve_verification.php")
+                    .url("http://10.149.229.109/Dormigo_Backend/api/approve_verification.php")
                     .post(body)
                     .build();
 
@@ -198,13 +182,12 @@ public class AdminVerificationDetailActivity extends AppCompatActivity {
         try {
             JSONObject json = new JSONObject();
             json.put("verification_id", verificationId);
-            json.put("house_id", houseId);
             json.put("admin_id", adminId);
             json.put("rejection_reason", reason);
 
             RequestBody body = RequestBody.create(json.toString(), MediaType.get("application/json; charset=utf-8"));
             Request request = new Request.Builder()
-                    .url("http://10.129.224.109/Dormigo_Backend/api/reject_verification.php")
+                    .url("http://10.149.229.109/Dormigo_Backend/api/reject_verification.php")
                     .post(body)
                     .build();
 

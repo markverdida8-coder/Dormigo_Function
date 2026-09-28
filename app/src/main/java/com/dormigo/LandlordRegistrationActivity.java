@@ -3,10 +3,17 @@ package com.dormigo;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
 import android.text.InputType;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.TextPaint;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -17,6 +24,8 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -150,6 +159,43 @@ public class LandlordRegistrationActivity extends AppCompatActivity {
 
         MaterialCheckBox termsCheckbox =
                 findViewById(R.id.termsCheckbox);
+
+        TextView termsText = findViewById(R.id.termsText);
+        if (termsText != null && termsCheckbox != null) {
+            SpannableString spannable = new SpannableString("I have read and agree to the Terms & Conditions and Privacy Policy.");
+            
+            ClickableSpan termsSpan = new ClickableSpan() {
+                @Override
+                public void onClick(@NonNull View widget) {
+                    showTermsDialog(termsCheckbox);
+                }
+                @Override
+                public void updateDrawState(@NonNull TextPaint ds) {
+                    super.updateDrawState(ds);
+                    ds.setUnderlineText(true);
+                    ds.setColor(Color.parseColor("#1B5E4C"));
+                }
+            };
+            
+            ClickableSpan privacySpan = new ClickableSpan() {
+                @Override
+                public void onClick(@NonNull View widget) {
+                    showPrivacyDialog(termsCheckbox);
+                }
+                @Override
+                public void updateDrawState(@NonNull TextPaint ds) {
+                    super.updateDrawState(ds);
+                    ds.setUnderlineText(true);
+                    ds.setColor(Color.parseColor("#1B5E4C"));
+                }
+            };
+
+            spannable.setSpan(termsSpan, 29, 47, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannable.setSpan(privacySpan, 52, 66, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+            termsText.setText(spannable);
+            termsText.setMovementMethod(LinkMovementMethod.getInstance());
+        }
 
         // Back Button Logic
         if (btnBack != null) {
@@ -328,10 +374,9 @@ public class LandlordRegistrationActivity extends AppCompatActivity {
 
                 // Terms
                 if (!termsCheckbox.isChecked()) {
-
                     Toast.makeText(
                             LandlordRegistrationActivity.this,
-                            "Please agree to the terms",
+                            "You must agree to the Terms & Conditions before creating an account.",
                             Toast.LENGTH_SHORT
                     ).show();
 
@@ -342,12 +387,13 @@ public class LandlordRegistrationActivity extends AppCompatActivity {
                 btnCreateAccount.setEnabled(false);
 
                 // Send landlord registration to API
-                apiClient.register(
+                apiClient.registerLandlordWithDocument(
+                        LandlordRegistrationActivity.this,
                         fullName,
                         email,
                         pass,
                         mobile,
-                        "LANDLORD",
+                        uploadedFileUri,
                         new Callback() {
 
                             @Override
@@ -356,7 +402,7 @@ public class LandlordRegistrationActivity extends AppCompatActivity {
                                     IOException e
                             ) {
 
-                                android.util.Log.e(
+                                Log.e(
                                         "DORMIGO_LANDLORD_REGISTER",
                                         "Connection failed",
                                         e
@@ -517,7 +563,7 @@ public class LandlordRegistrationActivity extends AppCompatActivity {
 
                                     } catch (Exception e) {
 
-                                        android.util.Log.e(
+                                        Log.e(
                                                 "DORMIGO_LANDLORD_REGISTER",
                                                 "Invalid server response: "
                                                         + finalResponseBody,
@@ -545,6 +591,133 @@ public class LandlordRegistrationActivity extends AppCompatActivity {
                 finish();
 
                 overrideActivitySlideBack();
+            });
+        }
+    }
+
+    private void showTermsDialog(MaterialCheckBox checkbox) {
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(R.layout.dialog_terms)
+                .create();
+        
+        dialog.show();
+
+        TextView title = dialog.findViewById(R.id.dialogTitle);
+        TextView content = dialog.findViewById(R.id.dialogContent);
+        if (title != null) title.setText("Dormigo Terms & Conditions");
+        if (content != null) content.setText(
+                "1. Welcome\n" +
+                "Dormigo is a boarding house finder platform that connects students and landlords.\n" +
+                "By creating an account you agree to these Terms.\n\n" +
+                "2. User Accounts\n" +
+                "Users must provide accurate information.\n" +
+                "Duplicate accounts are prohibited.\n" +
+                "Users are responsible for protecting their passwords.\n\n" +
+                "3. Student Responsibilities\n" +
+                "Students must:\n" +
+                "• Submit truthful booking requests.\n" +
+                "• Respect house rules.\n" +
+                "• Upload legitimate payment proofs.\n" +
+                "• Use respectful communication.\n\n" +
+                "4. Landlord Responsibilities\n" +
+                "Landlords must:\n" +
+                "• Upload genuine boarding house information.\n" +
+                "• Keep room availability updated.\n" +
+                "• Verify payments honestly.\n" +
+                "• Upload valid verification documents.\n\n" +
+                "5. Booking Policy\n" +
+                "Submitting a booking request does not guarantee approval.\n" +
+                "Only landlords approve bookings.\n\n" +
+                "6. Payment Policy\n" +
+                "Students must only use payment methods provided inside Dormigo.\n" +
+                "Dormigo does not directly process or hold payments.\n\n" +
+                "7. Messaging\n" +
+                "Users must not send:\n" +
+                "• Spam\n" +
+                "• Harassment\n" +
+                "• Threats\n" +
+                "• Fraudulent content\n" +
+                "Dormigo may suspend violating accounts.\n\n" +
+                "8. Reviews\n" +
+                "Reviews must represent real experiences.\n" +
+                "Fake reviews may be removed.\n\n" +
+                "9. Verification\n" +
+                "Students may upload Student IDs.\n" +
+                "Landlords must upload:\n" +
+                "Business Permit\n" +
+                "Valid Government ID\n" +
+                "Verification is reviewed by the Administrator.\n\n" +
+                "10. Privacy\n" +
+                "Dormigo stores:\n" +
+                "Account information\n" +
+                "Booking records\n" +
+                "Payment records\n" +
+                "Verification documents\n" +
+                "Verification documents are only accessible by authorized Administrators.\n" +
+                "Dormigo does not sell user information.\n\n" +
+                "11. Account Suspension\n" +
+                "Dormigo may suspend accounts involved in:\n" +
+                "Fraud\n" +
+                "Fake documents\n" +
+                "False payment proofs\n" +
+                "Harassment\n" +
+                "Platform abuse\n\n" +
+                "12. Limitation of Liability\n" +
+                "Dormigo only connects students and landlords.\n" +
+                "Dormigo is not responsible for rental disputes between users.\n\n" +
+                "13. Contact\n" +
+                "For concerns, contact the Dormigo Administrator."
+        );
+
+        View btnDecline = dialog.findViewById(R.id.btnDecline);
+        View btnAgree = dialog.findViewById(R.id.btnAgree);
+
+        if (btnDecline != null) btnDecline.setOnClickListener(v -> dialog.dismiss());
+        if (btnAgree != null) {
+            btnAgree.setOnClickListener(v -> {
+                checkbox.setChecked(true);
+                dialog.dismiss();
+            });
+        }
+    }
+
+    private void showPrivacyDialog(MaterialCheckBox checkbox) {
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(R.layout.dialog_terms)
+                .create();
+        
+        dialog.show();
+
+        TextView title = dialog.findViewById(R.id.dialogTitle);
+        TextView content = dialog.findViewById(R.id.dialogContent);
+        if (title != null) title.setText("Privacy Policy");
+        if (content != null) content.setText(
+                "• Information Collected\n" +
+                "We collect personal information such as your name, email, phone number, and school details when you register.\n\n" +
+                "• How Information is Used\n" +
+                "Your information is used to facilitate communication between students and landlords, process bookings, and manage your account.\n\n" +
+                "• Verification Document Handling\n" +
+                "Verification documents are securely uploaded and only accessed by authorized Dormigo Administrators for approval purposes.\n\n" +
+                "• Payment Information\n" +
+                "Dormigo only records payment transaction references and proof of payment receipts. We do not store credit card details.\n\n" +
+                "• Security\n" +
+                "We implement robust security measures to protect your personal data from unauthorized access or disclosure.\n\n" +
+                "• User Rights\n" +
+                "You have the right to request the deletion of your account and personal data at any time via your account settings.\n\n" +
+                "• Data Retention\n" +
+                "We retain your data only for as long as your account is active or as needed to provide you services and comply with legal obligations.\n\n" +
+                "• Contact Information\n" +
+                "If you have questions about this Privacy Policy, please contact the Dormigo Administrator."
+        );
+
+        View btnDecline = dialog.findViewById(R.id.btnDecline);
+        View btnAgree = dialog.findViewById(R.id.btnAgree);
+
+        if (btnDecline != null) btnDecline.setOnClickListener(v -> dialog.dismiss());
+        if (btnAgree != null) {
+            btnAgree.setOnClickListener(v -> {
+                checkbox.setChecked(true);
+                dialog.dismiss();
             });
         }
     }

@@ -941,7 +941,7 @@ public class BookingRequestsActivity extends AppCompatActivity {
         );
 
         int advanceMonths = booking.optInt("advance_months", 1);
-        int depositMonths = booking.optInt("security_deposit_months", 1);
+        int depositMonths = booking.optInt("deposit_months", 1);
         double utilityDeposit = parseAmount(booking.optString("utility_deposit", "0"));
         double otherFees = parseAmount(booking.optString("other_fees", "0"));
         int paymentDueDay = booking.optInt("payment_due_day", 1);

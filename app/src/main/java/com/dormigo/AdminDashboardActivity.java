@@ -5,9 +5,13 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -31,11 +35,22 @@ import okhttp3.Response;
 public class AdminDashboardActivity extends AppCompatActivity {
 
     private SwipeRefreshLayout swipeRefreshLayout;
-    private LinearLayout requestsContainer;
-    private TextView tabPending, tabVerified, tabRejected;
-    private TextView btnTypeProperties, btnTypeStudents;
-    private String currentStatus = "PENDING";
-    private String currentType = "PROPERTIES"; // PROPERTIES or STUDENTS
+    
+    // Stats Views
+    private TextView statStudents, statLandlords, statBoardingHouses, statAvailableRooms;
+    private TextView statPendingStudents, statPendingLandlords;
+    private TextView statVerifiedStudents, statVerifiedLandlords;
+    private TextView statRejectedStudents, statRejectedLandlords;
+    private TextView textPendingSummaryBadge;
+
+    private final Handler autoRefreshHandler = new Handler(Looper.getMainLooper());
+    private final Runnable autoRefreshRunnable = new Runnable() {
+        @Override
+        public void run() {
+            loadDashboardStats();
+            autoRefreshHandler.postDelayed(this, 30000);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,75 +68,44 @@ public class AdminDashboardActivity extends AppCompatActivity {
         }
 
         bindViews();
-        setupTypeSelector();
-        setupTabs();
-        setupLogout();
+        setupActions();
 
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
         if (swipeRefreshLayout != null) {
-            swipeRefreshLayout.setOnRefreshListener(this::loadVerifications);
+            swipeRefreshLayout.setOnRefreshListener(this::loadDashboardStats);
         }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        loadVerifications();
+        loadDashboardStats();
+        autoRefreshHandler.postDelayed(autoRefreshRunnable, 30000);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        autoRefreshHandler.removeCallbacks(autoRefreshRunnable);
     }
 
     private void bindViews() {
-        requestsContainer = findViewById(R.id.requestsContainer);
-        tabPending = findViewById(R.id.tabPending);
-        tabVerified = findViewById(R.id.tabVerified);
-        tabRejected = findViewById(R.id.tabRejected);
-        btnTypeProperties = findViewById(R.id.btnTypeProperties);
-        btnTypeStudents = findViewById(R.id.btnTypeStudents);
+        statStudents = findViewById(R.id.statStudents);
+        statLandlords = findViewById(R.id.statLandlords);
+        statBoardingHouses = findViewById(R.id.statBoardingHouses);
+        statAvailableRooms = findViewById(R.id.statAvailableRooms);
+        
+        statPendingStudents = findViewById(R.id.statPendingStudents);
+        statPendingLandlords = findViewById(R.id.statPendingLandlords);
+        statVerifiedStudents = findViewById(R.id.statVerifiedStudents);
+        statVerifiedLandlords = findViewById(R.id.statVerifiedLandlords);
+        statRejectedStudents = findViewById(R.id.statRejectedStudents);
+        statRejectedLandlords = findViewById(R.id.statRejectedLandlords);
+
+        textPendingSummaryBadge = findViewById(R.id.textPendingSummaryBadge);
     }
 
-    private void setupTypeSelector() {
-        btnTypeProperties.setOnClickListener(v -> selectType("PROPERTIES"));
-        btnTypeStudents.setOnClickListener(v -> selectType("STUDENTS"));
-    }
-
-    private void selectType(String type) {
-        currentType = type;
-        updateTypeStyles();
-        loadVerifications();
-    }
-
-    private void updateTypeStyles() {
-        boolean isProps = currentType.equals("PROPERTIES");
-        btnTypeProperties.setBackgroundResource(isProps ? R.drawable.bg_button_filled : R.drawable.bg_chip_white);
-        btnTypeProperties.setTextColor(isProps ? Color.WHITE : Color.parseColor("#1A1A1A"));
-
-        btnTypeStudents.setBackgroundResource(!isProps ? R.drawable.bg_button_filled : R.drawable.bg_chip_white);
-        btnTypeStudents.setTextColor(!isProps ? Color.WHITE : Color.parseColor("#1A1A1A"));
-    }
-
-    private void setupTabs() {
-        tabPending.setOnClickListener(v -> selectTab("PENDING"));
-        tabVerified.setOnClickListener(v -> selectTab("VERIFIED"));
-        tabRejected.setOnClickListener(v -> selectTab("REJECTED"));
-    }
-
-    private void selectTab(String status) {
-        currentStatus = status;
-        updateTabStyles();
-        loadVerifications();
-    }
-
-    private void updateTabStyles() {
-        tabPending.setBackgroundResource(currentStatus.equals("PENDING") ? R.drawable.bg_button_filled : R.drawable.bg_chip_white);
-        tabPending.setTextColor(currentStatus.equals("PENDING") ? Color.WHITE : Color.parseColor("#1A1A1A"));
-
-        tabVerified.setBackgroundResource(currentStatus.equals("VERIFIED") ? R.drawable.bg_button_filled : R.drawable.bg_chip_white);
-        tabVerified.setTextColor(currentStatus.equals("VERIFIED") ? Color.WHITE : Color.parseColor("#1A1A1A"));
-
-        tabRejected.setBackgroundResource(currentStatus.equals("REJECTED") ? R.drawable.bg_button_filled : R.drawable.bg_chip_white);
-        tabRejected.setTextColor(currentStatus.equals("REJECTED") ? Color.WHITE : Color.parseColor("#1A1A1A"));
-    }
-
-    private void setupLogout() {
+    private void setupActions() {
         View btnLogout = findViewById(R.id.btnLogout);
         if (btnLogout != null) {
             btnLogout.setOnClickListener(v -> {
@@ -134,17 +118,26 @@ public class AdminDashboardActivity extends AppCompatActivity {
                 finish();
             });
         }
+
+        View cardVerificationCenter = findViewById(R.id.cardVerificationCenter);
+        View btnOpenVerificationCenter = findViewById(R.id.btnOpenVerificationCenter);
+        View.OnClickListener openCenterListener = v -> {
+            Intent intent = new Intent(this, AdminVerificationActivity.class);
+            startActivity(intent);
+        };
+        if (cardVerificationCenter != null) cardVerificationCenter.setOnClickListener(openCenterListener);
+        if (btnOpenVerificationCenter != null) btnOpenVerificationCenter.setOnClickListener(openCenterListener);
     }
 
-    private void loadVerifications() {
-        String endpoint = currentType.equals("PROPERTIES") ? "get_verifications.php" : "get_student_verifications.php";
-        String url = "http://10.129.224.109/Dormigo_Backend/api/" + endpoint + "?status=" + currentStatus;
+    private void loadDashboardStats() {
+        String url = "http://10.149.229.109/Dormigo_Backend/api/get_admin_dashboard_stats.php";
         Request request = new Request.Builder().url(url).get().build();
         new OkHttpClient().newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 runOnUiThread(() -> {
                     if (swipeRefreshLayout != null) swipeRefreshLayout.setRefreshing(false);
+                    Toast.makeText(AdminDashboardActivity.this, "Failed to load dashboard data.", Toast.LENGTH_SHORT).show();
                 });
             }
 
@@ -155,13 +148,15 @@ public class AdminDashboardActivity extends AppCompatActivity {
                 try {
                     JSONObject json = new JSONObject(body);
                     if (json.optBoolean("success", false)) {
-                        JSONArray data = json.optJSONArray("data");
-                        runOnUiThread(() -> {
-                            if (swipeRefreshLayout != null) swipeRefreshLayout.setRefreshing(false);
-                            renderRequests(data != null ? data : new JSONArray());
-                        });
+                        JSONObject data = json.optJSONObject("data");
+                        if (data != null) {
+                            runOnUiThread(() -> {
+                                if (swipeRefreshLayout != null) swipeRefreshLayout.setRefreshing(false);
+                                updateDashboardStats(data);
+                            });
+                        }
                     }
-                } catch (Exception ignored) {
+                } catch (Exception e) {
                     runOnUiThread(() -> {
                         if (swipeRefreshLayout != null) swipeRefreshLayout.setRefreshing(false);
                     });
@@ -170,144 +165,31 @@ public class AdminDashboardActivity extends AppCompatActivity {
         });
     }
 
-    private void renderRequests(JSONArray requests) {
-        if (requestsContainer == null) return;
-        requestsContainer.removeAllViews();
+    private void updateDashboardStats(JSONObject data) {
+        if (statStudents != null) statStudents.setText(String.valueOf(data.optInt("students", 0)));
+        if (statLandlords != null) statLandlords.setText(String.valueOf(data.optInt("landlords", 0)));
+        if (statBoardingHouses != null) statBoardingHouses.setText(String.valueOf(data.optInt("boarding_houses", 0)));
+        if (statAvailableRooms != null) statAvailableRooms.setText(String.valueOf(data.optInt("available_rooms", 0)));
 
-        if (requests.length() == 0) {
-            TextView empty = new TextView(this);
-            empty.setText("No " + currentStatus.toLowerCase() + " " + (currentType.equals("PROPERTIES") ? "boarding house" : "student") + " verification requests.");
-            empty.setTextColor(Color.parseColor("#6E6E73"));
-            empty.setTextSize(14);
-            empty.setPadding(dp(16), dp(32), dp(16), dp(32));
-            requestsContainer.addView(empty);
-            return;
-        }
+        int pStudents = data.optInt("pending_students", 0);
+        int pLandlords = data.optInt("pending_landlords", 0);
+        int totalPending = pStudents + pLandlords;
 
-        for (int i = 0; i < requests.length(); i++) {
-            try {
-                JSONObject r = requests.getJSONObject(i);
-                int verificationId = r.optInt("verification_id", 0);
-                String status = r.optString("verification_status", "PENDING");
-                String reason = r.optString("rejection_reason", "");
+        if (statPendingStudents != null) statPendingStudents.setText(String.valueOf(pStudents));
+        if (statPendingLandlords != null) statPendingLandlords.setText(String.valueOf(pLandlords));
+        if (statVerifiedStudents != null) statVerifiedStudents.setText(String.valueOf(data.optInt("verified_students", 0)));
+        if (statVerifiedLandlords != null) statVerifiedLandlords.setText(String.valueOf(data.optInt("verified_landlords", 0)));
+        if (statRejectedStudents != null) statRejectedStudents.setText(String.valueOf(data.optInt("rejected_students", 0)));
+        if (statRejectedLandlords != null) statRejectedLandlords.setText(String.valueOf(data.optInt("rejected_landlords", 0)));
 
-                LinearLayout card = new LinearLayout(this);
-                card.setLayoutParams(new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
-                ));
-                card.setOrientation(LinearLayout.VERTICAL);
-                card.setPadding(dp(16), dp(16), dp(16), dp(16));
-                card.setBackgroundResource(R.drawable.bg_card_rounded);
-                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) card.getLayoutParams();
-                params.bottomMargin = dp(12);
-                card.setLayoutParams(params);
-
-                if (currentType.equals("PROPERTIES")) {
-                    int houseId = r.optInt("house_id", 0);
-                    String houseName = r.optString("house_name", "Boarding House");
-                    String address = r.optString("address", "");
-                    String landlordName = r.optString("landlord_name", "Landlord");
-
-                    TextView tvHouse = new TextView(this);
-                    tvHouse.setText(houseName);
-                    tvHouse.setTextColor(Color.parseColor("#1A1A1A"));
-                    tvHouse.setTextSize(16);
-                    tvHouse.setTypeface(null, Typeface.BOLD);
-
-                    TextView tvLandlord = new TextView(this);
-                    tvLandlord.setText("Landlord: " + landlordName);
-                    tvLandlord.setTextColor(Color.parseColor("#6E6E73"));
-                    tvLandlord.setTextSize(13);
-                    LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.MATCH_PARENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT
-                    );
-                    lp.topMargin = dp(4);
-                    tvLandlord.setLayoutParams(lp);
-
-                    TextView tvAddress = new TextView(this);
-                    tvAddress.setText(address);
-                    tvAddress.setTextColor(Color.parseColor("#6E6E73"));
-                    tvAddress.setTextSize(12);
-                    tvAddress.setLayoutParams(lp);
-
-                    card.addView(tvHouse);
-                    card.addView(tvLandlord);
-                    card.addView(tvAddress);
-
-                    if (status.equals("REJECTED") && !reason.isEmpty()) {
-                        TextView tvReason = new TextView(this);
-                        tvReason.setText("Reason: " + reason);
-                        tvReason.setTextColor(Color.parseColor("#D32F2F"));
-                        tvReason.setTextSize(12);
-                        tvReason.setLayoutParams(lp);
-                        card.addView(tvReason);
-                    }
-
-                    card.setOnClickListener(v -> {
-                        Intent intent = new Intent(this, AdminVerificationDetailActivity.class);
-                        intent.putExtra("VERIFICATION_ID", verificationId);
-                        intent.putExtra("HOUSE_ID", houseId);
-                        intent.putExtra("HOUSE_NAME", houseName);
-                        intent.putExtra("HOUSE_ADDRESS", address);
-                        intent.putExtra("LANDLORD_NAME", landlordName);
-                        intent.putExtra("LANDLORD_EMAIL", r.optString("landlord_email", ""));
-                        intent.putExtra("LANDLORD_PHONE", r.optString("landlord_phone", ""));
-                        intent.putExtra("VALID_ID_PATH", r.optString("valid_id_path", ""));
-                        intent.putExtra("PROOF_PATH", r.optString("proof_document_path", ""));
-                        intent.putExtra("STATUS", status);
-                        startActivity(intent);
-                    });
-
-                } else {
-                    String studentName = r.optString("full_name", "Student");
-                    String email = r.optString("email", "");
-                    String phone = r.optString("phone", "");
-
-                    TextView tvStudent = new TextView(this);
-                    tvStudent.setText(studentName);
-                    tvStudent.setTextColor(Color.parseColor("#1A1A1A"));
-                    tvStudent.setTextSize(16);
-                    tvStudent.setTypeface(null, Typeface.BOLD);
-
-                    TextView tvContact = new TextView(this);
-                    tvContact.setText("Email: " + email + " | Phone: " + phone);
-                    tvContact.setTextColor(Color.parseColor("#6E6E73"));
-                    tvContact.setTextSize(13);
-                    LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.MATCH_PARENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT
-                    );
-                    lp.topMargin = dp(4);
-                    tvContact.setLayoutParams(lp);
-
-                    card.addView(tvStudent);
-                    card.addView(tvContact);
-
-                    if (status.equals("REJECTED") && !reason.isEmpty()) {
-                        TextView tvReason = new TextView(this);
-                        tvReason.setText("Reason: " + reason);
-                        tvReason.setTextColor(Color.parseColor("#D32F2F"));
-                        tvReason.setTextSize(12);
-                        tvReason.setLayoutParams(lp);
-                        card.addView(tvReason);
-                    }
-
-                    card.setOnClickListener(v -> {
-                        Intent intent = new Intent(this, AdminStudentVerificationDetailActivity.class);
-                        intent.putExtra("VERIFICATION_ID", verificationId);
-                        intent.putExtra("STUDENT_NAME", studentName);
-                        intent.putExtra("STUDENT_EMAIL", email);
-                        intent.putExtra("STUDENT_PHONE", phone);
-                        intent.putExtra("STUDENT_ID_PATH", r.optString("student_id_path", ""));
-                        intent.putExtra("STATUS", status);
-                        startActivity(intent);
-                    });
-                }
-
-                requestsContainer.addView(card);
-            } catch (Exception ignored) {}
+        if (textPendingSummaryBadge != null) {
+            if (totalPending > 0) {
+                textPendingSummaryBadge.setText("🔔 " + totalPending + " Pending Requests");
+                textPendingSummaryBadge.setTextColor(Color.parseColor("#D97706"));
+            } else {
+                textPendingSummaryBadge.setText("✅ No Pending Requests");
+                textPendingSummaryBadge.setTextColor(Color.parseColor("#1B5E4C"));
+            }
         }
     }
 

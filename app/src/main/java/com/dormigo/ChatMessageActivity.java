@@ -1,6 +1,7 @@
 package com.dormigo;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -17,7 +18,10 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -25,6 +29,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 
 import java.io.IOException;
+import java.util.Locale;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -36,6 +41,8 @@ public class ChatMessageActivity extends AppCompatActivity {
     private SwipeRefreshLayout swipeRefreshLayout;
     private int currentSenderId;
     private int currentOtherId;
+    private int houseId = 0;
+    private String houseName = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,23 +91,68 @@ public class ChatMessageActivity extends AppCompatActivity {
     private void loadChatThread(int currentUserId, int otherUserId) {
         apiClient.getChatThread(currentUserId, otherUserId, new Callback() {
             @Override
-            public void onFailure(Call call, IOException e) {}
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {}
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (!response.isSuccessful()) return;
-                String body = response.body() != null ? response.body().string() : "";
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                if (!response.isSuccessful() || response.body() == null) return;
+                String body = response.body().string();
                 try {
                     JSONObject json = new JSONObject(body);
                     if (json.optBoolean("success", false)) {
                         JSONArray messages = json.optJSONArray("data");
                         if (messages != null) {
+                            for (int i = 0; i < messages.length(); i++) {
+                                JSONObject msg = messages.optJSONObject(i);
+                                if (msg != null) {
+                                    int mHouseId = msg.optInt("house_id", 0);
+                                    if (mHouseId > 0 && houseId <= 0) {
+                                        houseId = mHouseId;
+                                    }
+                                }
+                            }
                             runOnUiThread(() -> renderMessages(messages, currentUserId));
                         }
                     }
                 } catch (Exception ignored) {}
             }
         });
+
+        if (houseId <= 0 && otherUserId > 0) {
+            apiClient.getBoardingHouses(new Callback() {
+                @Override
+                public void onFailure(@NonNull Call call, @NonNull IOException e) {}
+
+                @Override
+                public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                    if (!response.isSuccessful() || response.body() == null) return;
+                    try {
+                        JSONObject json = new JSONObject(response.body().string());
+                        if (json.optBoolean("success", false)) {
+                            JSONArray houses = json.optJSONArray("data");
+                            if (houses != null) {
+                                for (int i = 0; i < houses.length(); i++) {
+                                    JSONObject h = houses.optJSONObject(i);
+                                    if (h != null && h.optInt("landlord_id", 0) == otherUserId) {
+                                        houseId = h.optInt("house_id", 0);
+                                        if (houseName == null || houseName.isEmpty() || houseName.equals("Boarding House")) {
+                                            houseName = h.optString("house_name", "Boarding House");
+                                        }
+                                        runOnUiThread(() -> {
+                                            TextView houseLabel = findViewById(R.id.chatHouseName);
+                                            if (houseLabel != null && houseName != null) {
+                                                houseLabel.setText(houseName + " • Verified Landlord");
+                                            }
+                                        });
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    } catch (Exception ignored) {}
+                }
+            });
+        }
     }
 
     private void renderMessages(JSONArray messages, int currentUserId) {
@@ -111,6 +163,17 @@ public class ChatMessageActivity extends AppCompatActivity {
         LinearLayout container = findViewById(R.id.messagesContainer);
         if (container == null) return;
         container.removeAllViews();
+
+        if (messages.length() == 0) {
+            TextView emptyText = new TextView(this);
+            emptyText.setText("💬\n\nNo messages yet.\nStart the conversation by sending a message.");
+            emptyText.setTextColor(0xFF9A9A9E);
+            emptyText.setTextSize(14);
+            emptyText.setGravity(Gravity.CENTER);
+            emptyText.setPadding(0, dp(60), 0, 0);
+            container.addView(emptyText);
+            return;
+        }
 
         for (int i = 0; i < messages.length(); i++) {
             try {
@@ -192,6 +255,17 @@ public class ChatMessageActivity extends AppCompatActivity {
         return Math.round(value * getResources().getDisplayMetrics().density);
     }
 
+    private String getInitials(String name) {
+        if (name == null || name.trim().isEmpty()) return "L";
+        String[] parts = name.trim().split("\\s+");
+        if (parts.length >= 2) {
+            return ("" + parts[0].charAt(0) + parts[1].charAt(0)).toUpperCase(Locale.US);
+        } else if (parts[0].length() >= 2) {
+            return parts[0].substring(0, 2).toUpperCase(Locale.US);
+        }
+        return parts[0].toUpperCase(Locale.US);
+    }
+
     private String formatMessageTime(String createdAt) {
         if (createdAt == null || createdAt.length() < 16) return "";
         try {
@@ -212,12 +286,84 @@ public class ChatMessageActivity extends AppCompatActivity {
         return "";
     }
 
+    private boolean isMutedState = false;
+
+    private void loadMuteStatus() {
+        if (currentSenderId <= 0 || currentOtherId <= 0) return;
+        apiClient.getMuteStatus(currentSenderId, currentOtherId, new Callback() {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {}
+
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                if (!response.isSuccessful() || response.body() == null) return;
+                try {
+                    JSONObject json = new JSONObject(response.body().string());
+                    boolean muted = json.optBoolean("is_muted", false);
+                    runOnUiThread(() -> updateMuteUI(muted));
+                } catch (Exception ignored) {}
+            }
+        });
+    }
+
+    private void updateMuteUI(boolean isMuted) {
+        this.isMutedState = isMuted;
+        View muteBanner = findViewById(R.id.muteBanner);
+        if (muteBanner != null) {
+            muteBanner.setVisibility(isMuted ? View.VISIBLE : View.GONE);
+        }
+    }
+
+    private void showMuteDurationDialog() {
+        String[] options = {"1 Hour", "8 Hours", "24 Hours", "Until I Turn It Back On"};
+        int[] hours = {1, 8, 24, 876000};
+
+        new AlertDialog.Builder(this)
+                .setTitle("Mute Notifications For")
+                .setItems(options, (dialog, which) -> {
+                    int duration = hours[which];
+                    apiClient.muteConversation(currentSenderId, currentOtherId, duration, new Callback() {
+                        @Override
+                        public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                            runOnUiThread(() -> Toast.makeText(ChatMessageActivity.this, "Unable to mute chat.", Toast.LENGTH_SHORT).show());
+                        }
+
+                        @Override
+                        public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                            runOnUiThread(() -> {
+                                updateMuteUI(true);
+                                Toast.makeText(ChatMessageActivity.this, "Conversation muted.", Toast.LENGTH_SHORT).show();
+                            });
+                        }
+                    });
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void unmuteChat() {
+        apiClient.unmuteConversation(currentSenderId, currentOtherId, new Callback() {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                runOnUiThread(() -> Toast.makeText(ChatMessageActivity.this, "Unable to unmute chat.", Toast.LENGTH_SHORT).show());
+            }
+
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                runOnUiThread(() -> {
+                    updateMuteUI(false);
+                    Toast.makeText(ChatMessageActivity.this, "Conversation unmuted.", Toast.LENGTH_SHORT).show();
+                });
+            }
+        });
+    }
+
     private void setupUI() {
         Intent intent = getIntent();
         String landlordName = intent.getStringExtra("LANDLORD_NAME");
-        String houseName = intent.getStringExtra("HOUSE_NAME");
+        this.houseName = intent.getStringExtra("HOUSE_NAME");
         currentOtherId = intent.getIntExtra("LANDLORD_ID", 2);
-        int houseId = intent.getIntExtra("HOUSE_ID", 1);
+        this.houseId = intent.getIntExtra("HOUSE_ID", 0);
         currentSenderId = getSharedPreferences("DormigoPrefs", MODE_PRIVATE).getInt("userId", 1);
 
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
@@ -226,28 +372,84 @@ public class ChatMessageActivity extends AppCompatActivity {
         }
 
         loadChatThread(currentSenderId, currentOtherId);
+        loadMuteStatus();
+
+        View btnUnmuteBanner = findViewById(R.id.btnUnmuteBanner);
+        if (btnUnmuteBanner != null) {
+            btnUnmuteBanner.setOnClickListener(v -> unmuteChat());
+        }
 
         if (landlordName != null) {
             TextView nameLabel = findViewById(R.id.chatLandlordName);
             if (nameLabel != null) nameLabel.setText(landlordName);
+
+            TextView avatar = findViewById(R.id.headerAvatar);
+            if (avatar != null) {
+                avatar.setText(getInitials(landlordName));
+            }
         }
 
-        if (houseName != null) {
-            TextView houseLabel = findViewById(R.id.chatHouseName);
-            if (houseLabel != null) houseLabel.setText(houseName);
-        }
+        String roomType = intent.getStringExtra("ROOM_TYPE");
+        String houseStr = (houseName != null && !houseName.isEmpty()) ? houseName : "Boarding House";
+        String subtitle = houseStr + " • " + (roomType != null && !roomType.isEmpty() ? roomType : "Verified Landlord");
+        TextView houseLabel = findViewById(R.id.chatHouseName);
+        if (houseLabel != null) houseLabel.setText(subtitle);
 
         View btnBack = findViewById(R.id.btnBack);
         if (btnBack != null) {
             btnBack.setOnClickListener(v -> finish());
         }
 
-        View btnViewHouse = findViewById(R.id.btnViewHouse);
-        if (btnViewHouse != null) {
-            btnViewHouse.setOnClickListener(v -> {
-                Intent viewHouseIntent = new Intent(this, ViewBoardingHouseActivity.class);
-                viewHouseIntent.putExtra("HOUSE_ID", houseId);
-                startActivity(viewHouseIntent);
+        View btnOverflowMenu = findViewById(R.id.btnOverflowMenu);
+        if (btnOverflowMenu != null) {
+            btnOverflowMenu.setOnClickListener(v -> {
+                PopupMenu popup = new PopupMenu(this, v);
+                popup.getMenu().add("👤 View Landlord Profile");
+                popup.getMenu().add(isMutedState ? "🔔 Unmute Conversation" : "🔕 Mute Conversation");
+                popup.getMenu().add("🗑 Clear Conversation");
+
+                popup.setOnMenuItemClickListener(item -> {
+                    CharSequence title = item.getTitle();
+                    if (title != null) {
+                        String str = title.toString();
+                        if (str.contains("View Landlord Profile")) {
+                            Intent profileIntent = new Intent(this, LandlordProfileViewActivity.class);
+                            profileIntent.putExtra("LANDLORD_ID", currentOtherId);
+                            profileIntent.putExtra("HOUSE_ID", houseId);
+                            profileIntent.putExtra("LANDLORD_NAME", landlordName);
+                            profileIntent.putExtra("HOUSE_NAME", houseName);
+                            startActivity(profileIntent);
+                        } else if (str.contains("Unmute")) {
+                            unmuteChat();
+                        } else if (str.contains("Mute")) {
+                            showMuteDurationDialog();
+                        } else if (str.contains("Clear Conversation")) {
+                            new AlertDialog.Builder(this)
+                                    .setTitle("Clear Conversation?")
+                                    .setMessage("This will permanently remove all messages in this conversation.\n\nThis action cannot be undone.")
+                                    .setNegativeButton("Cancel", null)
+                                    .setPositiveButton("Clear", (dialog, which) -> {
+                                        apiClient.clearConversationThread(currentSenderId, currentOtherId, new Callback() {
+                                            @Override
+                                            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                                                runOnUiThread(() -> Toast.makeText(ChatMessageActivity.this, "Failed to clear conversation.", Toast.LENGTH_SHORT).show());
+                                            }
+
+                                            @Override
+                                            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                                                runOnUiThread(() -> {
+                                                    Toast.makeText(ChatMessageActivity.this, "Conversation cleared.", Toast.LENGTH_SHORT).show();
+                                                    loadChatThread(currentSenderId, currentOtherId);
+                                                });
+                                            }
+                                        });
+                                    })
+                                    .show();
+                        }
+                    }
+                    return true;
+                });
+                popup.show();
             });
         }
 
@@ -259,7 +461,8 @@ public class ChatMessageActivity extends AppCompatActivity {
                 if (chatInput != null) {
                     String message = chatInput.getText().toString().trim();
                     if (!message.isEmpty()) {
-                        apiClient.sendMessage(currentSenderId, currentOtherId, null, message, new Callback() {
+                        Integer hId = (houseId > 0) ? houseId : null;
+                        apiClient.sendMessage(currentSenderId, currentOtherId, hId, message, new Callback() {
                             @Override
                             public void onFailure(Call call, IOException e) {
                                 runOnUiThread(() -> Toast.makeText(ChatMessageActivity.this, "Failed to send message.", Toast.LENGTH_SHORT).show());

@@ -1,9 +1,9 @@
 -- Merging decision tree log ---
 manifest
-ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:2:1-234:12
-INJECTED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:2:1-234:12
-INJECTED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:2:1-234:12
-INJECTED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:2:1-234:12
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:2:1-270:12
+INJECTED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:2:1-270:12
+INJECTED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:2:1-270:12
+INJECTED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:2:1-270:12
 MERGED from [com.google.android.material:material:1.14.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\6bfff5ecb6f4dbd35e9fc87fda93c07b\transformed\material-1.14.0\AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.constraintlayout:constraintlayout:2.2.2] C:\Users\markv\.gradle\caches\9.6.0\transforms\424a85c1bd821e29640e38a0a794a1f6\transformed\constraintlayout-2.2.2\AndroidManifest.xml:2:1-9:12
 MERGED from [androidx.appcompat:appcompat-resources:1.8.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\8f271cca0de33fb5efc570fc6db20c72\transformed\appcompat-resources-1.8.0\AndroidManifest.xml:2:1-7:12
@@ -104,8 +104,8 @@ ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidMa
 intent#action:name:android.intent.action.VIEW+data:host:www.google.com+data:pathPrefix:/maps+data:scheme:https
 ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:22:9-28:18
 application
-ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:31:5-232:19
-INJECTED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:31:5-232:19
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:31:5-268:19
+INJECTED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:31:5-268:19
 MERGED from [com.google.android.material:material:1.14.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\6bfff5ecb6f4dbd35e9fc87fda93c07b\transformed\material-1.14.0\AndroidManifest.xml:22:5-20
 MERGED from [com.google.android.material:material:1.14.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\6bfff5ecb6f4dbd35e9fc87fda93c07b\transformed\material-1.14.0\AndroidManifest.xml:22:5-20
 MERGED from [androidx.constraintlayout:constraintlayout:2.2.2] C:\Users\markv\.gradle\caches\9.6.0\transforms\424a85c1bd821e29640e38a0a794a1f6\transformed\constraintlayout-2.2.2\AndroidManifest.xml:7:5-20
@@ -135,329 +135,387 @@ MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\markv\.gradle\cach
 	android:appComponentFactory
 		ADDED from [androidx.core:core:1.18.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\d87e0c915c4c5950cc81f53ad8da8e1b\transformed\core-1.18.0\AndroidManifest.xml:28:18-86
 	android:supportsRtl
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:39:9-35
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:40:9-35
 	android:label
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:37:9-41
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:38:9-41
 	android:fullBackupContent
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:35:9-54
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:36:9-54
 	android:roundIcon
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:38:9-54
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:39:9-54
 	android:icon
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:36:9-43
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:37:9-43
 	android:allowBackup
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:32:9-35
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:33:9-35
 	android:theme
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:40:9-45
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:41:9-45
 	android:dataExtractionRules
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:34:9-65
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:35:9-65
 	android:usesCleartextTraffic
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:33:9-44
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:34:9-44
+	android:name
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:32:9-43
 activity#com.dormigo.LoginActivity
-ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:42:9-50:20
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:43:9-51:20
 	android:windowSoftInputMode
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:45:13-55
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:46:13-55
 	android:exported
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:44:13-36
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:45:13-36
 	android:name
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:43:13-42
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:44:13-42
 intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
-ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:46:13-49:29
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:47:13-50:29
 action#android.intent.action.MAIN
-ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:47:17-69
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:48:17-69
 	android:name
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:47:25-66
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:48:25-66
 category#android.intent.category.LAUNCHER
-ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:48:17-77
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:49:17-77
 	android:name
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:48:27-74
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:49:27-74
 activity#com.dormigo.AdminDashboardActivity
-ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:52:9-55:58
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:53:9-56:58
 	android:windowSoftInputMode
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:55:13-55
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:56:13-55
 	android:exported
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:54:13-37
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:55:13-37
 	android:name
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:53:13-51
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:54:13-51
+activity#com.dormigo.AdminVerificationActivity
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:58:9-61:58
+	android:windowSoftInputMode
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:61:13-55
+	android:exported
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:60:13-37
+	android:name
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:59:13-54
 activity#com.dormigo.AdminVerificationDetailActivity
-ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:57:9-60:58
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:63:9-66:58
 	android:windowSoftInputMode
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:60:13-55
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:66:13-55
 	android:exported
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:59:13-37
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:65:13-37
 	android:name
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:58:13-60
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:64:13-60
 activity#com.dormigo.AdminStudentVerificationDetailActivity
-ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:62:9-65:58
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:68:9-71:58
 	android:windowSoftInputMode
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:65:13-55
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:71:13-55
 	android:exported
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:64:13-37
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:70:13-37
 	android:name
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:63:13-67
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:69:13-67
 activity#com.dormigo.HomeActivity
-ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:67:9-70:58
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:73:9-76:58
 	android:windowSoftInputMode
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:70:13-55
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:76:13-55
 	android:exported
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:69:13-37
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:75:13-37
 	android:name
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:68:13-41
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:74:13-41
+activity#com.dormigo.LandlordProfileViewActivity
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:78:9-81:58
+	android:windowSoftInputMode
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:81:13-55
+	android:exported
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:80:13-37
+	android:name
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:79:13-56
+activity#com.dormigo.TenantProfileViewActivity
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:83:9-86:58
+	android:windowSoftInputMode
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:86:13-55
+	android:exported
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:85:13-37
+	android:name
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:84:13-54
 activity#com.dormigo.CreateAccountActivity
-ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:72:9-75:58
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:88:9-91:58
 	android:windowSoftInputMode
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:75:13-55
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:91:13-55
 	android:exported
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:74:13-37
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:90:13-37
 	android:name
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:73:13-50
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:89:13-50
 activity#com.dormigo.LandlordRegistrationActivity
-ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:77:9-80:58
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:93:9-96:58
 	android:windowSoftInputMode
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:80:13-55
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:96:13-55
 	android:exported
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:79:13-37
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:95:13-37
 	android:name
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:78:13-57
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:94:13-57
 activity#com.dormigo.ForgotPasswordActivity
-ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:82:9-85:58
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:98:9-101:58
 	android:windowSoftInputMode
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:85:13-55
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:101:13-55
 	android:exported
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:84:13-37
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:100:13-37
 	android:name
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:83:13-51
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:99:13-51
+activity#com.dormigo.VerifyOtpActivity
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:103:9-106:58
+	android:windowSoftInputMode
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:106:13-55
+	android:exported
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:105:13-37
+	android:name
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:104:13-46
+activity#com.dormigo.ResetPasswordActivity
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:108:9-111:58
+	android:windowSoftInputMode
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:111:13-55
+	android:exported
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:110:13-37
+	android:name
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:109:13-50
 activity#com.dormigo.ProfileActivity
-ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:87:9-90:58
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:113:9-116:58
 	android:windowSoftInputMode
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:90:13-55
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:116:13-55
 	android:exported
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:89:13-37
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:115:13-37
 	android:name
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:88:13-44
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:114:13-44
 activity#com.dormigo.ViewBoardingHouseActivity
-ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:92:9-95:58
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:118:9-121:58
 	android:windowSoftInputMode
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:95:13-55
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:121:13-55
 	android:exported
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:94:13-37
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:120:13-37
 	android:name
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:93:13-54
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:119:13-54
 activity#com.dormigo.BoardingHouseListingsActivity
-ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:97:9-100:58
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:123:9-126:58
 	android:windowSoftInputMode
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:100:13-55
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:126:13-55
 	android:exported
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:99:13-37
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:125:13-37
 	android:name
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:98:13-58
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:124:13-58
 activity#com.dormigo.RequestSentActivity
-ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:102:9-105:58
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:128:9-131:58
 	android:windowSoftInputMode
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:105:13-55
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:131:13-55
 	android:exported
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:104:13-37
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:130:13-37
 	android:name
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:103:13-48
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:129:13-48
 activity#com.dormigo.PaymentActivity
-ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:107:9-110:58
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:133:9-136:58
 	android:windowSoftInputMode
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:110:13-55
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:136:13-55
 	android:exported
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:109:13-37
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:135:13-37
 	android:name
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:108:13-44
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:134:13-44
 activity#com.dormigo.PaymentSuccessActivity
-ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:112:9-115:58
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:138:9-141:58
 	android:windowSoftInputMode
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:115:13-55
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:141:13-55
 	android:exported
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:114:13-37
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:140:13-37
 	android:name
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:113:13-51
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:139:13-51
 activity#com.dormigo.TransactionHistoryActivity
-ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:117:9-120:58
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:143:9-146:58
 	android:windowSoftInputMode
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:120:13-55
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:146:13-55
 	android:exported
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:119:13-37
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:145:13-37
 	android:name
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:118:13-55
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:144:13-55
 activity#com.dormigo.BookingRequestsActivity
-ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:122:9-125:58
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:148:9-151:58
 	android:windowSoftInputMode
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:125:13-55
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:151:13-55
 	android:exported
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:124:13-37
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:150:13-37
 	android:name
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:123:13-52
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:149:13-52
 activity#com.dormigo.ChatHistoryActivity
-ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:127:9-130:58
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:153:9-156:58
 	android:windowSoftInputMode
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:130:13-55
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:156:13-55
 	android:exported
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:129:13-37
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:155:13-37
 	android:name
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:128:13-48
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:154:13-48
 activity#com.dormigo.ChatMessageActivity
-ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:132:9-135:58
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:158:9-161:58
 	android:windowSoftInputMode
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:135:13-55
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:161:13-55
 	android:exported
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:134:13-37
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:160:13-37
 	android:name
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:133:13-48
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:159:13-48
 activity#com.dormigo.NotificationsActivity
-ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:137:9-140:58
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:163:9-166:58
 	android:windowSoftInputMode
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:140:13-55
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:166:13-55
 	android:exported
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:139:13-37
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:165:13-37
 	android:name
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:138:13-50
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:164:13-50
 activity#com.dormigo.VerificationActivity
-ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:142:9-145:58
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:168:9-171:58
 	android:windowSoftInputMode
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:145:13-55
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:171:13-55
 	android:exported
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:144:13-37
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:170:13-37
 	android:name
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:143:13-49
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:169:13-49
 activity#com.dormigo.MyReviewsActivity
-ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:147:9-150:58
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:173:9-176:58
 	android:windowSoftInputMode
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:150:13-55
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:176:13-55
 	android:exported
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:149:13-37
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:175:13-37
 	android:name
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:148:13-46
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:174:13-46
+activity#com.dormigo.LandlordReviewsActivity
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:178:9-181:58
+	android:windowSoftInputMode
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:181:13-55
+	android:exported
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:180:13-37
+	android:name
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:179:13-52
 activity#com.dormigo.WriteReviewActivity
-ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:152:9-155:58
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:183:9-186:58
 	android:windowSoftInputMode
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:155:13-55
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:186:13-55
 	android:exported
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:154:13-37
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:185:13-37
 	android:name
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:153:13-48
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:184:13-48
 activity#com.dormigo.AccountDetailsActivity
-ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:157:9-160:58
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:188:9-191:58
 	android:windowSoftInputMode
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:160:13-55
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:191:13-55
 	android:exported
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:159:13-37
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:190:13-37
 	android:name
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:158:13-51
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:189:13-51
 activity#com.dormigo.LandlordHomeActivity
-ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:162:9-165:58
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:193:9-196:58
 	android:windowSoftInputMode
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:165:13-55
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:196:13-55
 	android:exported
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:164:13-37
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:195:13-37
 	android:name
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:163:13-49
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:194:13-49
 activity#com.dormigo.AddBoardingHouseActivity
-ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:167:9-170:58
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:198:9-201:58
 	android:windowSoftInputMode
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:170:13-55
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:201:13-55
 	android:exported
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:169:13-37
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:200:13-37
 	android:name
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:168:13-53
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:199:13-53
 activity#com.dormigo.LandlordChatActivity
-ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:172:9-175:58
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:203:9-206:58
 	android:windowSoftInputMode
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:175:13-55
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:206:13-55
 	android:exported
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:174:13-37
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:205:13-37
 	android:name
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:173:13-49
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:204:13-49
 activity#com.dormigo.LandlordProfileActivity
-ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:177:9-180:58
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:208:9-211:58
 	android:windowSoftInputMode
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:180:13-55
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:211:13-55
 	android:exported
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:179:13-37
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:210:13-37
 	android:name
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:178:13-52
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:209:13-52
 activity#com.dormigo.LandlordTenantsActivity
-ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:182:9-185:58
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:213:9-216:58
 	android:windowSoftInputMode
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:185:13-55
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:216:13-55
 	android:exported
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:184:13-37
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:215:13-37
 	android:name
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:183:13-52
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:214:13-52
 activity#com.dormigo.LandlordPropertiesActivity
-ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:187:9-190:58
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:218:9-221:58
 	android:windowSoftInputMode
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:190:13-55
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:221:13-55
 	android:exported
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:189:13-37
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:220:13-37
 	android:name
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:188:13-55
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:219:13-55
 activity#com.dormigo.LandlordPropertyDetailsActivity
-ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:192:9-195:58
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:223:9-226:58
 	android:windowSoftInputMode
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:195:13-55
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:226:13-55
 	android:exported
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:194:13-37
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:225:13-37
 	android:name
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:193:13-60
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:224:13-60
 activity#com.dormigo.LandlordEditPropertyActivity
-ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:197:9-200:58
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:228:9-231:58
 	android:windowSoftInputMode
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:200:13-55
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:231:13-55
 	android:exported
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:199:13-37
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:230:13-37
 	android:name
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:198:13-57
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:229:13-57
 activity#com.dormigo.LandlordRequestsActivity
-ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:202:9-205:58
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:233:9-236:58
 	android:windowSoftInputMode
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:205:13-55
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:236:13-55
 	android:exported
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:204:13-37
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:235:13-37
 	android:name
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:203:13-53
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:234:13-53
 activity#com.dormigo.LandlordNotificationsActivity
-ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:207:9-210:58
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:238:9-241:58
 	android:windowSoftInputMode
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:210:13-55
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:241:13-55
 	android:exported
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:209:13-37
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:240:13-37
 	android:name
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:208:13-58
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:239:13-58
 activity#com.dormigo.LandlordPaymentMethodsActivity
-ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:212:9-215:58
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:243:9-246:58
 	android:windowSoftInputMode
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:215:13-55
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:246:13-55
 	android:exported
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:214:13-37
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:245:13-37
 	android:name
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:213:13-59
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:244:13-59
+activity#com.dormigo.LandlordRentalChargesActivity
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:248:9-251:58
+	android:windowSoftInputMode
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:251:13-55
+	android:exported
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:250:13-37
+	android:name
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:249:13-58
 activity#com.dormigo.LandlordChatMessageActivity
-ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:217:9-220:58
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:253:9-256:58
 	android:windowSoftInputMode
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:220:13-55
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:256:13-55
 	android:exported
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:219:13-37
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:255:13-37
 	android:name
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:218:13-56
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:254:13-56
 activity#com.dormigo.LandlordTransactionHistoryActivity
-ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:222:9-225:58
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:258:9-261:58
 	android:windowSoftInputMode
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:225:13-55
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:261:13-55
 	android:exported
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:224:13-37
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:260:13-37
 	android:name
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:223:13-63
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:259:13-63
 activity#com.dormigo.EditProfileActivity
-ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:227:9-230:58
+ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:263:9-266:58
 	android:windowSoftInputMode
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:230:13-55
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:266:13-55
 	android:exported
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:229:13-37
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:265:13-37
 	android:name
-		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:228:13-48
+		ADDED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:264:13-48
 uses-sdk
 INJECTED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml

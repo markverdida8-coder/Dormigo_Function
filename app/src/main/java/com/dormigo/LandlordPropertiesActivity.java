@@ -694,6 +694,52 @@ public class LandlordPropertiesActivity extends AppCompatActivity {
                 addressParams
         );
 
+        String verifStatus = house.optString("verification_status", "NOT_SUBMITTED");
+        boolean cashEnabled = house.optBoolean("cash_enabled", true);
+        String gcashQrCode = house.optString("gcash_qr_code", "");
+        boolean hasGcash = gcashQrCode != null && !gcashQrCode.trim().isEmpty() && !"null".equalsIgnoreCase(gcashQrCode.trim());
+
+        String verifBadgeStr;
+        if ("VERIFIED".equalsIgnoreCase(verifStatus)) {
+            verifBadgeStr = "🟢 Verified";
+        } else if ("PENDING".equalsIgnoreCase(verifStatus)) {
+            verifBadgeStr = "🟡 Pending Verification";
+        } else if ("REJECTED".equalsIgnoreCase(verifStatus)) {
+            verifBadgeStr = "🔴 Rejected";
+        } else {
+            verifBadgeStr = "⚪ Not Submitted";
+        }
+
+        String paymentMethodsStr;
+        if (cashEnabled && hasGcash) {
+            paymentMethodsStr = "💳 Payment Methods: Cash & GCash";
+        } else if (cashEnabled) {
+            paymentMethodsStr = "💳 Payment Methods: Cash Only";
+        } else if (hasGcash) {
+            paymentMethodsStr = "💳 Payment Methods: GCash Only";
+        } else {
+            paymentMethodsStr = "💳 Payment Methods: Not Configured ⚠️";
+        }
+
+        TextView verifBadgeText = new TextView(this);
+        verifBadgeText.setText(verifBadgeStr);
+        verifBadgeText.setTextColor(Color.parseColor("#D7E9E1"));
+        verifBadgeText.setTextSize(12);
+        verifBadgeText.setTypeface(null, Typeface.BOLD);
+        LinearLayout.LayoutParams verifParams = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        verifParams.topMargin = dp(4);
+        card.addView(verifBadgeText, verifParams);
+
+        TextView paymentMethodsText = new TextView(this);
+        paymentMethodsText.setText(paymentMethodsStr);
+        paymentMethodsText.setTextColor(Color.parseColor("#D7E9E1"));
+        paymentMethodsText.setTextSize(12);
+        LinearLayout.LayoutParams pmParams = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        pmParams.topMargin = dp(2);
+        card.addView(paymentMethodsText, pmParams);
+
         // =====================================================
         // OCCUPANCY BOX
         // =====================================================

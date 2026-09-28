@@ -2,15 +2,20 @@ package com.dormigo;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,13 +23,17 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.bumptech.glide.Glide;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -32,6 +41,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class LandlordEditPropertyActivity
@@ -90,7 +103,7 @@ public class LandlordEditPropertyActivity
 
         setupSaveButton();
 
-        setupDeleteButton();
+        setupPhotoManagement();
 
         if (houseId <= 0) {
 
@@ -466,6 +479,18 @@ public class LandlordEditPropertyActivity
 
                                         propertyStatus =
                                                 "ACTIVE";
+                                    }
+
+                                    JSONArray photosArr = house.optJSONArray("photo_paths");
+                                    if (photosArr != null && photoUris.isEmpty()) {
+                                        for (int p = 0; p < photosArr.length(); p++) {
+                                            String pPath = photosArr.optString(p, "");
+                                            if (!pPath.isEmpty()) {
+                                                String fullUrl = pPath.startsWith("http") ? pPath : "http://10.149.229.109/Dormigo_Backend/" + pPath;
+                                                photoUris.add(Uri.parse(fullUrl));
+                                            }
+                                        }
+                                        renderPhotos();
                                     }
 
                                     displayCurrentData();
@@ -1033,7 +1058,7 @@ public class LandlordEditPropertyActivity
                         amenitiesToRemove.size();
 
         if (totalOperations == 0) {
-
+            savePhotosIfAny();
             setSavingState(
                     false
             );
@@ -1164,6 +1189,25 @@ public class LandlordEditPropertyActivity
     // =========================================================
     // AMENITY OPERATION COMPLETION
     // =========================================================
+
+    private void savePhotosIfAny() {
+        boolean hasLocalPhotos = false;
+        for (Uri u : photoUris) {
+            if (u != null && !u.toString().startsWith("http")) {
+                hasLocalPhotos = true;
+                break;
+            }
+        }
+        if (hasLocalPhotos) {
+            apiClient.uploadHousePhotos(this, houseId, photoUris, new Callback() {
+                @Override
+                public void onFailure(@NonNull Call call, @NonNull IOException e) {}
+
+                @Override
+                public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {}
+            });
+        }
+    }
 
     private void finishAmenityOperation(
             AtomicInteger remaining,
@@ -1413,67 +1457,138 @@ public class LandlordEditPropertyActivity
     }
 
     // =========================================================
-    // DELETE BOARDING HOUSE
+    // PHOTO MANAGEMENT
     // =========================================================
 
-    private void setupDeleteButton() {
-        TextView btnDeleteProperty = findViewById(R.id.btnDeleteProperty);
-        if (btnDeleteProperty != null) {
-            btnDeleteProperty.setOnClickListener(v -> {
-                if (houseId <= 0) return;
+    private final List<Uri> photoUris = new ArrayList<>();
+    private ActivityResultLauncher<String[]> imagePickerLauncher;
+    private int replacePhotoIndex = -1;
 
-                new AlertDialog.Builder(this)
-                        .setTitle("Delete Boarding House?")
-                        .setMessage("Are you sure you want to permanently delete '" + (propertyName.isEmpty() ? "this house" : propertyName) + "'? This will remove all its rooms, photos, amenities, and records from PostgreSQL.")
-                        .setNegativeButton("Cancel", null)
-                        .setPositiveButton("Delete", (dialog, which) -> deleteHouse())
-                        .show();
+    private void setupPhotoManagement() {
+        imagePickerLauncher = registerForActivityResult(
+                new ActivityResultContracts.OpenDocument(), uri -> {
+                    if (uri != null) {
+                        try {
+                            getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        } catch (Exception ignored) {}
+
+                        if (replacePhotoIndex >= 0 && replacePhotoIndex < photoUris.size()) {
+                            Uri oldUri = photoUris.get(replacePhotoIndex);
+                            if (oldUri != null && oldUri.toString().startsWith("http")) {
+                                deletePhotoFromDatabase(oldUri.toString());
+                            }
+                            photoUris.set(replacePhotoIndex, uri);
+                            replacePhotoIndex = -1;
+                        } else {
+                            photoUris.add(uri);
+                        }
+                        renderPhotos();
+                    }
+                });
+
+        View btnAddPhoto = findViewById(R.id.btnAddPhoto);
+        if (btnAddPhoto != null) {
+            btnAddPhoto.setOnClickListener(v -> {
+                replacePhotoIndex = -1;
+                imagePickerLauncher.launch(new String[]{"image/jpeg", "image/png", "image/webp"});
             });
         }
     }
 
-    private void deleteHouse() {
-        setSavingState(true);
-        apiClient.deleteBoardingHouse(houseId, new Callback() {
-            @Override
-            public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                runOnUiThread(() -> {
-                    setSavingState(false);
-                    showToast("Failed to delete boarding house.");
-                });
+    private void deletePhotoFromDatabase(String photoUrl) {
+        try {
+            JSONObject json = new JSONObject();
+            json.put("action", "delete_photo");
+            json.put("house_id", houseId);
+            json.put("photo_path", photoUrl);
+
+            RequestBody body = RequestBody.create(json.toString(), MediaType.get("application/json; charset=utf-8"));
+            Request request = new Request.Builder()
+                    .url("http://10.149.229.109/Dormigo_Backend/api/boarding_houses.php")
+                    .delete(body)
+                    .build();
+
+            new OkHttpClient().newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(@NonNull Call call, @NonNull IOException e) {}
+
+                @Override
+                public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {}
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void renderPhotos() {
+        LinearLayout container = findViewById(R.id.editPhotosContainer);
+        TextView textInstructions = findViewById(R.id.textPhotoInstructions);
+
+        if (container == null) return;
+        container.removeAllViews();
+
+        if (photoUris.isEmpty()) {
+            if (textInstructions != null) textInstructions.setVisibility(View.GONE);
+            TextView empty = new TextView(this);
+            empty.setText("No photos uploaded yet.");
+            empty.setTextColor(Color.parseColor("#9A9A9E"));
+            empty.setTextSize(12);
+            empty.setPadding(0, dp(12), 0, dp(12));
+            container.addView(empty);
+            return;
+        }
+
+        if (textInstructions != null) textInstructions.setVisibility(View.VISIBLE);
+
+        for (int i = 0; i < photoUris.size(); i++) {
+            final int index = i;
+            Uri uri = photoUris.get(i);
+
+            FrameLayout card = new FrameLayout(this);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(dp(88), dp(88));
+            if (i > 0) params.setMarginStart(dp(8));
+            card.setLayoutParams(params);
+            card.setBackgroundResource(R.drawable.bg_card_rounded);
+
+            ImageView img = new ImageView(this);
+            img.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+            img.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            card.addView(img);
+
+            String url = uri.toString();
+            if (url.startsWith("http")) {
+                Glide.with(this)
+                        .load(url)
+                        .placeholder(R.drawable.bg_image_placeholder)
+                        .into(img);
+            } else {
+                img.setImageURI(uri);
             }
 
-            @Override
-            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                if (!response.isSuccessful()) {
-                    runOnUiThread(() -> setSavingState(false));
-                    return;
-                }
-                try {
-                    String body = response.body() != null ? response.body().string() : "";
-                    JSONObject json = new JSONObject(body);
-                    if (json.optBoolean("success", false)) {
-                        runOnUiThread(() -> {
-                            showToast("Boarding house deleted successfully!");
-                            Intent intent = new Intent(LandlordEditPropertyActivity.this, LandlordPropertiesActivity.class);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(intent);
-                            finish();
-                        });
-                    } else {
-                        String msg = json.optString("message", "Unable to delete boarding house.");
-                        runOnUiThread(() -> {
-                            setSavingState(false);
-                            showToast(msg);
-                        });
-                    }
-                } catch (Exception e) {
-                    runOnUiThread(() -> {
-                        setSavingState(false);
-                        showToast("Delete error.");
-                    });
-                }
-            }
-        });
+            // Tap photo -> replace photo
+            card.setOnClickListener(v -> {
+                replacePhotoIndex = index;
+                imagePickerLauncher.launch(new String[]{"image/jpeg", "image/png", "image/webp"});
+            });
+
+            // Long press photo -> delete photo
+            card.setOnLongClickListener(v -> {
+                new AlertDialog.Builder(this)
+                        .setTitle("Delete Photo?")
+                        .setMessage("Are you sure you want to delete this photo?")
+                        .setPositiveButton("Delete", (dialog, which) -> {
+                            Uri removedUri = photoUris.remove(index);
+                            if (removedUri != null && removedUri.toString().startsWith("http")) {
+                                deletePhotoFromDatabase(removedUri.toString());
+                            }
+                            renderPhotos();
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .show();
+                return true;
+            });
+
+            container.addView(card);
+        }
     }
 }

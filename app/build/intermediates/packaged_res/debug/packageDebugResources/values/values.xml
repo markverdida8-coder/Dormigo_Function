@@ -28,6 +28,7 @@
     <string name="amount_sent">%1$s sent</string>
     <string name="any">Any</string>
     <string name="app_name">Dormigo</string>
+    <string name="app_version">Version 1.0.0-rc1</string>
     <string name="apply_filters">Apply Filters</string>
     <string name="approve">Approve</string>
     <string name="approved">Approved</string>

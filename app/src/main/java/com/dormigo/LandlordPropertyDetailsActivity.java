@@ -87,7 +87,6 @@ public class LandlordPropertyDetailsActivity extends AppCompatActivity {
         bindViews();
         readIntentData();
         setupUI();
-        loadVerificationStatus();
         loadPaymentSettingsSummary();
     }
 
@@ -96,7 +95,6 @@ public class LandlordPropertyDetailsActivity extends AppCompatActivity {
         super.onResume();
         if (houseId > 0) {
             loadRooms();
-            loadVerificationStatus();
             loadPaymentSettingsSummary();
         }
     }
@@ -141,6 +139,74 @@ public class LandlordPropertyDetailsActivity extends AppCompatActivity {
         if (detailTotalUnits != null) detailTotalUnits.setText(totalUnits);
         if (detailOccupiedUnits != null) detailOccupiedUnits.setText(occupiedUnits);
         if (detailAvailableUnits != null) detailAvailableUnits.setText(availableUnits);
+
+        View btnConfigureRental = findViewById(R.id.btnConfigureRentalCharges);
+        View cardRentalCharges = findViewById(R.id.btnRentalChargesCard);
+        View.OnClickListener rentalChargesListener = v -> {
+            if (houseId <= 0) {
+                Toast.makeText(this, "Unable to load rental charges for this property.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            try {
+                Intent intent = new Intent(this, LandlordRentalChargesActivity.class);
+                intent.putExtra("HOUSE_ID", houseId);
+                intent.putExtra("PROPERTY_NAME", propertyName);
+                startActivity(intent);
+            } catch (Exception e) {
+                Toast.makeText(this, "Unable to load rental charges for this property.", Toast.LENGTH_SHORT).show();
+            }
+        };
+        if (btnConfigureRental != null) btnConfigureRental.setOnClickListener(rentalChargesListener);
+        if (cardRentalCharges != null) cardRentalCharges.setOnClickListener(rentalChargesListener);
+
+        View btnConfigure = findViewById(R.id.btnConfigurePaymentMethods);
+        View cardPaymentSettings = findViewById(R.id.btnPaymentSettingsCard);
+        View.OnClickListener paymentSettingsListener = v -> {
+            Intent intent = new Intent(this, LandlordPaymentMethodsActivity.class);
+            intent.putExtra("HOUSE_ID", houseId);
+            intent.putExtra("HOUSE_NAME", propertyName);
+            startActivity(intent);
+        };
+        if (btnConfigure != null) btnConfigure.setOnClickListener(paymentSettingsListener);
+        if (cardPaymentSettings != null) cardPaymentSettings.setOnClickListener(paymentSettingsListener);
+
+        View btnReviews = findViewById(R.id.btnViewReviews);
+        View cardReviews = findViewById(R.id.btnStudentReviewsCard);
+        View.OnClickListener reviewsListener = v -> {
+            Intent intent = new Intent(this, LandlordReviewsActivity.class);
+            intent.putExtra("HOUSE_ID", houseId);
+            intent.putExtra("PROPERTY_NAME", propertyName);
+            startActivity(intent);
+        };
+        if (btnReviews != null) btnReviews.setOnClickListener(reviewsListener);
+        if (cardReviews != null) cardReviews.setOnClickListener(reviewsListener);
+
+        View btnDeleteProperty = findViewById(R.id.btnDeleteProperty);
+        if (btnDeleteProperty != null) {
+            btnDeleteProperty.setOnClickListener(v -> {
+                new AlertDialog.Builder(this)
+                        .setTitle("Delete Property?")
+                        .setMessage("Are you sure you want to permanently delete " + (propertyName.isEmpty() ? "this property" : propertyName) + "?\n\nThis will remove all associated rooms, photos, and records.")
+                        .setPositiveButton("Delete", (dialog, which) -> {
+                            apiClient.deleteBoardingHouse(houseId, new Callback() {
+                                @Override
+                                public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                                    runOnUiThread(() -> Toast.makeText(LandlordPropertyDetailsActivity.this, "Failed to delete property.", Toast.LENGTH_SHORT).show());
+                                }
+
+                                @Override
+                                public void onResponse(@NonNull Call call, @NonNull Response response) {
+                                    runOnUiThread(() -> {
+                                        Toast.makeText(LandlordPropertyDetailsActivity.this, "Property deleted successfully.", Toast.LENGTH_SHORT).show();
+                                        finish();
+                                    });
+                                }
+                            });
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .show();
+            });
+        }
 
         View btnViewTenants = findViewById(R.id.btnViewTenants);
         if (btnViewTenants != null) {
@@ -243,6 +309,11 @@ public class LandlordPropertyDetailsActivity extends AppCompatActivity {
         if (detailTotalUnits != null) detailTotalUnits.setText(String.valueOf(total));
         if (detailOccupiedUnits != null) detailOccupiedUnits.setText(String.valueOf(occupied));
         if (detailAvailableUnits != null) detailAvailableUnits.setText(String.valueOf(available));
+
+        TextView headerOcc = findViewById(R.id.headerOccupancyText);
+        if (headerOcc != null) {
+            headerOcc.setText(occupied + " of " + total + " rooms occupied · " + available + " available");
+        }
 
         if (roomsStatus != null) {
             if (total == 0) {
@@ -569,132 +640,6 @@ public class LandlordPropertyDetailsActivity extends AppCompatActivity {
         builder.show();
     }
 
-    private void loadVerificationStatus() {
-        if (houseId <= 0) return;
-        String url = "http://10.129.224.109/Dormigo_Backend/api/get_landlord_verification_status.php?house_id=" + houseId;
-        Request request = new Request.Builder().url(url).get().build();
-        new OkHttpClient().newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                runOnUiThread(() -> updateVerificationUI("NOT_SUBMITTED", ""));
-            }
-
-            @Override
-            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                if (!response.isSuccessful()) {
-                    runOnUiThread(() -> updateVerificationUI("NOT_SUBMITTED", ""));
-                    return;
-                }
-                String body = response.body() != null ? response.body().string() : "";
-                try {
-                    JSONObject json = new JSONObject(body);
-                    if (json.optBoolean("success", false)) {
-                        JSONObject data = json.optJSONObject("data");
-                        if (data != null) {
-                            String status = data.optString("verification_status", "NOT_SUBMITTED");
-                            String reason = data.optString("rejection_reason", "");
-                            runOnUiThread(() -> updateVerificationUI(status, reason));
-                        } else {
-                            runOnUiThread(() -> updateVerificationUI("NOT_SUBMITTED", ""));
-                        }
-                    } else {
-                        runOnUiThread(() -> updateVerificationUI("NOT_SUBMITTED", ""));
-                    }
-                } catch (Exception e) {
-                    runOnUiThread(() -> updateVerificationUI("NOT_SUBMITTED", ""));
-                }
-            }
-        });
-    }
-
-    private void updateVerificationUI(String status, String reason) {
-        TextView tvStatus = findViewById(R.id.textVerificationStatus);
-        TextView tvReason = findViewById(R.id.textRejectionReason);
-        TextView btnSubmit = findViewById(R.id.btnSubmitVerification);
-
-        if (tvStatus != null) {
-            tvStatus.setText("Status: " + status);
-        }
-        if (tvReason != null) {
-            if (status.equals("REJECTED") && !reason.isEmpty()) {
-                tvReason.setVisibility(View.VISIBLE);
-                tvReason.setText("Reason: " + reason);
-            } else {
-                tvReason.setVisibility(View.GONE);
-            }
-        }
-        if (btnSubmit != null) {
-            if (status.equals("VERIFIED")) {
-                btnSubmit.setText("Verified Property");
-                btnSubmit.setEnabled(false);
-                btnSubmit.setAlpha(0.6f);
-            } else if (status.equals("PENDING")) {
-                btnSubmit.setText("Verification Pending...");
-                btnSubmit.setEnabled(false);
-                btnSubmit.setAlpha(0.6f);
-            } else {
-                btnSubmit.setText(status.equals("REJECTED") ? "Resubmit for Verification" : "Submit for Verification");
-                btnSubmit.setEnabled(true);
-                btnSubmit.setAlpha(1.0f);
-                btnSubmit.setOnClickListener(v -> submitVerificationDialog());
-            }
-        }
-    }
-
-    private void submitVerificationDialog() {
-        new AlertDialog.Builder(this)
-                .setTitle("Submit for Verification")
-                .setMessage("Submit this boarding house for admin verification?")
-                .setNegativeButton("Cancel", null)
-                .setPositiveButton("Submit", (dialog, which) -> sendVerificationSubmission())
-                .show();
-    }
-
-    private void sendVerificationSubmission() {
-        try {
-            MultipartBody.Builder builder = new MultipartBody.Builder()
-                    .setType(MultipartBody.FORM)
-                    .addFormDataPart("house_id", String.valueOf(houseId))
-                    .addFormDataPart("landlord_id", String.valueOf(landlordId));
-
-            RequestBody requestBody = builder.build();
-            Request request = new Request.Builder()
-                    .url("http://10.129.224.109/Dormigo_Backend/api/submit_verification.php")
-                    .post(requestBody)
-                    .build();
-
-            new OkHttpClient().newCall(request).enqueue(new Callback() {
-                @Override
-                public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                    Log.e("VERIF_SUBMIT", "Failure", e);
-                    runOnUiThread(() -> Toast.makeText(LandlordPropertyDetailsActivity.this, "Submission failed: " + e.getMessage(), Toast.LENGTH_LONG).show());
-                }
-
-                @Override
-                public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                    String body = response.body() != null ? response.body().string() : "";
-                    Log.d("VERIF_SUBMIT", "Code: " + response.code() + ", Body: " + body);
-                    runOnUiThread(() -> {
-                        try {
-                            JSONObject res = new JSONObject(body);
-                            if (res.optBoolean("success", false)) {
-                                Toast.makeText(LandlordPropertyDetailsActivity.this, "Submitted successfully! Status: PENDING", Toast.LENGTH_LONG).show();
-                                loadVerificationStatus();
-                            } else {
-                                Toast.makeText(LandlordPropertyDetailsActivity.this, res.optString("message", "Submission failed."), Toast.LENGTH_LONG).show();
-                            }
-                        } catch (Exception e) {
-                            Log.e("VERIF_SUBMIT", "JSON parse error", e);
-                            Toast.makeText(LandlordPropertyDetailsActivity.this, "Server response error: " + body, Toast.LENGTH_LONG).show();
-                        }
-                    });
-                }
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     private int dp(int value) {
         return Math.round(value * getResources().getDisplayMetrics().density);
     }
@@ -718,20 +663,39 @@ public class LandlordPropertyDetailsActivity extends AppCompatActivity {
                                 JSONObject h = data.getJSONObject(i);
                                 if (h.optInt("house_id", 0) == houseId) {
                                     int adv = h.optInt("advance_months", 1);
-                                    int dep = h.optInt("security_deposit_months", 1);
-                                    double util = h.optDouble("utility_deposit", 0);
+                                    int dep = h.optInt("deposit_months", 1);
                                     double fees = h.optDouble("other_fees", 0);
                                     int dueDay = h.optInt("payment_due_day", 1);
 
-                                    String summary = "Advance: " + adv + " Month" + (adv > 1 ? "s" : "") + "\n" +
+                                    boolean cashEnabled = h.optBoolean("cash_enabled", true);
+                                    String gcashQrCode = h.optString("gcash_qr_code", "");
+                                    boolean hasGcash = gcashQrCode != null && !gcashQrCode.trim().isEmpty() && !"null".equalsIgnoreCase(gcashQrCode.trim());
+
+                                    String methodsStr;
+                                    if (cashEnabled && hasGcash) {
+                                        methodsStr = "Cash & GCash";
+                                    } else if (cashEnabled) {
+                                        methodsStr = "Cash Only";
+                                    } else if (hasGcash) {
+                                        methodsStr = "GCash Only";
+                                    } else {
+                                        methodsStr = "Not Configured ⚠️";
+                                    }
+
+                                    String summary = "Payment Methods: " + methodsStr + "\n" +
+                                                     "Advance: " + adv + " Month" + (adv > 1 ? "s" : "") + "\n" +
                                                      "Security Deposit: " + dep + " Month" + (dep > 1 ? "s" : "") + "\n" +
-                                                     "Utility Deposit: ₱" + String.format(Locale.US, "%.2f", util) + "\n" +
                                                      "Other Fees: ₱" + String.format(Locale.US, "%.2f", fees) + "\n" +
                                                      "Monthly Due Day: Every " + dueDay + getOrdinalSuffix(dueDay) + " day";
+
+                                    final String pmHeaderStr = "💳 Payment Methods: " + methodsStr;
 
                                     runOnUiThread(() -> {
                                         TextView tv = findViewById(R.id.textPaymentSettingsSummary);
                                         if (tv != null) tv.setText(summary);
+
+                                        TextView headerPm = findViewById(R.id.headerPaymentMethodsText);
+                                        if (headerPm != null) headerPm.setText(pmHeaderStr);
                                     });
                                     break;
                                 }

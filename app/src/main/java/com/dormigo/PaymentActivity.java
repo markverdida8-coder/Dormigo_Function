@@ -1,26 +1,58 @@
 package com.dormigo;
 
+import android.app.Dialog;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.res.ColorStateList;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.net.Uri;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+
+import com.bumptech.glide.Glide;
 import android.util.Log;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.target.Target;
+import com.bumptech.glide.request.transition.Transition;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -36,9 +68,52 @@ public class PaymentActivity extends AppCompatActivity {
 
     private final ApiClient apiClient = new ApiClient();
 
+    private Uri selectedReceiptUri = null;
+    private ImageView sheetImgReceiptPreview = null;
+    private View sheetLayoutPlaceholder = null;
+    private View sheetLayoutPreview = null;
+
+    private final ActivityResultLauncher<String> receiptPickerLauncher = registerForActivityResult(
+            new ActivityResultContracts.GetContent(),
+            uri -> {
+                if (uri != null) {
+                    selectedReceiptUri = uri;
+                    updateReceiptPreviewUI();
+                }
+            }
+    );
+
+    private void updateReceiptPreviewUI() {
+        if (selectedReceiptUri != null && sheetImgReceiptPreview != null) {
+            if (sheetLayoutPlaceholder != null) sheetLayoutPlaceholder.setVisibility(View.GONE);
+            if (sheetLayoutPreview != null) sheetLayoutPreview.setVisibility(View.VISIBLE);
+            Glide.with(this)
+                    .load(selectedReceiptUri)
+                    .into(sheetImgReceiptPreview);
+        } else {
+            if (sheetLayoutPlaceholder != null) sheetLayoutPlaceholder.setVisibility(View.VISIBLE);
+            if (sheetLayoutPreview != null) sheetLayoutPreview.setVisibility(View.GONE);
+        }
+    }
+
+    private File getFileFromUri(Uri uri) throws IOException {
+        File tempFile = File.createTempFile("receipt_proof_", ".jpg", getCacheDir());
+        try (InputStream input = getContentResolver().openInputStream(uri);
+             OutputStream output = new FileOutputStream(tempFile)) {
+            if (input == null) throw new IOException("Cannot open selected receipt image.");
+            byte[] buffer = new byte[8192];
+            int count;
+            while ((count = input.read(buffer)) != -1) {
+                output.write(buffer, 0, count);
+            }
+        }
+        return tempFile;
+    }
+
     private int bookingId = 0;
     private int paymentId = 0;
     private int paymentPeriod = 1;
+    private String currentTransactionRef = "";
 
     private double monthlyRent = 0;
     private boolean initialPaymentCompleted = false;
@@ -56,6 +131,9 @@ public class PaymentActivity extends AppCompatActivity {
     private String bookingStatus = "";
     private String houseName = "";
     private String roomName = "";
+    private int houseId = 0;
+    private boolean houseCashEnabled = true;
+    private String houseGcashQrCode = "";
 
     private View methodGCash;
     private View methodCash;
@@ -181,19 +259,25 @@ public class PaymentActivity extends AppCompatActivity {
                                 monthlyRent = data.optDouble("agreed_monthly_rent", 0);
                                 initialPaymentCompleted = data.optBoolean("initial_payment_completed", false);
                                 advanceMonths = data.optInt("advance_months", 1);
-                                depositMonths = data.optInt("security_deposit_months", 1);
+                                depositMonths = data.optInt("deposit_months", 1);
                                 utilityDeposit = data.optDouble("utility_deposit", 0);
                                 otherFees = data.optDouble("other_fees", 0);
+
+                                double monthlyRecurringFees = data.optDouble("monthly_recurring_fees", 0);
+                                double utilitiesFixed = data.optDouble("utilities_fixed", 0);
 
                                 if (!initialPaymentCompleted) {
                                     double advAmt = monthlyRent * advanceMonths;
                                     double depAmt = monthlyRent * depositMonths;
                                     totalDueAmount = monthlyRent + advAmt + depAmt + utilityDeposit + otherFees;
                                 } else {
-                                    totalDueAmount = monthlyRent;
+                                    totalDueAmount = monthlyRent + monthlyRecurringFees + utilitiesFixed;
                                 }
 
-                                moveInDate = data.optString("move_in_date", "");
+                                houseId = data.optInt("house_id", 0);
+                                houseName = data.optString("house_name", "Boarding House");
+                                roomName = data.optString("room_number", "");
+                                refreshHousePaymentSettings();
                                 paymentDueDay = data.optInt("payment_due_day", 1);
                                 nextDueDate = data.optString("next_due_date", "");
 
@@ -277,7 +361,7 @@ public class PaymentActivity extends AppCompatActivity {
                                             dueDate = item.optString("due_date", "");
                                             double savedAmount = item.optDouble("amount", monthlyRent);
                                             if (savedAmount > 0) {
-                                                monthlyRent = savedAmount;
+                                                totalDueAmount = savedAmount;
                                             }
                                         }
                                     }
@@ -306,7 +390,7 @@ public class PaymentActivity extends AppCompatActivity {
     }
 
     private void updateAmountViews() {
-        double paymentAmount = initialPaymentCompleted ? monthlyRent : totalDueAmount;
+        double paymentAmount = totalDueAmount;
         String formattedTotal = formatMoney(paymentAmount);
 
         if (rentAmountLabel != null) {
@@ -372,7 +456,7 @@ public class PaymentActivity extends AppCompatActivity {
         }
 
         if (methodGCash != null && methodGCash.isSelected()) {
-            double paymentAmount = initialPaymentCompleted ? monthlyRent : totalDueAmount;
+            double paymentAmount = totalDueAmount;
             showGcashQrBottomSheet(formatMoney(paymentAmount));
         } else {
             submitOnsitePayment();
@@ -381,7 +465,7 @@ public class PaymentActivity extends AppCompatActivity {
 
     private void submitOnsitePayment() {
         setPaymentButtonEnabled(false);
-        double paymentAmount = initialPaymentCompleted ? monthlyRent : totalDueAmount;
+        double paymentAmount = totalDueAmount;
         String paymentDesc = initialPaymentCompleted ? "Monthly Rent – " + new SimpleDateFormat("MMMM yyyy", Locale.US).format(new Date()) : "Initial Move-in Payment";
 
         if (paymentId > 0) {
@@ -416,7 +500,51 @@ public class PaymentActivity extends AppCompatActivity {
         );
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (houseId > 0) {
+            refreshHousePaymentSettings();
+        }
+    }
+
+    private void refreshHousePaymentSettings() {
+        PaymentMethodManager.getInstance().refreshPaymentSettings(houseId, settings -> {
+            if (settings != null) {
+                houseCashEnabled = settings.cashEnabled;
+                houseGcashQrCode = settings.gcashQrCode;
+                configurePaymentMethodVisibility();
+            }
+        });
+    }
+
+    private void configurePaymentMethodVisibility() {
+        boolean hasQr = houseGcashQrCode != null && !houseGcashQrCode.trim().isEmpty() && !"null".equalsIgnoreCase(houseGcashQrCode.trim());
+
+        if (methodCash != null) {
+            methodCash.setVisibility(houseCashEnabled ? View.VISIBLE : View.GONE);
+        }
+        if (methodGCash != null) {
+            methodGCash.setVisibility(hasQr ? View.VISIBLE : View.GONE);
+        }
+
+        if (houseCashEnabled && hasQr) {
+            if (methodGCash != null) methodGCash.performClick();
+            setPaymentButtonEnabled(true);
+        } else if (houseCashEnabled) {
+            if (methodCash != null) methodCash.performClick();
+            setPaymentButtonEnabled(true);
+        } else if (hasQr) {
+            if (methodGCash != null) methodGCash.performClick();
+            setPaymentButtonEnabled(true);
+        } else {
+            setPaymentButtonEnabled(false);
+            showToast("No payment methods are currently available for this boarding house. Please contact the landlord.");
+        }
+    }
+
     private void showGcashQrBottomSheet(String amount) {
+        selectedReceiptUri = null;
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
         View view = getLayoutInflater().inflate(R.layout.gcash_qr_bottom_sheet, findViewById(R.id.mainLayout), false);
         bottomSheetDialog.setContentView(view);
@@ -426,6 +554,82 @@ public class PaymentActivity extends AppCompatActivity {
             amountLabel.setText(amount);
         }
 
+        TextView houseLabel = view.findViewById(R.id.houseNameLabel);
+        if (houseLabel != null) {
+            houseLabel.setText(houseName != null && !houseName.isEmpty() ? houseName : "Boarding House");
+        }
+
+        TextView roomLabel = view.findViewById(R.id.roomNameLabel);
+        if (roomLabel != null) {
+            roomLabel.setText(roomName != null && !roomName.isEmpty() ? "Room " + roomName : "Boarding House Unit");
+        }
+
+        ImageView imgGcashQr = view.findViewById(R.id.imgGcashQr);
+        View qrContainerCard = view.findViewById(R.id.qrContainerCard);
+        ProgressBar qrProgressBar = view.findViewById(R.id.qrProgressBar);
+
+        if (imgGcashQr != null) {
+            imgGcashQr.setLongClickable(false);
+            imgGcashQr.setOnLongClickListener(v -> true);
+        }
+
+        final String fullUrl;
+        if (houseGcashQrCode != null && !houseGcashQrCode.trim().isEmpty() && !"null".equalsIgnoreCase(houseGcashQrCode.trim())) {
+            fullUrl = houseGcashQrCode.startsWith("http") ? houseGcashQrCode : "http://10.149.229.109/Dormigo_Backend/" + houseGcashQrCode;
+        } else {
+            fullUrl = "";
+        }
+
+        if (imgGcashQr != null) {
+            if (!fullUrl.isEmpty()) {
+                if (qrProgressBar != null) qrProgressBar.setVisibility(View.VISIBLE);
+
+                Glide.with(this)
+                        .load(fullUrl)
+                        .placeholder(R.drawable.bg_image_placeholder)
+                        .error(R.drawable.ic_qr_code)
+                        .transition(DrawableTransitionOptions.withCrossFade())
+                        .listener(new RequestListener<Drawable>() {
+                            @Override
+                            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                                if (qrProgressBar != null) qrProgressBar.setVisibility(View.GONE);
+                                return false;
+                            }
+
+                            @Override
+                            public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                                if (qrProgressBar != null) qrProgressBar.setVisibility(View.GONE);
+                                return false;
+                            }
+                        })
+                        .into(imgGcashQr);
+            } else {
+                if (qrProgressBar != null) qrProgressBar.setVisibility(View.GONE);
+                imgGcashQr.setImageResource(R.drawable.ic_qr_code);
+            }
+        }
+
+        View.OnClickListener zoomListener = v -> {
+            if (!fullUrl.isEmpty()) {
+                showFullscreenQrDialog(amount, fullUrl);
+            } else {
+                showToast("No QR Code image available.");
+            }
+        };
+
+        if (imgGcashQr != null) imgGcashQr.setOnClickListener(zoomListener);
+        if (qrContainerCard != null) qrContainerCard.setOnClickListener(zoomListener);
+
+        EditText inputGcashRef = view.findViewById(R.id.inputGcashRef);
+        View btnUploadReceipt = view.findViewById(R.id.btnUploadReceipt);
+        sheetImgReceiptPreview = view.findViewById(R.id.imgReceiptPreview);
+        sheetLayoutPlaceholder = view.findViewById(R.id.layoutUploadPlaceholder);
+        sheetLayoutPreview = view.findViewById(R.id.layoutReceiptPreview);
+
+        if (btnUploadReceipt != null) {
+            btnUploadReceipt.setOnClickListener(v -> receiptPickerLauncher.launch("image/*"));
+        }
+
         View btnClose = view.findViewById(R.id.btnCloseQr);
         if (btnClose != null) {
             btnClose.setOnClickListener(v -> bottomSheetDialog.dismiss());
@@ -433,73 +637,167 @@ public class PaymentActivity extends AppCompatActivity {
 
         View btnDone = view.findViewById(R.id.btnDonePayment);
         if (btnDone != null) {
+            if (btnDone instanceof TextView) {
+                ((TextView) btnDone).setText("Submit Payment for Verification");
+            }
             btnDone.setOnClickListener(v -> {
+                String gcashRef = inputGcashRef != null ? inputGcashRef.getText().toString().trim() : "";
+
+                if (gcashRef.isEmpty()) {
+                    showToast("Please enter the GCash reference number.");
+                    return;
+                }
+                if (selectedReceiptUri == null) {
+                    showToast("Please upload a screenshot of the GCash receipt.");
+                    return;
+                }
+                if (bookingId <= 0) {
+                    showToast("Invalid booking ID.");
+                    return;
+                }
+                if (totalDueAmount <= 0) {
+                    showToast("Payment amount must be greater than zero.");
+                    return;
+                }
+
                 btnDone.setEnabled(false);
-                bottomSheetDialog.dismiss();
-                submitQrPayment();
+                if (btnDone instanceof TextView) {
+                    ((TextView) btnDone).setText("Submitting...");
+                }
+
+                submitQrPaymentProofWithFile(bottomSheetDialog, btnDone, gcashRef);
             });
         }
+
+        bottomSheetDialog.setOnShowListener(dialog -> {
+            BottomSheetDialog d = (BottomSheetDialog) dialog;
+            FrameLayout bottomSheet = d.findViewById(com.google.android.material.R.id.design_bottom_sheet);
+            if (bottomSheet != null) {
+                BottomSheetBehavior.from(bottomSheet).setState(BottomSheetBehavior.STATE_EXPANDED);
+                BottomSheetBehavior.from(bottomSheet).setSkipCollapsed(true);
+            }
+        });
 
         bottomSheetDialog.show();
     }
 
-    private void submitQrPayment() {
-        setPaymentButtonEnabled(false);
-        String paymentDate = getCurrentDate();
-        String transactionRef = "QR-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase(Locale.ROOT);
+    private void showFullscreenQrDialog(String amount, String fullUrl) {
+        Dialog dialog = new Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
+        View view = getLayoutInflater().inflate(R.layout.dialog_fullscreen_qr, findViewById(R.id.mainLayout), false);
+        dialog.setContentView(view);
 
-        if (paymentId > 0) {
-            apiClient.updatePaymentStatus(
-                    paymentId,
-                    "PAID",
-                    paymentDate,
-                    transactionRef,
-                    new Callback() {
-                        @Override
-                        public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                            runOnUiThread(() -> {
-                                setPaymentButtonEnabled(true);
-                                showToast("Unable to complete payment.");
-                            });
-                        }
+        TextView fullHouseName = view.findViewById(R.id.fullHouseName);
+        TextView fullAmount = view.findViewById(R.id.fullAmount);
+        ImageView fullQrImage = view.findViewById(R.id.fullQrImage);
+        View btnClose = view.findViewById(R.id.btnCloseFullscreen);
 
-                        @Override
-                        public void onResponse(@NonNull Call call, @NonNull Response response) {
-                            handlePaidResponse(response);
-                        }
-                    }
-            );
-            return;
+        if (fullHouseName != null) fullHouseName.setText(houseName != null && !houseName.isEmpty() ? houseName : "Boarding House");
+        if (fullAmount != null) fullAmount.setText(amount);
+
+        if (fullQrImage != null && !fullUrl.isEmpty()) {
+            Glide.with(this)
+                    .load(fullUrl)
+                    .placeholder(R.drawable.bg_image_placeholder)
+                    .error(R.drawable.ic_qr_code)
+                    .into(fullQrImage);
         }
 
-        double paymentAmount = initialPaymentCompleted ? monthlyRent : totalDueAmount;
+        if (btnClose != null) {
+            btnClose.setOnClickListener(v -> dialog.dismiss());
+        }
+
+        dialog.show();
+    }
+
+    private void submitQrPaymentProofWithFile(BottomSheetDialog dialog, View btnDone, String gcashRef) {
+        setPaymentButtonEnabled(false);
+        String paymentDate = getCurrentDate();
         String paymentDesc = initialPaymentCompleted ? "Monthly Rent – " + new SimpleDateFormat("MMMM yyyy", Locale.US).format(new Date()) : "Initial Move-in Payment";
 
-        apiClient.createPayment(
-                bookingId,
-                paymentPeriod,
-                dueDate,
-                paymentAmount,
-                "QR",
-                paymentDate,
-                "PAID",
-                transactionRef,
-                paymentDesc,
-                new Callback() {
-                    @Override
-                    public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                        runOnUiThread(() -> {
-                            setPaymentButtonEnabled(true);
-                            showToast("Unable to complete payment.");
-                        });
-                    }
+        new Thread(() -> {
+            try {
+                File proofFile = getFileFromUri(selectedReceiptUri);
 
-                    @Override
-                    public void onResponse(@NonNull Call call, @NonNull Response response) {
-                        handleCreatePaymentResponse(response);
+                apiClient.submitQrPaymentProof(
+                        bookingId,
+                        paymentId,
+                        paymentPeriod,
+                        dueDate,
+                        totalDueAmount,
+                        "QR",
+                        paymentDate,
+                        gcashRef,
+                        paymentDesc,
+                        proofFile,
+                        new Callback() {
+                            @Override
+                            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                                runOnUiThread(() -> {
+                                    if (dialog != null && dialog.isShowing()) {
+                                        btnDone.setEnabled(true);
+                                        if (btnDone instanceof TextView) {
+                                            ((TextView) btnDone).setText("Submit Payment for Verification");
+                                        }
+                                    }
+                                    setPaymentButtonEnabled(true);
+                                    showToast("Unable to submit payment proof. Check network.");
+                                });
+                            }
+
+                            @Override
+                            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                                String responseBody = response.body() != null ? response.body().string() : "";
+                                runOnUiThread(() -> {
+                                    try {
+                                        JSONObject json = new JSONObject(responseBody);
+                                        boolean success = json.optBoolean("success", false);
+                                        String msg = json.optString("message", "Payment proof submission failed.");
+
+                                        if (success) {
+                                            if (dialog != null && dialog.isShowing()) {
+                                                dialog.dismiss();
+                                            }
+                                            currentTransactionRef = gcashRef;
+                                            navigateToSuccess(formatMoney(totalDueAmount), paymentDesc);
+                                        } else {
+                                            if (dialog != null && dialog.isShowing()) {
+                                                btnDone.setEnabled(true);
+                                                if (btnDone instanceof TextView) {
+                                                    ((TextView) btnDone).setText("Submit Payment for Verification");
+                                                }
+                                            }
+                                            setPaymentButtonEnabled(true);
+                                            showToast(msg);
+                                        }
+                                    } catch (Exception e) {
+                                        if (dialog != null && dialog.isShowing()) {
+                                            btnDone.setEnabled(true);
+                                            if (btnDone instanceof TextView) {
+                                                ((TextView) btnDone).setText("Submit Payment for Verification");
+                                            }
+                                        }
+                                        setPaymentButtonEnabled(true);
+                                        showToast("Invalid response from server.");
+                                    }
+                                });
+                            }
+                        }
+                );
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                runOnUiThread(() -> {
+                    if (dialog != null && dialog.isShowing()) {
+                        btnDone.setEnabled(true);
+                        if (btnDone instanceof TextView) {
+                            ((TextView) btnDone).setText("Submit Payment for Verification");
+                        }
                     }
-                }
-        );
+                    setPaymentButtonEnabled(true);
+                    showToast("Failed to process selected receipt image.");
+                });
+            }
+        }).start();
     }
 
     private void handleCreatePaymentResponse(Response response) {
@@ -519,7 +817,8 @@ public class PaymentActivity extends AppCompatActivity {
                 }
 
                 paymentId = json.optInt("payment_id", paymentId);
-                double paymentAmount = initialPaymentCompleted ? monthlyRent : totalDueAmount;
+                currentTransactionRef = json.optString("transaction_ref", "");
+                double paymentAmount = totalDueAmount;
                 String paymentDesc = initialPaymentCompleted ? "Monthly Rent – " + new SimpleDateFormat("MMMM yyyy", Locale.US).format(new Date()) : "Initial Move-in Payment";
 
                 navigateToSuccess(formatMoney(paymentAmount), paymentDesc);
@@ -547,7 +846,9 @@ public class PaymentActivity extends AppCompatActivity {
                     return;
                 }
 
-                double paymentAmount = initialPaymentCompleted ? monthlyRent : totalDueAmount;
+                paymentId = json.optInt("payment_id", paymentId);
+                currentTransactionRef = json.optString("transaction_ref", "");
+                double paymentAmount = totalDueAmount;
                 String paymentDesc = initialPaymentCompleted ? "Monthly Rent – " + new SimpleDateFormat("MMMM yyyy", Locale.US).format(new Date()) : "Initial Move-in Payment";
 
                 navigateToSuccess(formatMoney(paymentAmount), paymentDesc);
@@ -584,37 +885,30 @@ public class PaymentActivity extends AppCompatActivity {
     private void navigateToSuccess(String amount, String paymentDesc) {
         if (bookingId > 0) {
             if (!initialPaymentCompleted) {
-                String initialDue = HomeActivity.calculateNextFutureDueDate(moveInDate, paymentDueDay);
-                apiClient.updateBookingInitialPaymentCompleted(bookingId, initialDue, new Callback() {
-                    @Override public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                        launchSuccessActivity(amount, paymentDesc);
-                    }
-                    @Override public void onResponse(@NonNull Call call, @NonNull Response response) {
-                        launchSuccessActivity(amount, paymentDesc);
-                    }
-                });
+                launchSuccessActivity(amount, paymentDesc, currentTransactionRef);
             } else {
                 String currentDue = (nextDueDate != null && !nextDueDate.isEmpty() && !"null".equals(nextDueDate)) ? nextDueDate : dueDate;
                 String updatedDue = addOneMonthToDate(currentDue);
                 apiClient.updateBookingNextDueDate(bookingId, updatedDue, new Callback() {
                     @Override public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                        launchSuccessActivity(amount, paymentDesc);
+                        launchSuccessActivity(amount, paymentDesc, currentTransactionRef);
                     }
                     @Override public void onResponse(@NonNull Call call, @NonNull Response response) {
-                        launchSuccessActivity(amount, paymentDesc);
+                        launchSuccessActivity(amount, paymentDesc, currentTransactionRef);
                     }
                 });
             }
         } else {
-            launchSuccessActivity(amount, paymentDesc);
+            launchSuccessActivity(amount, paymentDesc, currentTransactionRef);
         }
     }
 
-    private void launchSuccessActivity(String amount, String paymentDesc) {
+    private void launchSuccessActivity(String amount, String paymentDesc, String transactionRef) {
         runOnUiThread(() -> {
             Intent successIntent = new Intent(this, PaymentSuccessActivity.class);
             successIntent.putExtra("AMOUNT", amount);
             successIntent.putExtra("PAYMENT_DESC", paymentDesc);
+            successIntent.putExtra("TRANSACTION_REF", transactionRef);
             successIntent.putExtra("BOOKING_ID", bookingId);
             successIntent.putExtra("PAYMENT_ID", paymentId);
             successIntent.putExtra("PAYMENT_PERIOD", paymentPeriod);

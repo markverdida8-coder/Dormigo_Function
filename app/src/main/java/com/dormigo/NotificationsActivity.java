@@ -2,15 +2,11 @@ package com.dormigo;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -18,14 +14,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -33,13 +31,18 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
-public class NotificationsActivity extends AppCompatActivity {
+public class NotificationsActivity extends AppCompatActivity implements NotificationAdapter.OnNotificationClickListener {
 
     private final ApiClient apiClient = new ApiClient();
     private int userId;
-    private final List<JSONObject> notificationsList = new ArrayList<>();
+    private final List<JSONObject> rawNotificationList = new ArrayList<>();
+    private final List<JSONObject> filteredNotificationList = new ArrayList<>();
     private String currentFilter = "ALL";
-    private LinearLayout notificationsContainer;
+
+    private RecyclerView recyclerView;
+    private NotificationAdapter adapter;
+    private LinearLayout emptyStateLayout;
+    private TextView textUnreadCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,15 +62,21 @@ public class NotificationsActivity extends AppCompatActivity {
             });
         }
 
-        notificationsContainer = findViewById(R.id.notifListLayout);
-
+        bindViews();
         setupUI();
+        setupRecyclerView();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         loadNotifications();
+    }
+
+    private void bindViews() {
+        recyclerView = findViewById(R.id.recyclerViewNotifications);
+        emptyStateLayout = findViewById(R.id.emptyStateLayout);
+        textUnreadCount = findViewById(R.id.textUnreadCount);
     }
 
     private void setupUI() {
@@ -81,8 +90,8 @@ public class NotificationsActivity extends AppCompatActivity {
             markAllAsRead.setOnClickListener(v -> {
                 if (userId > 0) {
                     apiClient.markAllNotificationsAsRead(userId, new Callback() {
-                        @Override public void onFailure(Call call, IOException e) {}
-                        @Override public void onResponse(Call call, Response response) throws IOException {
+                        @Override public void onFailure(@NonNull Call call, @NonNull IOException e) {}
+                        @Override public void onResponse(@NonNull Call call, @NonNull Response response) {
                             runOnUiThread(() -> loadNotifications());
                         }
                     });
@@ -91,6 +100,33 @@ public class NotificationsActivity extends AppCompatActivity {
         }
 
         setupFilters();
+    }
+
+    private void setupRecyclerView() {
+        if (recyclerView == null) return;
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+
+        adapter = new NotificationAdapter(this, filteredNotificationList, this);
+        recyclerView.setAdapter(adapter);
+
+        // Swipe-to-dismiss
+        ItemTouchHelper.SimpleCallback swipeCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                int position = viewHolder.getBindingAdapterPosition();
+                if (position != RecyclerView.NO_POSITION && position < filteredNotificationList.size()) {
+                    adapter.removeItem(position);
+                }
+            }
+        };
+        new ItemTouchHelper(swipeCallback).attachToRecyclerView(recyclerView);
     }
 
     private void setupFilters() {
@@ -125,8 +161,8 @@ public class NotificationsActivity extends AppCompatActivity {
             } else if (id == R.id.filterMessages) {
                 currentFilter = "CHAT";
             }
-            
-            renderNotifications();
+
+            filterAndRenderNotifications();
         };
 
         if (filterAll != null) filterAll.setOnClickListener(filterListener);
@@ -137,26 +173,26 @@ public class NotificationsActivity extends AppCompatActivity {
 
     private void loadNotifications() {
         if (userId <= 0) return;
-        
+
         apiClient.getNotifications(userId, new Callback() {
             @Override
-            public void onFailure(Call call, IOException e) {}
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {}
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (!response.isSuccessful()) return;
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                if (!response.isSuccessful() || response.body() == null) return;
                 try {
                     JSONObject json = new JSONObject(response.body().string());
                     if (json.optBoolean("success", false)) {
                         JSONArray data = json.optJSONArray("data");
                         runOnUiThread(() -> {
-                            notificationsList.clear();
+                            rawNotificationList.clear();
                             if (data != null) {
                                 for (int i = 0; i < data.length(); i++) {
-                                    notificationsList.add(data.optJSONObject(i));
+                                    rawNotificationList.add(data.optJSONObject(i));
                                 }
                             }
-                            renderNotifications();
+                            filterAndRenderNotifications();
                         });
                     }
                 } catch (Exception ignored) {}
@@ -164,144 +200,74 @@ public class NotificationsActivity extends AppCompatActivity {
         });
     }
 
-    private void renderNotifications() {
-        // We will replace existing hardcoded mock elements if present
-        if (notificationsContainer == null) return;
-        
-        // Remove children except filters/headers if needed. For now, assume a dedicated container or we will dynamically add.
-        // Assuming we replace the whole ScrollView content if it's currently hardcoded.
-        LinearLayout parent = findViewById(R.id.notifListLayout);
-        if (parent != null) {
-            parent.removeAllViews();
-        } else {
-            return;
-        }
+    private void filterAndRenderNotifications() {
+        filteredNotificationList.clear();
+        int unreadCount = 0;
 
-        List<JSONObject> filtered = new ArrayList<>();
-        for (JSONObject notif : notificationsList) {
-            String type = notif.optString("type", "");
+        for (JSONObject notif : rawNotificationList) {
+            boolean isRead = notif.optBoolean("is_read", false);
+            if (!isRead) unreadCount++;
+
+            String type = notif.optString("type", "").toUpperCase(Locale.ROOT);
             if ("ALL".equals(currentFilter) || type.equals(currentFilter)) {
-                filtered.add(notif);
+                filteredNotificationList.add(notif);
             }
         }
 
-        if (filtered.isEmpty()) {
-            TextView empty = new TextView(this);
-            empty.setText("No notifications found.");
-            empty.setTextColor(0xFF9A9A9E);
-            empty.setGravity(Gravity.CENTER);
-            empty.setPadding(0, dp(40), 0, 0);
-            parent.addView(empty);
-            return;
+        if (textUnreadCount != null) {
+            if (unreadCount > 0) {
+                textUnreadCount.setText(unreadCount + " unread notification" + (unreadCount == 1 ? "" : "s"));
+            } else {
+                textUnreadCount.setText("All caught up");
+            }
         }
 
-        for (JSONObject notif : filtered) {
-            View card = createNotificationCard(notif);
-            parent.addView(card);
+        if (adapter != null) {
+            adapter.notifyDataSetChanged();
+        }
+
+        if (filteredNotificationList.isEmpty()) {
+            if (emptyStateLayout != null) emptyStateLayout.setVisibility(View.VISIBLE);
+            if (recyclerView != null) recyclerView.setVisibility(View.GONE);
+        } else {
+            if (emptyStateLayout != null) emptyStateLayout.setVisibility(View.GONE);
+            if (recyclerView != null) recyclerView.setVisibility(View.VISIBLE);
         }
     }
 
-    private View createNotificationCard(JSONObject notif) {
+    @Override
+    public void onNotificationClick(JSONObject notif, int position) {
         int notifId = notif.optInt("notification_id", 0);
-        String title = notif.optString("title", "");
-        String message = notif.optString("message", "");
-        String type = notif.optString("type", "");
         boolean isRead = notif.optBoolean("is_read", false);
-        String dateStr = notif.optString("created_at", "");
 
-        LinearLayout card = new LinearLayout(this);
-        card.setOrientation(LinearLayout.HORIZONTAL);
-        card.setPadding(0, dp(16), 0, dp(16));
-        card.setBackgroundResource(isRead ? 0 : R.drawable.bg_unread_notif);
+        if (!isRead && notifId > 0) {
+            try {
+                notif.put("is_read", true);
+            } catch (Exception ignored) {}
 
-        // Icon
-        ImageView icon = new ImageView(this);
-        int iconRes = R.drawable.ic_bell;
-        if ("BOOKING".equals(type)) iconRes = R.drawable.ic_receipt;
-        if ("PAYMENT".equals(type)) iconRes = R.drawable.ic_receipt;
-        if ("CHAT".equals(type)) iconRes = R.drawable.ic_message_square;
-        if ("REVIEW".equals(type)) iconRes = R.drawable.ic_star;
-        
-        icon.setImageResource(iconRes);
-        icon.setColorFilter(Color.parseColor("#1A1A1A"));
-        LinearLayout.LayoutParams iconLp = new LinearLayout.LayoutParams(dp(24), dp(24));
-        iconLp.setMarginEnd(dp(16));
-        card.addView(icon, iconLp);
-
-        // Text Content
-        LinearLayout textCol = new LinearLayout(this);
-        textCol.setOrientation(LinearLayout.VERTICAL);
-        LinearLayout.LayoutParams textLp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
-        card.addView(textCol, textLp);
-
-        TextView tvTitle = new TextView(this);
-        tvTitle.setText(title);
-        tvTitle.setTextColor(Color.parseColor("#1A1A1A"));
-        tvTitle.setTextSize(15);
-        tvTitle.setTypeface(null, Typeface.BOLD);
-        textCol.addView(tvTitle);
-
-        TextView tvMsg = new TextView(this);
-        tvMsg.setText(message);
-        tvMsg.setTextColor(Color.parseColor("#6E6E73"));
-        tvMsg.setTextSize(14);
-        tvMsg.setPadding(0, dp(4), 0, 0);
-        textCol.addView(tvMsg);
-
-        TextView tvTime = new TextView(this);
-        try {
-            SimpleDateFormat s1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
-            Date d = s1.parse(dateStr);
-            SimpleDateFormat s2 = new SimpleDateFormat("MMM d, yyyy h:mm a", Locale.US);
-            tvTime.setText(d != null ? s2.format(d) : dateStr);
-        } catch (Exception e) {
-            tvTime.setText(dateStr);
-        }
-        tvTime.setTextColor(Color.parseColor("#9A9A9E"));
-        tvTime.setTextSize(12);
-        tvTime.setPadding(0, dp(6), 0, 0);
-        textCol.addView(tvTime);
-
-        // Delete button
-        ImageView btnDelete = new ImageView(this);
-        btnDelete.setImageResource(R.drawable.ic_close);
-        btnDelete.setColorFilter(Color.parseColor("#9A9A9E"));
-        btnDelete.setPadding(dp(8), dp(8), dp(8), dp(8));
-        btnDelete.setOnClickListener(v -> {
-            apiClient.deleteNotification(notifId, new Callback() {
-                @Override public void onFailure(Call call, IOException e) {}
-                @Override public void onResponse(Call call, Response response) throws IOException {
-                    runOnUiThread(() -> loadNotifications());
-                }
+            apiClient.markNotificationAsRead(notifId, new Callback() {
+                @Override public void onFailure(@NonNull Call call, @NonNull IOException e) {}
+                @Override public void onResponse(@NonNull Call call, @NonNull Response response) {}
             });
-        });
-        card.addView(btnDelete);
+            filterAndRenderNotifications();
+        }
 
-        // Click Action
-        card.setOnClickListener(v -> {
-            if (!isRead) {
-                apiClient.markNotificationAsRead(notifId, new Callback() {
-                    @Override public void onFailure(Call call, IOException e) {}
-                    @Override public void onResponse(Call call, Response response) throws IOException {}
-                });
-            }
-            
-            // Navigate based on type
-            if ("BOOKING".equals(type)) {
-                startActivity(new Intent(this, BookingRequestsActivity.class));
-            } else if ("PAYMENT".equals(type)) {
-                startActivity(new Intent(this, TransactionHistoryActivity.class));
-            } else if ("CHAT".equals(type)) {
-                startActivity(new Intent(this, ChatHistoryActivity.class));
-            } else if ("REVIEW".equals(type)) {
-                startActivity(new Intent(this, MyReviewsActivity.class));
-            }
-        });
-
-        return card;
+        // Centralized Role-Based Notification Routing
+        NotificationRouter.route(this, notif);
     }
 
-    private int dp(int dp) {
-        return Math.round(dp * getResources().getDisplayMetrics().density);
+    @Override
+    public void onNotificationDismissed(JSONObject notif, int position) {
+        int notifId = notif.optInt("notification_id", 0);
+        rawNotificationList.remove(notif);
+
+        if (notifId > 0) {
+            apiClient.deleteNotification(notifId, new Callback() {
+                @Override public void onFailure(@NonNull Call call, @NonNull IOException e) {}
+                @Override public void onResponse(@NonNull Call call, @NonNull Response response) {}
+            });
+        }
+
+        filterAndRenderNotifications();
     }
 }

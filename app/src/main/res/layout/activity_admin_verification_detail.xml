@@ -51,37 +51,12 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- House Details Card -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_card_rounded"
                 android:orientation="vertical"
                 android:padding="16dp">
-
-                <TextView
-                    android:id="@+id/textHouseName"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="House Name"
-                    android:textColor="#1A1A1A"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/textAddress"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="Address"
-                    android:textColor="#6E6E73"
-                    android:textSize="14sp" />
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginVertical="12dp"
-                    android:background="#EFEFEF" />
 
                 <TextView
                     android:id="@+id/textLandlordName"
@@ -117,30 +92,14 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="Submitted Valid ID"
-                android:textColor="#1A1A1A"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-            <ImageView
-                android:id="@+id/imgValidId"
-                android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:layout_marginTop="8dp"
-                android:background="@drawable/bg_image_placeholder"
-                android:scaleType="centerCrop"
-                android:contentDescription="Valid ID" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:text="Proof of Ownership / Authorization"
+                android:text="Proof Document (PDF)"
                 android:textColor="#1A1A1A"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
+            <!-- Using ImageView to display a placeholder since it's a PDF,
+                 but it would be better handled via an Intent to a PDF viewer -->
             <ImageView
                 android:id="@+id/imgProof"
                 android:layout_width="match_parent"

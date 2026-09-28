@@ -4,13 +4,14 @@
     android:id="@+id/mainLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF">
+    android:background="#FAFAFC">
 
     <!-- Top Bar -->
     <LinearLayout
         android:id="@+id/topBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="#FFFFFF"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:padding="16dp"
@@ -21,10 +22,10 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:clickable="true"
+            android:contentDescription="@string/desc_menu"
             android:focusable="true"
             android:src="@drawable/ic_arrow_back"
-            app:tint="#1A1A1A"
-            android:contentDescription="@string/desc_menu" />
+            app:tint="#1A1A1A" />
 
         <LinearLayout
             android:layout_width="0dp"
@@ -42,6 +43,7 @@
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/textUnreadCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
@@ -55,12 +57,12 @@
             android:id="@+id/btnMarkAllRead"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
             android:text="Mark all as read"
             android:textColor="#1B5E4C"
             android:textSize="13sp"
-            android:textStyle="bold"
-            android:clickable="true"
-            android:focusable="true"/>
+            android:textStyle="bold" />
 
     </LinearLayout>
 
@@ -76,6 +78,7 @@
         android:id="@+id/filtersScroll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="#FFFFFF"
         android:paddingHorizontal="16dp"
         android:paddingVertical="12dp"
         android:scrollbars="none"
@@ -107,7 +110,7 @@
                 android:layout_marginStart="8dp"
                 android:background="@drawable/bg_chip_selectable"
                 android:clickable="true"
-                android:focusable="true"
+                android:focusable="false"
                 android:paddingHorizontal="16dp"
                 android:paddingVertical="8dp"
                 android:text="@string/filter_requests"
@@ -121,7 +124,7 @@
                 android:layout_marginStart="8dp"
                 android:background="@drawable/bg_chip_selectable"
                 android:clickable="true"
-                android:focusable="true"
+                android:focusable="false"
                 android:paddingHorizontal="16dp"
                 android:paddingVertical="8dp"
                 android:text="@string/filter_payments"
@@ -135,7 +138,7 @@
                 android:layout_marginStart="8dp"
                 android:background="@drawable/bg_chip_selectable"
                 android:clickable="true"
-                android:focusable="true"
+                android:focusable="false"
                 android:paddingHorizontal="16dp"
                 android:paddingVertical="8dp"
                 android:text="@string/filter_messages"
@@ -145,22 +148,53 @@
         </LinearLayout>
     </HorizontalScrollView>
 
-    <!-- Notification List -->
-    <ScrollView
+    <!-- Empty State View -->
+    <LinearLayout
+        android:id="@+id/emptyStateLayout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:fillViewport="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="32dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/filtersScroll">
 
-        <LinearLayout
-            android:id="@+id/notifListLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingBottom="24dp">
+        <ImageView
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:contentDescription="@string/desc_notifications"
+            android:src="@drawable/ic_bell"
+            app:tint="#D0D0D5" />
 
-        </LinearLayout>
-    </ScrollView>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="No notifications yet"
+            android:textColor="#1A1A1A"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:gravity="center"
+            android:text="You'll see updates about your bookings, payments, and messages here."
+            android:textColor="#9A9A9E"
+            android:textSize="13sp" />
+
+    </LinearLayout>
+
+    <!-- RecyclerView for Notifications -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewNotifications"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:paddingVertical="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/filtersScroll" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

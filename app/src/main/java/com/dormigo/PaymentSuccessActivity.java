@@ -63,12 +63,14 @@ public class PaymentSuccessActivity extends AppCompatActivity {
             amountSentLabel.setText(displayAmount);
         }
 
-        // Generate dummy reference
-        String timeStamp = new SimpleDateFormat("yyyy-MMdd-SSS", Locale.US).format(new Date());
-        String reference = "BHF-" + timeStamp;
+        // Authoritative Database Reference
+        String reference = intent.getStringExtra("TRANSACTION_REF");
+        if (reference == null || reference.trim().isEmpty() || reference.equalsIgnoreCase("null") || reference.startsWith("BHF-")) {
+            reference = "Reference unavailable";
+        }
         TextView referenceLabel = findViewById(R.id.referenceLabel);
         if (referenceLabel != null) {
-            referenceLabel.setText(getString(R.string.reference_label, reference));
+            referenceLabel.setText("Ref: " + reference);
         }
 
         View btnBack = findViewById(R.id.btnBack);

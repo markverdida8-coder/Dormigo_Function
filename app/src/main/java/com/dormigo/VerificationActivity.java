@@ -94,10 +94,94 @@ public class VerificationActivity extends AppCompatActivity {
             });
         }
 
+        boolean isStudent = getSharedPreferences("DormigoPrefs", MODE_PRIVATE).getBoolean("isStudent", true);
+
         View btnSubmitVerification = findViewById(R.id.btnSubmitVerification);
         if (btnSubmitVerification != null) {
-            btnSubmitVerification.setOnClickListener(v -> submitStudentVerification());
+            btnSubmitVerification.setOnClickListener(v -> {
+                if (isStudent) {
+                    submitStudentVerification();
+                } else {
+                    submitLandlordVerification();
+                }
+            });
         }
+
+        TextView titleLabel = findViewById(R.id.titleLabel);
+        TextView descLabel = findViewById(R.id.descLabel);
+        TextView proofTitleLabel = findViewById(R.id.proofTitleLabel);
+
+        if (!isStudent) {
+            if (titleLabel != null) titleLabel.setText("Landlord Verification");
+            if (descLabel != null) descLabel.setText("Please upload your Business Permit or valid Government ID to verify your landlord account.");
+            if (proofTitleLabel != null) proofTitleLabel.setText("Verification Document");
+        }
+    }
+
+    private void submitLandlordVerification() {
+        if (selectedFileUri == null) {
+            showToast("Please upload a verification document first.");
+            return;
+        }
+
+        int userId = getSharedPreferences("DormigoPrefs", MODE_PRIVATE).getInt("userId", -1);
+        if (userId <= 0) {
+            showToast("Please log in again.");
+            return;
+        }
+
+        new Thread(() -> {
+            try {
+                File file = File.createTempFile("landlord_id_", ".tmp", getCacheDir());
+                try (InputStream input = getContentResolver().openInputStream(selectedFileUri);
+                     OutputStream output = new FileOutputStream(file)) {
+                    if (input == null) throw new IOException("Cannot read selected file.");
+                    byte[] buffer = new byte[8192];
+                    int count;
+                    while ((count = input.read(buffer)) != -1) {
+                        output.write(buffer, 0, count);
+                    }
+                }
+
+                MultipartBody.Builder builder = new MultipartBody.Builder()
+                        .setType(MultipartBody.FORM)
+                        .addFormDataPart("landlord_id", String.valueOf(userId))
+                        .addFormDataPart("document", "landlord_verif.pdf",
+                                RequestBody.create(file, MediaType.get("application/octet-stream")));
+
+                Request request = new Request.Builder()
+                        .url("http://10.149.229.109/Dormigo_Backend/api/submit_landlord_verification.php")
+                        .post(builder.build())
+                        .build();
+
+                new OkHttpClient().newCall(request).enqueue(new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        runOnUiThread(() -> showToast("Failed to submit verification document."));
+                    }
+
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        String body = response.body() != null ? response.body().string() : "";
+                        runOnUiThread(() -> {
+                            try {
+                                JSONObject res = new JSONObject(body);
+                                if (res.optBoolean("success", false)) {
+                                    showToast("Verification document submitted successfully!");
+                                    finish();
+                                } else {
+                                    showToast(res.optString("message", "Submission failed."));
+                                }
+                            } catch (Exception e) {
+                                showToast("Submission failed.");
+                            }
+                        });
+                    }
+                });
+            } catch (Exception e) {
+                runOnUiThread(() -> showToast("Error preparing file for upload."));
+            }
+        }).start();
     }
 
     private void submitStudentVerification() {
@@ -132,7 +216,7 @@ public class VerificationActivity extends AppCompatActivity {
                                 RequestBody.create(file, MediaType.get("application/octet-stream")));
 
                 Request request = new Request.Builder()
-                        .url("http://10.129.224.109/Dormigo_Backend/api/submit_student_verification.php")
+                        .url("http://10.149.229.109/Dormigo_Backend/api/submit_student_verification.php")
                         .post(builder.build())
                         .build();
 
@@ -169,7 +253,7 @@ public class VerificationActivity extends AppCompatActivity {
     private void updateUploadUI(Uri uri) {
         ImageView uploadIcon = findViewById(R.id.uploadIcon);
         TextView uploadTitle = findViewById(R.id.uploadTitle);
-        TextView uploadSubtitle = findViewById(R.id.uploadSubtitle);
+        TextView uploadSubtitle = findViewById(R.id.proofTitleLabel);
 
         if (uploadIcon != null) {
             uploadIcon.setImageResource(R.drawable.ic_document); // Change to document icon

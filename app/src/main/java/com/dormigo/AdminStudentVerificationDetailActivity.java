@@ -85,7 +85,7 @@ public class AdminStudentVerificationDetailActivity extends AppCompatActivity {
         if (tvStatus != null) tvStatus.setText("Status: " + status);
 
         if (studentIdPath != null && !studentIdPath.isEmpty()) {
-            String url = "http://10.129.224.109/Dormigo_Backend/" + studentIdPath;
+            String url = "http://10.149.229.109/Dormigo_Backend/" + studentIdPath;
             if (imgId != null) {
                 Glide.with(this).load(url).placeholder(R.drawable.bg_image_placeholder).into(imgId);
             }
@@ -122,7 +122,7 @@ public class AdminStudentVerificationDetailActivity extends AppCompatActivity {
 
             RequestBody body = RequestBody.create(json.toString(), MediaType.get("application/json; charset=utf-8"));
             Request request = new Request.Builder()
-                    .url("http://10.129.224.109/Dormigo_Backend/api/approve_student_verification.php")
+                    .url("http://10.149.229.109/Dormigo_Backend/api/approve_student_verification.php")
                     .post(body)
                     .build();
 
@@ -185,7 +185,7 @@ public class AdminStudentVerificationDetailActivity extends AppCompatActivity {
 
             RequestBody body = RequestBody.create(json.toString(), MediaType.get("application/json; charset=utf-8"));
             Request request = new Request.Builder()
-                    .url("http://10.129.224.109/Dormigo_Backend/api/reject_student_verification.php")
+                    .url("http://10.149.229.109/Dormigo_Backend/api/reject_student_verification.php")
                     .post(body)
                     .build();
 

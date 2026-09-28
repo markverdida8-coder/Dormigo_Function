@@ -427,19 +427,53 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Amenities &amp; house rules"
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:text="Amenities &amp; House Rules"
+                        android:textColor="#1A1A1A"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/btnAddCustomAmenity"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:background="?attr/selectableItemBackground"
+                        android:padding="4dp"
+                        android:text="+ Custom Amenity"
+                        android:textColor="#1B5E4C"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                </RelativeLayout>
+
+                <!-- Search Amenities Input -->
+                <EditText
+                    android:id="@+id/searchAmenitiesInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="42dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/bg_input_field"
+                    android:hint="Search Amenities (e.g. air, wifi, bath)..."
+                    android:inputType="text"
+                    android:paddingHorizontal="12dp"
                     android:textColor="#1A1A1A"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
+                    android:textColorHint="#9A9A9E"
+                    android:textSize="13sp" />
 
                 <TextView
                     android:id="@+id/amenitiesStatus"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:minHeight="48dp"
                     android:gravity="center_vertical"
                     android:layout_marginTop="8dp"
                     android:text="Loading amenities..."
@@ -448,6 +482,7 @@
                     android:clickable="true"
                     android:focusable="true" />
 
+                <!-- Available Amenities Scroll Container -->
                 <HorizontalScrollView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -460,22 +495,45 @@
                         android:orientation="horizontal" />
                 </HorizontalScrollView>
 
+                <!-- Selected Amenities Chips Container -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="House rules (one per line)"
-                    android:textColor="#6E6E73"
-                    android:textSize="12sp" />
+                    android:layout_marginTop="12dp"
+                    android:text="Selected Amenities"
+                    android:textColor="#1A1A1A"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:scrollbars="none">
+                    <LinearLayout
+                        android:id="@+id/selectedAmenitiesContainer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal" />
+                </HorizontalScrollView>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="House Rules"
+                    android:textColor="#1A1A1A"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
 
                 <EditText
                     android:id="@+id/inputHouseRules"
                     android:layout_width="match_parent"
-                    android:layout_height="80dp"
+                    android:layout_height="100dp"
                     android:layout_marginTop="8dp"
                     android:background="@drawable/bg_input_field"
                     android:gravity="top|start"
-                    android:hint="Curfew at 10:00 PM\nNo overnight visitors\nNo pets"
+                    android:hint="Curfew 10 PM.\nNo Smoking.\nNo Pets.\nVisitors until 8 PM."
                     android:padding="12dp"
                     android:textColor="#1A1A1A"
                     android:textColorHint="#9A9A9E"

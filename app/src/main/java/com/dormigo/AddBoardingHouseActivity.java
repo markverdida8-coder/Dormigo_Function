@@ -10,8 +10,12 @@ import org.json.JSONArray;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Typeface;
+import android.text.InputType;
+import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
+import android.widget.Spinner;
 import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -23,10 +27,14 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import okhttp3.Response;
+import androidx.annotation.NonNull;
 import java.io.IOException;
 import android.net.Uri;
 import android.os.Bundle;
@@ -50,6 +58,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 public class AddBoardingHouseActivity extends AppCompatActivity {
 
+    private final ApiClient apiClient = new ApiClient();
     private boolean saving;
     private boolean amenitiesLoaded;
     private boolean amenitiesLoading;
@@ -57,6 +66,20 @@ public class AddBoardingHouseActivity extends AppCompatActivity {
     private final List<Uri> photoUris = new ArrayList<>();
     private final List<RoomViewHolder> roomHolders = new ArrayList<>();
     private ActivityResultLauncher<String[]> imagePickerLauncher;
+
+    private static class RoomFee {
+        String name;
+        double amount;
+        String feeType;
+        String description;
+
+        RoomFee(String name, double amount, String feeType, String description) {
+            this.name = name;
+            this.amount = amount;
+            this.feeType = feeType != null ? feeType : "ONE_TIME";
+            this.description = description;
+        }
+    }
 
     private static class RoomViewHolder {
         View rootView;
@@ -66,46 +89,32 @@ public class AddBoardingHouseActivity extends AppCompatActivity {
         EditText inputRoomName;
         EditText inputRoomRent;
         EditText inputRoomCapacity;
-        AutoCompleteTextView inputAdvance;
-        AutoCompleteTextView inputDeposit;
-        CheckBox checkboxOtherFees;
-        View layoutOtherFeesContainer;
-        EditText inputOtherFees;
-        EditText inputOtherFeesDesc;
+        TextView btnAddRoomFee;
+        LinearLayout roomFeesContainer;
         EditText inputRefundPolicy;
         TextView textCalculatedTotal;
 
-        int getAdvanceMonths() {
-            String val = inputAdvance.getText().toString();
-            if (val.contains("3")) return 3;
-            if (val.contains("2")) return 2;
-            if (val.contains("1")) return 1;
-            return 0;
-        }
-
-        int getDepositMonths() {
-            String val = inputDeposit.getText().toString();
-            if (val.contains("3")) return 3;
-            if (val.contains("2")) return 2;
-            if (val.contains("1")) return 1;
-            return 0;
-        }
+        List<RoomFee> roomFees = new ArrayList<>();
 
         void updateCalculation() {
             try {
                 String rentStr = inputRoomRent.getText().toString().trim();
                 BigDecimal rent = rentStr.isEmpty() ? BigDecimal.ZERO : new BigDecimal(rentStr);
-                int adv = getAdvanceMonths();
-                int dep = getDepositMonths();
-                boolean hasFees = checkboxOtherFees.isChecked();
-                String feesStr = hasFees ? inputOtherFees.getText().toString().trim() : "0";
-                BigDecimal fees = feesStr.isEmpty() ? BigDecimal.ZERO : new BigDecimal(feesStr);
 
-                BigDecimal advTotal = rent.multiply(new BigDecimal(adv));
-                BigDecimal depTotal = rent.multiply(new BigDecimal(dep));
-                BigDecimal total = rent.add(advTotal).add(depTotal).add(fees);
+                BigDecimal oneTimeFeesTotal = BigDecimal.ZERO;
+                BigDecimal monthlyFeesTotal = BigDecimal.ZERO;
+                for (RoomFee f : roomFees) {
+                    if ("MONTHLY".equalsIgnoreCase(f.feeType) || "Monthly Recurring Fee".equalsIgnoreCase(f.feeType)) {
+                        monthlyFeesTotal = monthlyFeesTotal.add(new BigDecimal(String.valueOf(f.amount)));
+                    } else {
+                        oneTimeFeesTotal = oneTimeFeesTotal.add(new BigDecimal(String.valueOf(f.amount)));
+                    }
+                }
 
-                textCalculatedTotal.setText("Total Move-in Payment: ₱" + total.setScale(2, RoundingMode.HALF_UP));
+                BigDecimal moveInTotal = rent.add(oneTimeFeesTotal);
+                BigDecimal monthlyTotal = rent.add(monthlyFeesTotal);
+
+                textCalculatedTotal.setText("Move-In: ₱" + moveInTotal.setScale(2, RoundingMode.HALF_UP) + " | Monthly: ₱" + monthlyTotal.setScale(2, RoundingMode.HALF_UP) + "/mo");
             } catch (Exception e) {
                 textCalculatedTotal.setText("Total Move-in Payment: ₱0.00");
             }
@@ -186,6 +195,7 @@ public class AddBoardingHouseActivity extends AppCompatActivity {
         setupUtilitySwitch(R.id.switchFreeElectricity, R.id.inputElectricityRate);
         setupUtilitySwitch(R.id.switchFreeWater, R.id.inputWaterRate);
         setupPaymentSettingsUI();
+        setupAmenitiesSearchAndCustom();
 
         View btnPublish = findViewById(R.id.btnPublish);
         if (btnPublish != null) {
@@ -243,14 +253,14 @@ public class AddBoardingHouseActivity extends AppCompatActivity {
         holder.inputRoomName = card.findViewById(R.id.inputRoomName);
         holder.inputRoomRent = card.findViewById(R.id.inputRoomRent);
         holder.inputRoomCapacity = card.findViewById(R.id.inputRoomCapacity);
-        holder.inputAdvance = card.findViewById(R.id.inputAdvance);
-        holder.inputDeposit = card.findViewById(R.id.inputDeposit);
-        holder.checkboxOtherFees = card.findViewById(R.id.checkboxOtherFees);
-        holder.layoutOtherFeesContainer = card.findViewById(R.id.layoutOtherFeesContainer);
-        holder.inputOtherFees = card.findViewById(R.id.inputOtherFees);
-        holder.inputOtherFeesDesc = card.findViewById(R.id.inputOtherFeesDesc);
+        holder.btnAddRoomFee = card.findViewById(R.id.btnAddRoomFee);
+        holder.roomFeesContainer = card.findViewById(R.id.roomFeesContainer);
         holder.inputRefundPolicy = card.findViewById(R.id.inputRefundPolicy);
         holder.textCalculatedTotal = card.findViewById(R.id.textCalculatedTotal);
+
+        if (holder.btnAddRoomFee != null) {
+            holder.btnAddRoomFee.setOnClickListener(v -> showAddRoomFeeDialog(holder, null, -1));
+        }
 
         // Setup Room Types
         String[] roomTypes = new String[]{"Bedspace", "Shared room", "Solo room", "Dormitory Type", "Studio Type", "Apartment Type"};
@@ -263,37 +273,6 @@ public class AddBoardingHouseActivity extends AppCompatActivity {
             if (hasFocus) holder.inputRoomType.showDropDown();
         });
 
-        // Setup Advance Options
-        String[] advanceOptions = new String[]{"1 Month", "2 Months", "3 Months"};
-        ArrayAdapter<String> advAdapter = new ArrayAdapter<>(
-                this, android.R.layout.simple_dropdown_item_1line, advanceOptions
-        );
-        holder.inputAdvance.setAdapter(advAdapter);
-        holder.inputAdvance.setText("1 Month", false);
-        holder.inputAdvance.setOnClickListener(v -> holder.inputAdvance.showDropDown());
-        holder.inputAdvance.setOnFocusChangeListener((v, hasFocus) -> {
-            if (hasFocus) holder.inputAdvance.showDropDown();
-        });
-
-        // Setup Deposit Options
-        String[] depositOptions = new String[]{"1 Month", "2 Months", "3 Months"};
-        ArrayAdapter<String> depAdapter = new ArrayAdapter<>(
-                this, android.R.layout.simple_dropdown_item_1line, depositOptions
-        );
-        holder.inputDeposit.setAdapter(depAdapter);
-        holder.inputDeposit.setText("1 Month", false);
-        holder.inputDeposit.setOnClickListener(v -> holder.inputDeposit.showDropDown());
-        holder.inputDeposit.setOnFocusChangeListener((v, hasFocus) -> {
-            if (hasFocus) holder.inputDeposit.showDropDown();
-        });
-
-        holder.checkboxOtherFees.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (holder.layoutOtherFeesContainer != null) {
-                holder.layoutOtherFeesContainer.setVisibility(isChecked ? View.VISIBLE : View.GONE);
-            }
-            holder.updateCalculation();
-        });
-
         TextWatcher watcher = new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
@@ -302,26 +281,16 @@ public class AddBoardingHouseActivity extends AppCompatActivity {
             }
         };
         holder.inputRoomRent.addTextChangedListener(watcher);
-        holder.inputOtherFees.addTextChangedListener(watcher);
-
-        holder.inputAdvance.setOnItemClickListener((parent, view, position, id) -> holder.updateCalculation());
-        holder.inputDeposit.setOnItemClickListener((parent, view, position, id) -> holder.updateCalculation());
 
         if (savedData != null) {
             holder.inputRoomName.setText(savedData.optString("room_number", ""));
             holder.inputRoomType.setText(savedData.optString("room_type", "Bedspace"), false);
             holder.inputRoomCapacity.setText(String.valueOf(savedData.optInt("capacity", 1)));
             holder.inputRoomRent.setText(savedData.optString("monthly_rent", ""));
-            int adv = savedData.optInt("advance_months", 1);
-            holder.inputAdvance.setText(adv + " Month" + (adv > 1 ? "s" : ""), false);
-            int dep = savedData.optInt("deposit_months", 1);
-            holder.inputDeposit.setText(dep + " Month" + (dep > 1 ? "s" : ""), false);
             double fees = savedData.optDouble("other_fees", 0);
             if (fees > 0) {
-                holder.checkboxOtherFees.setChecked(true);
-                holder.layoutOtherFeesContainer.setVisibility(View.VISIBLE);
-                holder.inputOtherFees.setText(String.valueOf(fees));
-                holder.inputOtherFeesDesc.setText(savedData.optString("other_fees_description", ""));
+                holder.roomFees.add(new RoomFee("Additional Fee", fees, "ONE_TIME", savedData.optString("other_fees_description", "")));
+                renderRoomFees(holder);
             }
             holder.inputRefundPolicy.setText(savedData.optString("deposit_refund_policy", ""));
         }
@@ -340,6 +309,146 @@ public class AddBoardingHouseActivity extends AppCompatActivity {
         container.addView(card);
         updateRoomTitles();
         holder.updateCalculation();
+    }
+
+    private void showAddRoomFeeDialog(RoomViewHolder holder, RoomFee existingFee, int editIndex) {
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setPadding(dp(20), dp(16), dp(20), dp(16));
+
+        Spinner spinnerType = new Spinner(this);
+        String[] feeTypes = new String[]{"Advance Payment", "Security Deposit", "Reservation Fee", "Utility Deposit", "Cleaning Deposit", "One-Time Fee", "Monthly Recurring Fee"};
+        ArrayAdapter<String> typeAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, feeTypes);
+        spinnerType.setAdapter(typeAdapter);
+
+        LinearLayout.LayoutParams amtLp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        amtLp.topMargin = dp(10);
+        spinnerType.setLayoutParams(amtLp);
+        layout.addView(spinnerType);
+
+        EditText inputName = new EditText(this);
+        inputName.setHint("Fee Name");
+        inputName.setText(existingFee != null ? existingFee.name : "Advance Payment");
+        inputName.setLayoutParams(amtLp);
+        layout.addView(inputName);
+
+        spinnerType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override public void onItemSelected(AdapterView<?> parent, View v, int position, long id) {
+                String selectedType = feeTypes[position];
+                if (!"One-Time Fee".equalsIgnoreCase(selectedType) && !"Monthly Recurring Fee".equalsIgnoreCase(selectedType)) {
+                    inputName.setText(selectedType);
+                }
+            }
+            @Override public void onNothingSelected(AdapterView<?> parent) {}
+        });
+
+        if (existingFee != null) {
+            for (int i = 0; i < feeTypes.length; i++) {
+                if (feeTypes[i].equalsIgnoreCase(existingFee.feeType)) {
+                    spinnerType.setSelection(i);
+                    break;
+                }
+            }
+        }
+
+        EditText inputAmt = new EditText(this);
+        inputAmt.setHint("Amount (₱)");
+        inputAmt.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        inputAmt.setText(existingFee != null ? String.valueOf(existingFee.amount) : "");
+        inputAmt.setLayoutParams(amtLp);
+        layout.addView(inputAmt);
+
+        EditText inputDesc = new EditText(this);
+        inputDesc.setHint("Description / Details (Optional)");
+        inputDesc.setText(existingFee != null ? existingFee.description : "");
+        inputDesc.setLayoutParams(amtLp);
+        layout.addView(inputDesc);
+
+        new AlertDialog.Builder(this)
+                .setTitle(existingFee != null ? "Edit Fee" : "+ Add Fee")
+                .setView(layout)
+                .setPositiveButton("Save", (dialog, which) -> {
+                    String name = inputName.getText().toString().trim();
+                    String amtStr = inputAmt.getText().toString().trim();
+                    String feeType = spinnerType.getSelectedItem().toString();
+                    String canonicalType = "Monthly Recurring Fee".equalsIgnoreCase(feeType) ? "MONTHLY" : "ONE_TIME";
+                    String desc = inputDesc.getText().toString().trim();
+
+                    if (!name.isEmpty() && !amtStr.isEmpty()) {
+                        double amt = Double.parseDouble(amtStr);
+                        if (editIndex >= 0 && editIndex < holder.roomFees.size()) {
+                            holder.roomFees.set(editIndex, new RoomFee(name, amt, canonicalType, desc));
+                        } else {
+                            holder.roomFees.add(new RoomFee(name, amt, canonicalType, desc));
+                        }
+                        renderRoomFees(holder);
+                        holder.updateCalculation();
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void renderRoomFees(RoomViewHolder holder) {
+        if (holder.roomFeesContainer == null) return;
+        holder.roomFeesContainer.removeAllViews();
+
+        for (int i = 0; i < holder.roomFees.size(); i++) {
+            final int index = i;
+            RoomFee f = holder.roomFees.get(i);
+
+            LinearLayout card = new LinearLayout(this);
+            card.setOrientation(LinearLayout.HORIZONTAL);
+            card.setGravity(Gravity.CENTER_VERTICAL);
+            card.setPadding(dp(12), dp(8), dp(12), dp(8));
+            card.setBackgroundResource(R.drawable.bg_card_rounded);
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            lp.topMargin = dp(6);
+            card.setLayoutParams(lp);
+
+            LinearLayout textLayout = new LinearLayout(this);
+            textLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+            textLayout.setOrientation(LinearLayout.VERTICAL);
+
+            TextView tvName = new TextView(this);
+            String typeTag = "MONTHLY".equalsIgnoreCase(f.feeType) ? "Monthly Recurring Fee · ₱" + String.format(Locale.US, "%,.2f", f.amount) + "/mo" : "One-Time Fee · ₱" + String.format(Locale.US, "%,.2f", f.amount);
+            tvName.setText(f.name + "\n" + typeTag);
+            tvName.setTextColor(Color.parseColor("#1A1A1A"));
+            tvName.setTextSize(13);
+            tvName.setTypeface(null, Typeface.BOLD);
+
+            textLayout.addView(tvName);
+            if (!f.description.isEmpty()) {
+                TextView tvDesc = new TextView(this);
+                tvDesc.setText(f.description);
+                tvDesc.setTextColor(Color.parseColor("#6E6E73"));
+                tvDesc.setTextSize(11);
+                textLayout.addView(tvDesc);
+            }
+            card.addView(textLayout);
+
+            TextView btnEdit = new TextView(this);
+            btnEdit.setText("Edit");
+            btnEdit.setTextColor(Color.parseColor("#1B5E4C"));
+            btnEdit.setTextSize(12);
+            btnEdit.setPadding(dp(6), dp(4), dp(6), dp(4));
+            btnEdit.setOnClickListener(v -> showAddRoomFeeDialog(holder, f, index));
+            card.addView(btnEdit);
+
+            TextView btnDelete = new TextView(this);
+            btnDelete.setText("Delete");
+            btnDelete.setTextColor(Color.parseColor("#D32F2F"));
+            btnDelete.setTextSize(12);
+            btnDelete.setPadding(dp(6), dp(4), dp(6), dp(4));
+            btnDelete.setOnClickListener(v -> {
+                holder.roomFees.remove(index);
+                renderRoomFees(holder);
+                holder.updateCalculation();
+            });
+            card.addView(btnDelete);
+
+            holder.roomFeesContainer.addView(card);
+        }
     }
 
     private void updateRoomTitles() {
@@ -499,9 +608,57 @@ public class AddBoardingHouseActivity extends AppCompatActivity {
         if (!validateRooms() || !validateListingDetails()) return;
         saving = true;
         TextView button = findViewById(R.id.btnPublish);
-        button.setEnabled(false);
-        button.setText("Saving...");
+        if (button != null) {
+            button.setEnabled(false);
+            button.setText("Saving...");
+        }
         findViewById(R.id.btnBack).setEnabled(false);
+
+        String url = "http://10.149.229.109/Dormigo_Backend/api/get_landlord_account_verification_status.php?landlord_id=" + landlordId;
+        Request request = new Request.Builder().url(url).get().build();
+        new OkHttpClient().newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                runOnUiThread(() -> {
+                    Toast.makeText(AddBoardingHouseActivity.this, "Your landlord account must be verified before your boarding house can be published. Saved as draft.", Toast.LENGTH_LONG).show();
+                    executeSaveHouse(landlordId, "INACTIVE");
+                });
+            }
+
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                String vStatus = "NOT_SUBMITTED";
+                if (response.isSuccessful() && response.body() != null) {
+                    try {
+                        JSONObject json = new JSONObject(response.body().string());
+                        if (json.optBoolean("success", false)) {
+                            JSONObject data = json.optJSONObject("data");
+                            if (data != null) {
+                                vStatus = data.optString("verification_status", "NOT_SUBMITTED").toUpperCase();
+                            }
+                        }
+                    } catch (Exception ignored) {}
+                }
+
+                final String finalStatus = vStatus;
+                runOnUiThread(() -> {
+                    if ("VERIFIED".equals(finalStatus) || "APPROVED".equals(finalStatus)) {
+                        executeSaveHouse(landlordId, "ACTIVE");
+                    } else if ("REJECTED".equals(finalStatus)) {
+                        saving = false;
+                        if (button != null) { button.setEnabled(true); button.setText("Save listing"); }
+                        findViewById(R.id.btnBack).setEnabled(true);
+                        Toast.makeText(AddBoardingHouseActivity.this, "Your landlord verification was rejected. Please resubmit your verification documents.", Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(AddBoardingHouseActivity.this, "Your landlord account must be verified before your boarding house can be published. Saved as draft.", Toast.LENGTH_LONG).show();
+                        executeSaveHouse(landlordId, "INACTIVE");
+                    }
+                });
+            }
+        });
+    }
+
+    private void executeSaveHouse(int landlordId, String targetStatus) {
         JSONObject payload;
         List<Uri> photos = new ArrayList<>(photoUris);
         try {
@@ -511,7 +668,7 @@ public class AddBoardingHouseActivity extends AppCompatActivity {
             payload.put("description", inputText(R.id.inputDescription));
             payload.put("address", inputText(R.id.inputAddress));
             payload.put("house_rules", inputText(R.id.inputHouseRules));
-            payload.put("status", "ACTIVE");
+            payload.put("status", targetStatus);
             payload.put("barangay", inputText(R.id.inputBarangay));
             payload.put("distance_km", inputText(R.id.inputDistance));
             boolean freeElectricity = ((SwitchCompat) findViewById(R.id.switchFreeElectricity)).isChecked();
@@ -530,12 +687,17 @@ public class AddBoardingHouseActivity extends AppCompatActivity {
                 room.put("room_type", h.inputRoomType.getText().toString().trim());
                 room.put("capacity", Integer.parseInt(h.inputRoomCapacity.getText().toString().trim()));
                 room.put("monthly_rent", h.inputRoomRent.getText().toString().trim());
-                room.put("advance_months", h.getAdvanceMonths());
-                room.put("deposit_months", h.getDepositMonths());
-                boolean hasFees = h.checkboxOtherFees.isChecked();
-                String fees = hasFees ? h.inputOtherFees.getText().toString().trim() : "0.00";
-                room.put("other_fees", fees.isEmpty() ? "0.00" : fees);
-                room.put("other_fees_description", hasFees ? h.inputOtherFeesDesc.getText().toString().trim() : "");
+                room.put("advance_months", 0);
+                room.put("deposit_months", 0);
+                double totalOtherFees = 0;
+                StringBuilder otherFeesDesc = new StringBuilder();
+                for (RoomFee f : h.roomFees) {
+                    totalOtherFees += f.amount;
+                    if (otherFeesDesc.length() > 0) otherFeesDesc.append("; ");
+                    otherFeesDesc.append(f.name).append(": ₱").append(f.amount);
+                }
+                room.put("other_fees", totalOtherFees);
+                room.put("other_fees_description", otherFeesDesc.toString());
                 room.put("deposit_refund_policy", h.inputRefundPolicy.getText().toString().trim());
                 room.put("status", "AVAILABLE");
                 rooms.put(room);
@@ -723,7 +885,9 @@ public class AddBoardingHouseActivity extends AppCompatActivity {
                     }
                     runOnUiThread(() -> {
                         if (isFinishing() || isDestroyed()) return;
-                        renderAmenities(rows);
+                        masterAmenitiesRows = rows;
+                        filterAndRenderAmenities("");
+                        renderSelectedAmenitiesChips();
                     });
                 } catch (Exception e) {
                     amenityLoadFailed();
@@ -766,6 +930,7 @@ public class AddBoardingHouseActivity extends AppCompatActivity {
                 if (saving) return;
                 if (!selectedAmenityIds.remove(id)) selectedAmenityIds.add(id);
                 updateAmenityChip(chip, id, name);
+                renderSelectedAmenitiesChips();
             });
             container.addView(chip);
         }
@@ -776,6 +941,106 @@ public class AddBoardingHouseActivity extends AppCompatActivity {
         status.setEnabled(false);
         status.setText(rows.length() == 0 ? "No amenities available yet. You can save without amenities."
                 : "Tap to select the amenities your house offers.");
+    }
+
+    private JSONArray masterAmenitiesRows = new JSONArray();
+
+    private void setupAmenitiesSearchAndCustom() {
+        EditText searchInput = findViewById(R.id.searchAmenitiesInput);
+        if (searchInput != null) {
+            searchInput.addTextChangedListener(new TextWatcher() {
+                @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    filterAndRenderAmenities(s.toString().trim());
+                }
+                @Override public void afterTextChanged(Editable s) {}
+            });
+        }
+
+        View btnAddCustom = findViewById(R.id.btnAddCustomAmenity);
+        if (btnAddCustom != null) {
+            btnAddCustom.setOnClickListener(v -> showAddCustomAmenityDialog());
+        }
+    }
+
+    private void showAddCustomAmenityDialog() {
+        EditText input = new EditText(this);
+        input.setHint("e.g. Balcony, Study Desk, Hot Shower");
+        input.setPadding(dp(16), dp(16), dp(16), dp(16));
+
+        new AlertDialog.Builder(this)
+                .setTitle("+ Add Custom Amenity")
+                .setView(input)
+                .setPositiveButton("Add", (dialog, which) -> {
+                    String name = input.getText().toString().trim();
+                    if (!name.isEmpty()) {
+                        apiClient.addCustomAmenity(name, new Callback() {
+                            @Override
+                            public void onFailure(Call call, IOException e) {
+                                runOnUiThread(() -> Toast.makeText(AddBoardingHouseActivity.this, "Failed to add amenity.", Toast.LENGTH_SHORT).show());
+                            }
+
+                            @Override
+                            public void onResponse(Call call, Response response) throws IOException {
+                                runOnUiThread(() -> {
+                                    Toast.makeText(AddBoardingHouseActivity.this, "Amenity added successfully!", Toast.LENGTH_SHORT).show();
+                                    loadAmenities();
+                                });
+                            }
+                        });
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void filterAndRenderAmenities(String query) {
+        if (masterAmenitiesRows == null) return;
+        JSONArray filtered = new JSONArray();
+        String q = query.toLowerCase(Locale.ROOT);
+        for (int i = 0; i < masterAmenitiesRows.length(); i++) {
+            JSONObject row = masterAmenitiesRows.optJSONObject(i);
+            if (row != null) {
+                String name = row.optString("amenity_name", "").toLowerCase(Locale.ROOT);
+                if (q.isEmpty() || name.contains(q)) {
+                    filtered.put(row);
+                }
+            }
+        }
+        renderAmenities(filtered);
+    }
+
+    private void renderSelectedAmenitiesChips() {
+        LinearLayout container = findViewById(R.id.selectedAmenitiesContainer);
+        if (container == null) return;
+        container.removeAllViews();
+
+        for (int i = 0; i < masterAmenitiesRows.length(); i++) {
+            JSONObject row = masterAmenitiesRows.optJSONObject(i);
+            if (row != null) {
+                int id = row.optInt("amenity_id");
+                String name = row.optString("amenity_name");
+                if (selectedAmenityIds.contains(id)) {
+                    TextView chip = new TextView(this);
+                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.WRAP_CONTENT, dp(38));
+                    params.setMarginEnd(dp(8));
+                    chip.setLayoutParams(params);
+                    chip.setGravity(Gravity.CENTER);
+                    chip.setPadding(dp(12), 0, dp(12), 0);
+                    chip.setTextSize(12);
+                    chip.setText("✓ " + name + " ✕");
+                    chip.setBackgroundResource(R.drawable.bg_button_filled);
+                    chip.setTextColor(Color.WHITE);
+                    chip.setOnClickListener(v -> {
+                        selectedAmenityIds.remove(id);
+                        renderSelectedAmenitiesChips();
+                        filterAndRenderAmenities(inputText(R.id.searchAmenitiesInput));
+                    });
+                    container.addView(chip);
+                }
+            }
+        }
     }
 
     private void updateAmenityChip(TextView chip, int id, String name) {

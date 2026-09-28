@@ -28,7 +28,6 @@ public class EditProfileActivity extends AppCompatActivity {
     private EditText inputContactNumber;
     private EditText inputEmail;
     private EditText inputSchool;
-    private EditText inputProgram;
     private TextView profileAvatarText;
     private View btnSubmitSave;
     private View btnSaveProfile;
@@ -62,7 +61,6 @@ public class EditProfileActivity extends AppCompatActivity {
         inputContactNumber = findViewById(R.id.inputContactNumber);
         inputEmail = findViewById(R.id.inputEmail);
         inputSchool = findViewById(R.id.inputSchool);
-        inputProgram = findViewById(R.id.inputProgram);
         profileAvatarText = findViewById(R.id.profileAvatarText);
         btnSubmitSave = findViewById(R.id.btnSubmitSave);
         btnSaveProfile = findViewById(R.id.btnSaveProfile);
@@ -86,13 +84,11 @@ public class EditProfileActivity extends AppCompatActivity {
         String email = prefs.getString("email", "");
         String phone = prefs.getString("phone", "");
         String school = prefs.getString("school", "Southwestern University Phinma");
-        String program = prefs.getString("program", "BS Information Technology");
 
         if (inputFullName != null) inputFullName.setText(name);
         if (inputContactNumber != null) inputContactNumber.setText(phone);
         if (inputEmail != null) inputEmail.setText(email);
         if (inputSchool != null) inputSchool.setText(school);
-        if (inputProgram != null) inputProgram.setText(program);
 
         if (profileAvatarText != null) {
             profileAvatarText.setText(getInitials(name));
@@ -112,7 +108,6 @@ public class EditProfileActivity extends AppCompatActivity {
         String newPhone = inputContactNumber != null ? inputContactNumber.getText().toString().trim() : "";
         String newEmail = inputEmail != null ? inputEmail.getText().toString().trim() : "";
         String newSchool = inputSchool != null ? inputSchool.getText().toString().trim() : "";
-        String newProgram = inputProgram != null ? inputProgram.getText().toString().trim() : "";
 
         if (newName.isEmpty() || newEmail.isEmpty()) {
             Toast.makeText(this, "Name and Email cannot be empty.", Toast.LENGTH_SHORT).show();
@@ -140,7 +135,6 @@ public class EditProfileActivity extends AppCompatActivity {
                         ed.putString("email", newEmail);
                         ed.putString("phone", newPhone);
                         ed.putString("school", newSchool);
-                        ed.putString("program", newProgram);
                         ed.apply();
 
                         runOnUiThread(() -> {

@@ -1,7 +1,10 @@
 package com.dormigo;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
+
+import androidx.annotation.NonNull;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,13 +36,21 @@ public class ApiClient {
     // Phone and PC must be connected to the same Wi-Fi/network.
 
     private static final String BASE_URL =
-            "http://10.129.224.109/Dormigo_Backend/api/";
+            "http://10.149.229.109/Dormigo_Backend/api/";
 
 
     private static final MediaType JSON =
             MediaType.get(
                     "application/json; charset=utf-8"
             );
+
+    private static Context appContext;
+
+    public static void init(Context context) {
+        if (context != null) {
+            appContext = context.getApplicationContext();
+        }
+    }
 
     private final OkHttpClient client;
 
@@ -49,9 +60,20 @@ public class ApiClient {
                     @Override
                     public Response intercept(Chain chain) throws IOException {
                         Request original = chain.request();
-                        Request request = original.newBuilder()
-                                .header("ngrok-skip-browser-warning", "69420")
-                                .build();
+                        Request.Builder builder = original.newBuilder()
+                                .header("ngrok-skip-browser-warning", "69420");
+
+                        if (appContext != null) {
+                            try {
+                                SharedPreferences prefs = appContext.getSharedPreferences("DormigoPrefs", Context.MODE_PRIVATE);
+                                String token = prefs.getString("authToken", null);
+                                if (token != null && !token.trim().isEmpty()) {
+                                    builder.header("Authorization", "Bearer " + token.trim());
+                                }
+                            } catch (Exception ignored) {}
+                        }
+
+                        Request request = builder.build();
                         return chain.proceed(request);
                     }
                 })
@@ -241,60 +263,113 @@ public class ApiClient {
     ) {
 
         try {
+            JSONObject json = new JSONObject();
+            json.put("full_name", fullName);
+            json.put("email", email);
+            json.put("password", password);
+            json.put("phone", phone);
+            json.put("user_type", userType);
+            json.put("profile_image", JSONObject.NULL);
 
-            JSONObject json =
-                    new JSONObject();
+            RequestBody body = RequestBody.create(json.toString(), JSON);
+            Request request = new Request.Builder()
+                    .url(BASE_URL + "register_landlord.php") // Point to the new landlord register that handles PDFs if we switch it, or just use register.php if no file is sent here
+                    .post(body)
+                    .build();
 
-            json.put(
-                    "full_name",
-                    fullName
-            );
+            client.newCall(request).enqueue(callback);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-            json.put(
-                    "email",
-                    email
-            );
+    // =========================================================
+    // REGISTER LANDLORD WITH DOCUMENT
+    // =========================================================
 
-            json.put(
-                    "password",
-                    password
-            );
+    public void registerLandlordWithDocument(
+            Context context,
+            String fullName,
+            String email,
+            String password,
+            String phone,
+            Uri documentUri,
+            Callback callback
+    ) {
+        try {
+            File file = File.createTempFile("landlord_doc_", ".pdf", context.getCacheDir());
+            try (InputStream input = context.getContentResolver().openInputStream(documentUri);
+                 OutputStream output = new FileOutputStream(file)) {
+                if (input == null) throw new IOException("Cannot read selected file.");
+                byte[] buffer = new byte[8192];
+                int count;
+                while ((count = input.read(buffer)) != -1) {
+                    output.write(buffer, 0, count);
+                }
+            }
 
-            json.put(
-                    "phone",
-                    phone
-            );
+            MultipartBody.Builder builder = new MultipartBody.Builder()
+                    .setType(MultipartBody.FORM)
+                    .addFormDataPart("full_name", fullName)
+                    .addFormDataPart("email", email)
+                    .addFormDataPart("password", password)
+                    .addFormDataPart("phone", phone)
+                    .addFormDataPart("document", "landlord_verif.pdf",
+                            RequestBody.create(file, MediaType.get("application/pdf")));
 
-            json.put(
-                    "user_type",
-                    userType
-            );
+            Request request = new Request.Builder()
+                    .url(BASE_URL + "register_landlord.php")
+                    .post(builder.build())
+                    .build();
 
-            json.put(
-                    "profile_image",
-                    JSONObject.NULL
-            );
-
-            RequestBody body =
-                    RequestBody.create(
-                            json.toString(),
-                            JSON
-                    );
-
-            Request request =
-                    new Request.Builder()
-                            .url(
-                                    BASE_URL
-                                            + "register.php"
-                            )
-                            .post(body)
-                            .build();
-
-            client.newCall(request)
-                    .enqueue(callback);
+            client.newCall(request).enqueue(callback);
 
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
+    public void registerStudentWithId(
+            Context context,
+            String fullName,
+            String email,
+            String password,
+            String phone,
+            String school,
+            Uri studentIdUri,
+            Callback callback
+    ) {
+
+        try {
+            File file = File.createTempFile("student_id_", ".tmp", context.getCacheDir());
+            try (InputStream input = context.getContentResolver().openInputStream(studentIdUri);
+                 OutputStream output = new FileOutputStream(file)) {
+                if (input == null) throw new IOException("Cannot read selected file.");
+                byte[] buffer = new byte[8192];
+                int count;
+                while ((count = input.read(buffer)) != -1) {
+                    output.write(buffer, 0, count);
+                }
+            }
+
+            MultipartBody.Builder builder = new MultipartBody.Builder()
+                    .setType(MultipartBody.FORM)
+                    .addFormDataPart("full_name", fullName)
+                    .addFormDataPart("email", email)
+                    .addFormDataPart("password", password)
+                    .addFormDataPart("phone", phone)
+                    .addFormDataPart("school", school)
+                    .addFormDataPart("document", "student_id.jpg",
+                            RequestBody.create(file, MediaType.get("application/octet-stream")));
+
+            Request request = new Request.Builder()
+                    .url(BASE_URL + "register_student.php")
+                    .post(builder.build())
+                    .build();
+
+            client.newCall(request).enqueue(callback);
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -720,6 +795,26 @@ public class ApiClient {
                 .enqueue(callback);
     }
 
+    public void getBookingsForStudent(
+            int studentId,
+            Callback callback
+    ) {
+
+        String url =
+                BASE_URL
+                        + "bookings.php?user_id="
+                        + studentId;
+
+        Request request =
+                new Request.Builder()
+                        .url(url)
+                        .get()
+                        .build();
+
+        client.newCall(request)
+                .enqueue(callback);
+    }
+
     public void getBookingsForLandlord(
             int landlordId,
             Callback callback
@@ -1055,9 +1150,108 @@ public class ApiClient {
         createPayment(bookingId, paymentPeriod, dueDate, amount, paymentMethod, paymentDate, status, transactionRef, "Monthly Rent", callback);
     }
 
+    public void submitQrPaymentProof(
+            int bookingId,
+            int paymentId,
+            int paymentPeriod,
+            String dueDate,
+            double amount,
+            String paymentMethod,
+            String paymentDate,
+            String transactionRef,
+            String paymentDescription,
+            File proofFile,
+            Callback callback
+    ) {
+        new Thread(() -> {
+            try {
+                MultipartBody.Builder builder = new MultipartBody.Builder()
+                        .setType(MultipartBody.FORM)
+                        .addFormDataPart("booking_id", String.valueOf(bookingId))
+                        .addFormDataPart("payment_period", String.valueOf(paymentPeriod))
+                        .addFormDataPart("due_date", dueDate != null ? dueDate : "")
+                        .addFormDataPart("amount", String.valueOf(amount))
+                        .addFormDataPart("payment_method", paymentMethod != null ? paymentMethod : "QR")
+                        .addFormDataPart("payment_date", paymentDate != null ? paymentDate : "")
+                        .addFormDataPart("transaction_ref", transactionRef != null ? transactionRef : "")
+                        .addFormDataPart("payment_description", paymentDescription != null ? paymentDescription : "Monthly Rent")
+                        .addFormDataPart("status", "SUBMITTED");
+
+                if (paymentId > 0) {
+                    builder.addFormDataPart("payment_id", String.valueOf(paymentId));
+                }
+
+                if (proofFile != null && proofFile.exists()) {
+                    String mimeType = "image/jpeg";
+                    if (proofFile.getName().toLowerCase().endsWith(".png")) {
+                        mimeType = "image/png";
+                    }
+                    builder.addFormDataPart("proof_image", proofFile.getName(),
+                            RequestBody.create(proofFile, MediaType.get(mimeType)));
+                }
+
+                RequestBody requestBody = builder.build();
+                Request request = new Request.Builder()
+                        .url(BASE_URL + "payments.php")
+                        .post(requestBody)
+                        .build();
+
+                client.newCall(request).enqueue(new Callback() {
+                    @Override
+                    public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                        if (proofFile != null && proofFile.exists()) {
+                            proofFile.delete();
+                        }
+                        callback.onFailure(call, e);
+                    }
+
+                    @Override
+                    public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                        if (proofFile != null && proofFile.exists()) {
+                            proofFile.delete();
+                        }
+                        callback.onResponse(call, response);
+                    }
+                });
+
+            } catch (Exception e) {
+                if (proofFile != null && proofFile.exists()) {
+                    proofFile.delete();
+                }
+                e.printStackTrace();
+            }
+        }, "qr-payment-upload").start();
+    }
+
     // =========================================================
-    // UPDATE PAYMENT STATUS
+    // UPDATE PAYMENT STATUS / VERIFY PAYMENT
     // =========================================================
+
+    public void verifyPayment(
+            int paymentId,
+            String status,
+            String rejectionReason,
+            Callback callback
+    ) {
+        try {
+            JSONObject json = new JSONObject();
+            json.put("payment_id", paymentId);
+            json.put("status", status != null ? status : "PAID");
+            if (rejectionReason != null && !rejectionReason.trim().isEmpty()) {
+                json.put("rejection_reason", rejectionReason.trim());
+            }
+
+            RequestBody body = RequestBody.create(json.toString(), JSON);
+            Request request = new Request.Builder()
+                    .url(BASE_URL + "payments.php")
+                    .patch(body)
+                    .build();
+
+            client.newCall(request).enqueue(callback);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     public void updatePaymentStatus(
             int paymentId,
@@ -1654,6 +1848,54 @@ public class ApiClient {
         }
     }
 
+    public void uploadHousePhotos(Context context, int houseId, List<Uri> photoUris, Callback callback) {
+        final Context appContext = context.getApplicationContext();
+        final String url = BASE_URL + "boarding_houses.php";
+        new Thread(() -> {
+            List<File> stagedFiles = new ArrayList<>();
+            try {
+                MultipartBody.Builder multipart = new MultipartBody.Builder()
+                        .setType(MultipartBody.FORM)
+                        .addFormDataPart("action", "upload_photos")
+                        .addFormDataPart("house_id", String.valueOf(houseId));
+
+                int photoCount = 0;
+                for (int i = 0; i < photoUris.size(); i++) {
+                    Uri uri = photoUris.get(i);
+                    if (uri != null && !uri.toString().startsWith("http")) {
+                        File file = File.createTempFile("house_photo_", ".tmp", appContext.getCacheDir());
+                        stagedFiles.add(file);
+                        try (InputStream input = appContext.getContentResolver().openInputStream(uri);
+                             OutputStream output = new FileOutputStream(file)) {
+                            if (input != null) {
+                                byte[] buffer = new byte[8192];
+                                int count;
+                                while ((count = input.read(buffer)) != -1) {
+                                    output.write(buffer, 0, count);
+                                }
+                            }
+                        }
+                        multipart.addFormDataPart("photos[]", "photo_" + i + ".bin",
+                                RequestBody.create(file, MediaType.get("application/octet-stream")));
+                        photoCount++;
+                    }
+                }
+
+                if (photoCount == 0) {
+                    return;
+                }
+
+                Request request = new Request.Builder().url(url).post(multipart.build()).build();
+                client.newCall(request).enqueue(callback);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                deleteUploadFiles(stagedFiles);
+            }
+        }, "upload-photos-thread").start();
+    }
+
     // =========================================================
     // MESSAGES / CHAT API
     // =========================================================
@@ -1743,6 +1985,22 @@ public class ApiClient {
         }
     }
 
+    public void markNotificationsAsReadByType(int userId, String type, Callback callback) {
+        try {
+            JSONObject json = new JSONObject();
+            json.put("user_id", userId);
+            json.put("type", type);
+            RequestBody body = RequestBody.create(json.toString(), JSON);
+            Request request = new Request.Builder()
+                    .url(BASE_URL + "notifications.php")
+                    .patch(body)
+                    .build();
+            client.newCall(request).enqueue(callback);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void deleteNotification(int notificationId, Callback callback) {
         try {
             JSONObject json = new JSONObject();
@@ -1787,6 +2045,193 @@ public class ApiClient {
             Request request = new Request.Builder()
                     .url(BASE_URL + "bookings.php")
                     .patch(body)
+                    .build();
+            client.newCall(request).enqueue(callback);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void clearConversationThread(int userId, int otherUserId, Callback callback) {
+        try {
+            JSONObject json = new JSONObject();
+            json.put("user_id", userId);
+            json.put("other_user_id", otherUserId);
+            RequestBody body = RequestBody.create(json.toString(), JSON);
+            Request request = new Request.Builder()
+                    .url(BASE_URL + "messages.php")
+                    .delete(body)
+                    .build();
+            client.newCall(request).enqueue(callback);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void uploadGcashQrCode(Context context, int houseId, Uri imageUri, Callback callback) {
+        new Thread(() -> {
+            try {
+                File file = new File(context.getCacheDir(), "gcash_qr_" + houseId + "_" + System.currentTimeMillis() + ".jpg");
+                try (InputStream input = context.getContentResolver().openInputStream(imageUri);
+                     FileOutputStream output = new FileOutputStream(file)) {
+                    byte[] buffer = new byte[8192];
+                    int count;
+                    while ((count = input.read(buffer)) != -1) {
+                        output.write(buffer, 0, count);
+                    }
+                }
+
+                RequestBody requestBody = new MultipartBody.Builder()
+                        .setType(MultipartBody.FORM)
+                        .addFormDataPart("action", "upload_gcash_qr")
+                        .addFormDataPart("house_id", String.valueOf(houseId))
+                        .addFormDataPart("gcash_qr", file.getName(),
+                                RequestBody.create(file, MediaType.get("image/jpeg")))
+                        .build();
+
+                Request request = new Request.Builder()
+                        .url(BASE_URL + "boarding_houses.php")
+                        .post(requestBody)
+                        .build();
+
+                client.newCall(request).enqueue(new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        if (file.exists()) file.delete();
+                        callback.onFailure(call, e);
+                    }
+
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        if (file.exists()) file.delete();
+                        callback.onResponse(call, response);
+                    }
+                });
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }, "gcash-qr-upload").start();
+    }
+
+    public void updateBoardingHousePaymentSettings(int houseId, boolean cashEnabled, String gcashQrCode, Callback callback) {
+        try {
+            JSONObject json = new JSONObject();
+            json.put("house_id", houseId);
+            json.put("cash_enabled", cashEnabled);
+            if (gcashQrCode != null) {
+                json.put("gcash_qr_code", gcashQrCode);
+            }
+            RequestBody body = RequestBody.create(json.toString(), JSON);
+            Request request = new Request.Builder()
+                    .url(BASE_URL + "boarding_houses.php")
+                    .patch(body)
+                    .build();
+            client.newCall(request).enqueue(callback);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void muteConversation(int userId, int otherUserId, int durationHours, Callback callback) {
+        try {
+            JSONObject json = new JSONObject();
+            json.put("action", "mute_conversation");
+            json.put("user_id", userId);
+            json.put("other_user_id", otherUserId);
+            json.put("duration_hours", durationHours);
+
+            RequestBody body = RequestBody.create(json.toString(), JSON);
+            Request request = new Request.Builder()
+                    .url(BASE_URL + "messages.php")
+                    .post(body)
+                    .build();
+            client.newCall(request).enqueue(callback);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void unmuteConversation(int userId, int otherUserId, Callback callback) {
+        try {
+            JSONObject json = new JSONObject();
+            json.put("action", "unmute_conversation");
+            json.put("user_id", userId);
+            json.put("other_user_id", otherUserId);
+
+            RequestBody body = RequestBody.create(json.toString(), JSON);
+            Request request = new Request.Builder()
+                    .url(BASE_URL + "messages.php")
+                    .post(body)
+                    .build();
+            client.newCall(request).enqueue(callback);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void getMuteStatus(int userId, int otherUserId, Callback callback) {
+        String url = BASE_URL + "messages.php?action=get_mute_status&user_id=" + userId + "&other_user_id=" + otherUserId;
+        Request request = new Request.Builder().url(url).get().build();
+        client.newCall(request).enqueue(callback);
+    }
+
+    public void forgotPassword(String email, Callback callback) {
+        try {
+            JSONObject json = new JSONObject();
+            json.put("email", email);
+            RequestBody body = RequestBody.create(json.toString(), JSON);
+            Request request = new Request.Builder()
+                    .url(BASE_URL + "forgot_password.php")
+                    .post(body)
+                    .build();
+            client.newCall(request).enqueue(callback);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void verifyOtp(String email, String otpCode, Callback callback) {
+        try {
+            JSONObject json = new JSONObject();
+            json.put("email", email);
+            json.put("otp_code", otpCode);
+            RequestBody body = RequestBody.create(json.toString(), JSON);
+            Request request = new Request.Builder()
+                    .url(BASE_URL + "verify_otp.php")
+                    .post(body)
+                    .build();
+            client.newCall(request).enqueue(callback);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void resetPassword(String email, String otpCode, String newPassword, Callback callback) {
+        try {
+            JSONObject json = new JSONObject();
+            json.put("email", email);
+            json.put("otp_code", otpCode);
+            json.put("new_password", newPassword);
+            RequestBody body = RequestBody.create(json.toString(), JSON);
+            Request request = new Request.Builder()
+                    .url(BASE_URL + "reset_password.php")
+                    .post(body)
+                    .build();
+            client.newCall(request).enqueue(callback);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addCustomAmenity(String amenityName, Callback callback) {
+        try {
+            JSONObject json = new JSONObject();
+            json.put("amenity_name", amenityName);
+            RequestBody body = RequestBody.create(json.toString(), JSON);
+            Request request = new Request.Builder()
+                    .url(BASE_URL + "amenities.php")
+                    .post(body)
                     .build();
             client.newCall(request).enqueue(callback);
         } catch (Exception e) {

@@ -120,14 +120,14 @@
                 android:textSize="14sp"
                 android:visibility="gone" />
 
-            <LinearLayout
-                android:id="@+id/transactionsContainer"
+            <!-- Transactions RecyclerView -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewTransactions"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:background="@drawable/bg_card_rounded"
-                android:orientation="vertical"
-                android:paddingHorizontal="16dp" />
+                android:layout_marginTop="16dp"
+                android:clipToPadding="false"
+                android:nestedScrollingEnabled="false" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

@@ -265,6 +265,47 @@ public class ViewBoardingHouseActivity extends AppCompatActivity {
         setOptionalTextView("rulesText", houseRules);
         setOptionalTextView("houseStatus", houseStatus);
         setOptionalTextView("statusText", houseStatus);
+        renderHouseRules(houseRules);
+    }
+
+    private void renderHouseRules(String rulesStr) {
+        LinearLayout container = findViewById(R.id.houseRulesContainer);
+        if (container == null) return;
+        container.removeAllViews();
+
+        if (rulesStr == null || rulesStr.trim().isEmpty() || "null".equalsIgnoreCase(rulesStr.trim())) {
+            TextView emptyText = new TextView(this);
+            emptyText.setText("No house rules specified.");
+            emptyText.setTextColor(Color.parseColor("#9A9A9E"));
+            emptyText.setTextSize(13);
+            container.addView(emptyText);
+            return;
+        }
+
+        String[] rules = rulesStr.split("\n");
+        for (String rule : rules) {
+            String trimmed = rule.trim();
+            if (trimmed.isEmpty()) continue;
+
+            LinearLayout row = new LinearLayout(this);
+            row.setLayoutParams(new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            ));
+            row.setOrientation(LinearLayout.HORIZONTAL);
+            row.setGravity(Gravity.CENTER_VERTICAL);
+            LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) row.getLayoutParams();
+            lp.topMargin = dp(6);
+            row.setLayoutParams(lp);
+
+            TextView tv = new TextView(this);
+            tv.setText("📌 " + trimmed);
+            tv.setTextColor(Color.parseColor("#6E6E73"));
+            tv.setTextSize(14);
+            row.addView(tv);
+
+            container.addView(row);
+        }
     }
 
     private void setOptionalTextView(
@@ -298,127 +339,123 @@ public class ViewBoardingHouseActivity extends AppCompatActivity {
     }
 
     private void loadLandlordName() {
-
         if (landlordId <= 0) {
+            setupLandlordCardInteractions();
             return;
         }
 
-        apiClient.getUsers(new Callback() {
-
+        apiClient.getUserById(landlordId, new Callback() {
             @Override
-            public void onFailure(
-                    @NonNull Call call,
-                    @NonNull IOException e
-            ) {
-
-                runOnUiThread(() ->
-                        setLandlordName("Landlord")
-                );
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                runOnUiThread(() -> setLandlordDetails("Landlord", "", false));
             }
 
             @Override
-            public void onResponse(
-                    @NonNull Call call,
-                    @NonNull Response response
-            ) throws IOException {
-
-                String body = "";
-
-                if (response.body() != null) {
-                    body =
-                            response.body().string();
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                if (!response.isSuccessful() || response.body() == null) {
+                    runOnUiThread(() -> setLandlordDetails("Landlord", "", false));
+                    return;
                 }
-
-                String result = body;
-
-                runOnUiThread(() -> {
-
-                    try {
-
-                        JSONObject json =
-                                new JSONObject(result);
-
-                        if (!json.optBoolean(
-                                "success",
-                                false
-                        )) {
-
-                            setLandlordName(
-                                    "Landlord"
-                            );
-
-                            return;
-                        }
-
-                        JSONArray data =
-                                json.optJSONArray(
-                                        "data"
-                                );
-
-                        if (data == null) {
-
-                            setLandlordName(
-                                    "Landlord"
-                            );
-
-                            return;
-                        }
-
-                        for (int i = 0;
-                             i < data.length();
-                             i++) {
-
-                            JSONObject user =
-                                    data.getJSONObject(i);
-
-                            if (user.optInt(
-                                    "user_id",
-                                    0
-                            ) == landlordId) {
-
-                                setLandlordName(
-                                        user.optString(
-                                                "full_name",
-                                                "Landlord"
-                                        )
-                                );
-
-                                return;
+                try {
+                    JSONObject json = new JSONObject(response.body().string());
+                    if (json.optBoolean("success", false)) {
+                        JSONObject u = json.optJSONObject("data");
+                        if (u == null) {
+                            JSONArray arr = json.optJSONArray("data");
+                            if (arr != null && arr.length() > 0) {
+                                u = arr.optJSONObject(0);
                             }
                         }
+                        if (u != null) {
+                            String name = u.optString("full_name", "Landlord");
+                            String profileImage = u.optString("profile_image", "");
+                            boolean isVerified = true;
 
-                        setLandlordName(
-                                "Landlord"
-                        );
-
-                    } catch (Exception e) {
-
-                        setLandlordName(
-                                "Landlord"
-                        );
+                            runOnUiThread(() -> setLandlordDetails(name, profileImage, isVerified));
+                            return;
+                        }
                     }
-                });
+                    runOnUiThread(() -> setLandlordDetails("Landlord", "", false));
+                } catch (Exception e) {
+                    runOnUiThread(() -> setLandlordDetails("Landlord", "", false));
+                }
             }
         });
     }
 
-    private void setLandlordName(
-            String name
-    ) {
-
+    private void setLandlordDetails(String name, String profileImage, boolean isVerified) {
         landlordName = name;
 
-        TextView landlordNameText =
-                findViewById(
-                        R.id.landlordName
-                );
+        TextView landlordNameText = findViewById(R.id.landlordName);
+        if (landlordNameText != null) landlordNameText.setText(name);
 
-        if (landlordNameText != null) {
-
-            landlordNameText.setText(
-                    name
-            );
+        TextView landlordInitials = findViewById(R.id.landlordInitials);
+        if (landlordInitials != null) {
+            landlordInitials.setText(getInitials(name));
         }
+
+        ImageView landlordAvatarImage = findViewById(R.id.landlordAvatarImage);
+        if (landlordAvatarImage != null && profileImage != null && !profileImage.trim().isEmpty() && !"null".equalsIgnoreCase(profileImage.trim())) {
+            landlordAvatarImage.setVisibility(View.VISIBLE);
+            if (landlordInitials != null) landlordInitials.setVisibility(View.GONE);
+            String fullUrl = profileImage.startsWith("http") ? profileImage : "http://10.149.229.109/Dormigo_Backend/" + profileImage;
+            Glide.with(this)
+                    .load(fullUrl)
+                    .placeholder(R.drawable.bg_image_placeholder)
+                    .into(landlordAvatarImage);
+        } else {
+            if (landlordAvatarImage != null) landlordAvatarImage.setVisibility(View.GONE);
+            if (landlordInitials != null) landlordInitials.setVisibility(View.VISIBLE);
+        }
+
+        View verifiedBadge = findViewById(R.id.landlordVerifiedBadge);
+        if (verifiedBadge != null) {
+            verifiedBadge.setVisibility(isVerified ? View.VISIBLE : View.GONE);
+        }
+
+        TextView subtitle = findViewById(R.id.landlordSubtitle);
+        if (subtitle != null) {
+            subtitle.setText(isVerified ? "Verified Landlord" : "Member");
+        }
+
+        setupLandlordCardInteractions();
+    }
+
+    private void setupLandlordCardInteractions() {
+        View landlordCard = findViewById(R.id.landlordCard);
+        View landlordChatBtn = findViewById(R.id.landlordChatBtn);
+
+        View.OnClickListener openProfileListener = v -> {
+            Intent profileIntent = new Intent(this, LandlordProfileViewActivity.class);
+            profileIntent.putExtra("LANDLORD_ID", landlordId);
+            profileIntent.putExtra("HOUSE_ID", houseId);
+            profileIntent.putExtra("LANDLORD_NAME", landlordName);
+            startActivity(profileIntent);
+        };
+
+        if (landlordCard != null) landlordCard.setOnClickListener(openProfileListener);
+
+        if (landlordChatBtn != null) {
+            landlordChatBtn.setOnClickListener(v -> {
+                Intent chatIntent = new Intent(this, ChatMessageActivity.class);
+                chatIntent.putExtra("LANDLORD_ID", landlordId);
+                chatIntent.putExtra("LANDLORD_NAME", landlordName);
+                chatIntent.putExtra("HOUSE_ID", houseId);
+                chatIntent.putExtra("HOUSE_NAME", houseName);
+                startActivity(chatIntent);
+            });
+        }
+    }
+
+    private String getInitials(String name) {
+        if (name == null || name.trim().isEmpty()) return "L";
+        String[] parts = name.trim().split("\\s+");
+        if (parts.length >= 2) {
+            return ("" + parts[0].charAt(0) + parts[1].charAt(0)).toUpperCase(Locale.US);
+        } else if (parts[0].length() >= 2) {
+            return parts[0].substring(0, 2).toUpperCase(Locale.US);
+        }
+        return parts[0].toUpperCase(Locale.US);
     }
 
     private void updateRoomViews() {
@@ -1351,9 +1388,8 @@ public class ViewBoardingHouseActivity extends AppCompatActivity {
                             this
                     );
 
-            chip.setText(
-                    amenity.trim()
-            );
+            String icon = AmenityHelper.getAmenityIcon(amenity.trim());
+            chip.setText(icon + " " + amenity.trim());
 
             chip.setTextColor(
                     Color.parseColor(
@@ -1708,7 +1744,8 @@ public class ViewBoardingHouseActivity extends AppCompatActivity {
         if (tvAdvance != null) tvAdvance.setText(formatRent(advAmt) + " (" + selectedAdvanceMonths + " mo)");
         if (tvDeposit != null) tvDeposit.setText(formatRent(depAmt) + " (" + selectedDepositMonths + " mo)");
         if (tvUtility != null) tvUtility.setText(formatRent(selectedUtilityDeposit));
-        if (tvOther != null) tvOther.setText(formatRent(selectedOtherFees) + (!selectedOtherFeesDesc.isEmpty() ? " (" + selectedOtherFeesDesc + ")" : ""));
+        boolean hasOtherDesc = !selectedOtherFeesDesc.isEmpty() && !"null".equalsIgnoreCase(selectedOtherFeesDesc.trim());
+        if (tvOther != null) tvOther.setText(formatRent(selectedOtherFees) + (hasOtherDesc ? " (" + selectedOtherFeesDesc.trim() + ")" : ""));
         if (tvTotal != null) tvTotal.setText(formatRent(totalInitial));
         if (tvPolicy != null) tvPolicy.setText("Refund Policy: " + (selectedRefundPolicy.isEmpty() ? "As specified by landlord." : selectedRefundPolicy));
 
@@ -2288,7 +2325,7 @@ public class ViewBoardingHouseActivity extends AppCompatActivity {
         final int[] currentSelectedIndex = {0};
 
         if (!paths.isEmpty() && imgMain != null) {
-            String mainUrl = "http://10.129.224.109/Dormigo_Backend/" + paths.get(0);
+            String mainUrl = "http://10.149.229.109/Dormigo_Backend/" + paths.get(0);
             Glide.with(this)
                     .load(mainUrl)
                     .placeholder(R.drawable.bg_image_placeholder)
@@ -2299,7 +2336,7 @@ public class ViewBoardingHouseActivity extends AppCompatActivity {
         for (int i = 0; i < thumbs.length; i++) {
             if (thumbs[i] != null) {
                 if (i + 1 < paths.size()) {
-                    String thumbUrl = "http://10.129.224.109/Dormigo_Backend/" + paths.get(i + 1);
+                    String thumbUrl = "http://10.149.229.109/Dormigo_Backend/" + paths.get(i + 1);
                     thumbs[i].setVisibility(View.VISIBLE);
                     Glide.with(this)
                             .load(thumbUrl)
@@ -2310,7 +2347,7 @@ public class ViewBoardingHouseActivity extends AppCompatActivity {
                     thumbs[i].setOnClickListener(v -> {
                         if (imgMain != null && index < paths.size()) {
                             currentSelectedIndex[0] = index;
-                            String url = "http://10.129.224.109/Dormigo_Backend/" + paths.get(index);
+                            String url = "http://10.149.229.109/Dormigo_Backend/" + paths.get(index);
                             Glide.with(this).load(url).into(imgMain);
                         }
                     });
@@ -2371,7 +2408,7 @@ public class ViewBoardingHouseActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-            String url = "http://10.129.224.109/Dormigo_Backend/" + paths.get(position);
+            String url = "http://10.149.229.109/Dormigo_Backend/" + paths.get(position);
             Glide.with(holder.itemView.getContext())
                     .load(url)
                     .placeholder(R.drawable.bg_image_placeholder)

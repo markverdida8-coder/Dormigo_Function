@@ -104,117 +104,43 @@
         android:textColorHint="#9A9A9E"
         android:textSize="14sp" />
 
-    <!-- Advance Payment & Security Deposit -->
-    <LinearLayout
+    <!-- Additional Fees Section -->
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:orientation="horizontal">
+        android:layout_marginTop="12dp">
 
-        <LinearLayout
-            android:layout_width="0dp"
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:text="Additional Fees"
+            android:textColor="#1A1A1A"
+            android:textSize="13sp"
+            android:textStyle="bold" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Advance Payment"
-                android:textColor="#6E6E73"
-                android:textSize="12sp" />
-
-            <AutoCompleteTextView
-                android:id="@+id/inputAdvance"
-                android:layout_width="match_parent"
-                android:layout_height="44dp"
-                android:layout_marginTop="4dp"
-                android:background="@drawable/bg_input_field"
-                android:clickable="true"
-                android:focusable="false"
-                android:inputType="none"
-                android:paddingHorizontal="10dp"
-                android:textColor="#1A1A1A"
-                android:textSize="13sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
+        <TextView
+            android:id="@+id/btnAddRoomFee"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_weight="1"
-            android:orientation="vertical">
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:background="?attr/selectableItemBackground"
+            android:padding="4dp"
+            android:text="+ Add Fee"
+            android:textColor="#1B5E4C"
+            android:textSize="13sp"
+            android:textStyle="bold" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Security Deposit"
-                android:textColor="#6E6E73"
-                android:textSize="12sp" />
+    </RelativeLayout>
 
-            <AutoCompleteTextView
-                android:id="@+id/inputDeposit"
-                android:layout_width="match_parent"
-                android:layout_height="44dp"
-                android:layout_marginTop="4dp"
-                android:background="@drawable/bg_input_field"
-                android:clickable="true"
-                android:focusable="false"
-                android:inputType="none"
-                android:paddingHorizontal="10dp"
-                android:textColor="#1A1A1A"
-                android:textSize="13sp" />
-        </LinearLayout>
-
-    </LinearLayout>
-
-    <!-- Checkbox for Additional Move-in Fees -->
-    <CheckBox
-        android:id="@+id/checkboxOtherFees"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:text="This room has additional move-in fees"
-        android:textColor="#1A1A1A"
-        android:textSize="13sp" />
-
-    <!-- Other Fees & Description Container (Hidden by default) -->
     <LinearLayout
-        android:id="@+id/layoutOtherFeesContainer"
+        android:id="@+id/roomFeesContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:orientation="horizontal"
-        android:visibility="gone">
-
-        <EditText
-            android:id="@+id/inputOtherFees"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:background="@drawable/bg_input_field"
-            android:hint="Other Fees (₱0)"
-            android:inputType="numberDecimal"
-            android:paddingHorizontal="14dp"
-            android:textColor="#1A1A1A"
-            android:textColorHint="#9A9A9E"
-            android:textSize="14sp" />
-
-        <EditText
-            android:id="@+id/inputOtherFeesDesc"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_marginStart="8dp"
-            android:layout_weight="1"
-            android:background="@drawable/bg_input_field"
-            android:hint="Fee description"
-            android:inputType="text"
-            android:paddingHorizontal="14dp"
-            android:textColor="#1A1A1A"
-            android:textColorHint="#9A9A9E"
-            android:textSize="14sp" />
-
-    </LinearLayout>
+        android:layout_marginTop="4dp"
+        android:orientation="vertical" />
 
     <!-- Refund Policy -->
     <EditText

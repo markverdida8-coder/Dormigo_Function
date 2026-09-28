@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -25,10 +26,14 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
 
+import android.app.AlertDialog;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -40,12 +45,17 @@ public class LandlordHomeActivity extends AppCompatActivity {
     private JSONArray landlordHouses = new JSONArray();
     private int currentHouseIndex = 0;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private int lastOccupancyRate = -1;
+    private boolean isDataLoading = false;
 
     private final Handler pollHandler = new Handler(Looper.getMainLooper());
     private final Runnable pollRunnable = new Runnable() {
         @Override
         public void run() {
-            loadLandlordData();
+            if (!isDataLoading) {
+                loadLandlordData();
+            }
+            pollHandler.removeCallbacks(this);
             pollHandler.postDelayed(this, 3000);
         }
     };
@@ -86,6 +96,7 @@ public class LandlordHomeActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        pollHandler.removeCallbacks(pollRunnable);
         loadLandlordData();
         pollHandler.postDelayed(pollRunnable, 3000);
     }
@@ -197,10 +208,13 @@ public class LandlordHomeActivity extends AppCompatActivity {
     private void loadRoomsForHouse(int houseId) {
         apiClient.getRooms(new Callback() {
             @Override
-            public void onFailure(Call call, IOException e) {}
+            public void onFailure(Call call, IOException e) {
+                isDataLoading = false;
+            }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
+                isDataLoading = false;
                 if (!response.isSuccessful()) return;
                 try {
                     String body = response.body() != null ? response.body().string() : "";
@@ -300,17 +314,34 @@ public class LandlordHomeActivity extends AppCompatActivity {
             if (paymentsSection != null) paymentsSection.setVisibility(View.VISIBLE);
             if (paymentsCard != null) paymentsCard.setVisibility(View.VISIBLE);
 
+            List<JSONObject> sortedPayments = new ArrayList<>();
+            List<JSONObject> submittedPayments = new ArrayList<>();
+            List<JSONObject> otherPayments = new ArrayList<>();
+
+            for (int i = 0; i < payments.length(); i++) {
+                JSONObject obj = payments.optJSONObject(i);
+                if (obj != null) {
+                    String status = obj.optString("status", "").toUpperCase(Locale.ROOT);
+                    if ("SUBMITTED".equals(status)) {
+                        submittedPayments.add(obj);
+                    } else {
+                        otherPayments.add(obj);
+                    }
+                }
+            }
+            sortedPayments.addAll(submittedPayments);
+            sortedPayments.addAll(otherPayments);
+
             // Payment 1
-            if (payments.length() > 0) {
+            if (sortedPayments.size() > 0) {
                 if (paymentItem1 != null) paymentItem1.setVisibility(View.VISIBLE);
                 try {
-                    JSONObject p1 = payments.getJSONObject(0);
-                    int paymentId1 = p1.optInt("payment_id", 0);
+                    JSONObject p1 = sortedPayments.get(0);
                     String tenantName1 = p1.optString("tenant_name", "Student Tenant");
                     String houseName1 = p1.optString("house_name", "Boarding House");
                     String roomNo1 = p1.optString("room_number", "Room");
                     double amount1 = p1.optDouble("amount", 0);
-                    String status1 = p1.optString("status", "PENDING");
+                    String status1 = p1.optString("status", "PENDING").toUpperCase(Locale.ROOT);
 
                     TextView nameView1 = paymentItem1.findViewById(R.id.textPaymentTenantName1);
                     TextView detailsView1 = paymentItem1.findViewById(R.id.textPaymentDetails1);
@@ -321,16 +352,29 @@ public class LandlordHomeActivity extends AppCompatActivity {
                     if (nameView1 != null) nameView1.setText(tenantName1);
                     if (detailsView1 != null) detailsView1.setText(houseName1 + " · " + roomNo1);
                     if (amountView1 != null) amountView1.setText("₱" + amount1);
-                    if (statusView1 != null) statusView1.setText(status1);
 
-                    if ("CONFIRMED".equalsIgnoreCase(status1) || "PAID".equalsIgnoreCase(status1)) {
+                    if ("PAID".equals(status1) || "CONFIRMED".equals(status1)) {
+                        if (statusView1 != null) statusView1.setText("Paid");
                         if (btnAccept1 != null) btnAccept1.setVisibility(View.GONE);
-                        if (statusView1 != null) statusView1.setText("Approved");
-                    } else {
+                    } else if ("SUBMITTED".equals(status1)) {
+                        if (statusView1 != null) statusView1.setText("Awaiting Verification");
                         if (btnAccept1 != null) {
                             btnAccept1.setVisibility(View.VISIBLE);
-                            btnAccept1.setOnClickListener(v -> acceptPayment(paymentId1, tenantName1, btnAccept1, statusView1));
+                            if (btnAccept1 instanceof TextView) {
+                                ((TextView) btnAccept1).setText("Review Payment");
+                            }
+                            final int payId1 = p1.optInt("payment_id", 0);
+                            btnAccept1.setOnClickListener(v -> {
+                                Intent intent = new Intent(LandlordHomeActivity.this, LandlordTransactionHistoryActivity.class);
+                                if (payId1 > 0) {
+                                    intent.putExtra("openPaymentId", payId1);
+                                }
+                                startActivity(intent);
+                            });
                         }
+                    } else {
+                        if (statusView1 != null) statusView1.setText(status1);
+                        if (btnAccept1 != null) btnAccept1.setVisibility(View.GONE);
                     }
                 } catch (Exception ignored) {}
             } else {
@@ -338,17 +382,16 @@ public class LandlordHomeActivity extends AppCompatActivity {
             }
 
             // Payment 2
-            if (payments.length() > 1) {
+            if (sortedPayments.size() > 1) {
                 if (paymentItem2 != null) paymentItem2.setVisibility(View.VISIBLE);
                 if (dividerView != null) dividerView.setVisibility(View.VISIBLE);
                 try {
-                    JSONObject p2 = payments.getJSONObject(1);
-                    int paymentId2 = p2.optInt("payment_id", 0);
+                    JSONObject p2 = sortedPayments.get(1);
                     String tenantName2 = p2.optString("tenant_name", "Student Tenant");
                     String houseName2 = p2.optString("house_name", "Boarding House");
                     String roomNo2 = p2.optString("room_number", "Room");
                     double amount2 = p2.optDouble("amount", 0);
-                    String status2 = p2.optString("status", "PENDING");
+                    String status2 = p2.optString("status", "PENDING").toUpperCase(Locale.ROOT);
 
                     TextView nameView2 = paymentItem2.findViewById(R.id.textPaymentTenantName2);
                     TextView detailsView2 = paymentItem2.findViewById(R.id.textPaymentDetails2);
@@ -359,16 +402,29 @@ public class LandlordHomeActivity extends AppCompatActivity {
                     if (nameView2 != null) nameView2.setText(tenantName2);
                     if (detailsView2 != null) detailsView2.setText(houseName2 + " · " + roomNo2);
                     if (amountView2 != null) amountView2.setText("₱" + amount2);
-                    if (statusView2 != null) statusView2.setText(status2);
 
-                    if ("CONFIRMED".equalsIgnoreCase(status2) || "PAID".equalsIgnoreCase(status2)) {
+                    if ("PAID".equals(status2) || "CONFIRMED".equals(status2)) {
+                        if (statusView2 != null) statusView2.setText("Paid");
                         if (btnAccept2 != null) btnAccept2.setVisibility(View.GONE);
-                        if (statusView2 != null) statusView2.setText("Approved");
-                    } else {
+                    } else if ("SUBMITTED".equals(status2)) {
+                        if (statusView2 != null) statusView2.setText("Awaiting Verification");
                         if (btnAccept2 != null) {
                             btnAccept2.setVisibility(View.VISIBLE);
-                            btnAccept2.setOnClickListener(v -> acceptPayment(paymentId2, tenantName2, btnAccept2, statusView2));
+                            if (btnAccept2 instanceof TextView) {
+                                ((TextView) btnAccept2).setText("Review Payment");
+                            }
+                            final int payId2 = p2.optInt("payment_id", 0);
+                            btnAccept2.setOnClickListener(v -> {
+                                Intent intent = new Intent(LandlordHomeActivity.this, LandlordTransactionHistoryActivity.class);
+                                if (payId2 > 0) {
+                                    intent.putExtra("openPaymentId", payId2);
+                                }
+                                startActivity(intent);
+                            });
                         }
+                    } else {
+                        if (statusView2 != null) statusView2.setText(status2);
+                        if (btnAccept2 != null) btnAccept2.setVisibility(View.GONE);
                     }
                 } catch (Exception ignored) {}
             } else {
@@ -376,29 +432,6 @@ public class LandlordHomeActivity extends AppCompatActivity {
                 if (dividerView != null) dividerView.setVisibility(View.GONE);
             }
         }
-    }
-
-    private void acceptPayment(int paymentId, String studentName, View btnAccept, TextView statusView) {
-        apiClient.updatePaymentStatus(paymentId, "CONFIRMED", null, null, new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {}
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful()) {
-                    runOnUiThread(() -> {
-                        btnAccept.setVisibility(View.GONE);
-                        if (statusView != null) statusView.setText("Approved");
-                        Toast.makeText(LandlordHomeActivity.this, "Payment accepted for " + studentName, Toast.LENGTH_SHORT).show();
-                        SharedPreferences prefs = getSharedPreferences("DormigoPrefs", MODE_PRIVATE);
-                        int landlordId = prefs.getInt("userId", -1);
-                        if (landlordId > 0) {
-                            loadRecentPayments(landlordId);
-                        }
-                    });
-                }
-            }
-        });
     }
 
     private void loadPendingRequests(int landlordId) {
@@ -557,10 +590,15 @@ public class LandlordHomeActivity extends AppCompatActivity {
     }
 
     private void animateOccupancy(int rate) {
+        if (lastOccupancyRate == rate) {
+            return;
+        }
+
         CircularProgressIndicator occupancyProgressBar = findViewById(R.id.occupancyProgressBar);
         TextView occupancyPercentText = findViewById(R.id.occupancyPercentText);
         if (occupancyProgressBar != null && occupancyPercentText != null) {
-            ObjectAnimator progressAnimator = ObjectAnimator.ofInt(occupancyProgressBar, "progress", 0, rate);
+            int startVal = lastOccupancyRate >= 0 ? lastOccupancyRate : 0;
+            ObjectAnimator progressAnimator = ObjectAnimator.ofInt(occupancyProgressBar, "progress", startVal, rate);
             progressAnimator.setDuration(1000);
             progressAnimator.setInterpolator(new DecelerateInterpolator());
             progressAnimator.addUpdateListener(animation -> {
@@ -568,6 +606,7 @@ public class LandlordHomeActivity extends AppCompatActivity {
                 occupancyPercentText.setText(current + "%");
             });
             progressAnimator.start();
+            lastOccupancyRate = rate;
         }
     }
 

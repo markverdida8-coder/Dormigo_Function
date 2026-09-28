@@ -12,12 +12,12 @@
         "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\drawable\\bg_dot_orange.xml"
     },
     {
-        "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\drawable_bg_role_selected.xml.flat",
-        "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\drawable\\bg_role_selected.xml"
-    },
-    {
         "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\drawable_bg_upload_dropzone.xml.flat",
         "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\drawable\\bg_upload_dropzone.xml"
+    },
+    {
+        "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\drawable_bg_role_selected.xml.flat",
+        "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\drawable\\bg_role_selected.xml"
     },
     {
         "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\drawable_bg_circle_green_light.xml.flat",
@@ -48,20 +48,32 @@
         "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\layout\\activity_notifications.xml"
     },
     {
+        "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\drawable_bg_circle_blue.xml.flat",
+        "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\drawable\\bg_circle_blue.xml"
+    },
+    {
         "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\layout_filter_bottom_sheet.xml.flat",
         "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\layout\\filter_bottom_sheet.xml"
+    },
+    {
+        "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\layout_item_chat_conversation.xml.flat",
+        "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\layout\\item_chat_conversation.xml"
+    },
+    {
+        "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\layout_item_transaction_card.xml.flat",
+        "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\layout\\item_transaction_card.xml"
     },
     {
         "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\drawable_bg_role_unselected.xml.flat",
         "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\drawable\\bg_role_unselected.xml"
     },
     {
-        "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\drawable_bg_button_outline_white.xml.flat",
-        "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\drawable\\bg_button_outline_white.xml"
-    },
-    {
         "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\layout_activity_landlord_profile.xml.flat",
         "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\layout\\activity_landlord_profile.xml"
+    },
+    {
+        "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\drawable_bg_button_outline_white.xml.flat",
+        "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\drawable\\bg_button_outline_white.xml"
     },
     {
         "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\drawable_ic_menu.xml.flat",
@@ -80,6 +92,10 @@
         "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\drawable\\bg_unread_notif.xml"
     },
     {
+        "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\layout_activity_landlord_profile_view.xml.flat",
+        "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\layout\\activity_landlord_profile_view.xml"
+    },
+    {
         "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\xml_data_extraction_rules.xml.flat",
         "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\xml\\data_extraction_rules.xml"
     },
@@ -96,6 +112,10 @@
         "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\drawable\\bg_notif_unread.xml"
     },
     {
+        "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\layout_item_chat_section_header.xml.flat",
+        "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\layout\\item_chat_section_header.xml"
+    },
+    {
         "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\layout_profile_settings.xml.flat",
         "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\layout\\profile_settings.xml"
     },
@@ -108,8 +128,8 @@
         "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\drawable\\ic_upload_cloud.xml"
     },
     {
-        "merged": "com.dormigo.app-debug-44:/layout_home_page_layout.xml.flat",
-        "source": "com.dormigo.app-main-46:/layout/home_page_layout.xml"
+        "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\layout_dialog_payment_details.xml.flat",
+        "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\layout\\dialog_payment_details.xml"
     },
     {
         "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\layout_login_page.xml.flat",
@@ -118,6 +138,10 @@
     {
         "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\layout-land_activity_booking_requests.xml.flat",
         "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\layout-land\\activity_booking_requests.xml"
+    },
+    {
+        "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\drawable_ic_event_available.xml.flat",
+        "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\drawable\\ic_event_available.xml"
     },
     {
         "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\drawable_bg_chip_selectable.xml.flat",
@@ -136,12 +160,12 @@
         "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\drawable\\bg_circle_green_dark.xml"
     },
     {
-        "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\mipmap-mdpi_ic_launcher_foreground.webp.flat",
-        "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\mipmap-mdpi\\ic_launcher_foreground.webp"
-    },
-    {
         "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\layout_activity_landlord_payment_methods.xml.flat",
         "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\layout\\activity_landlord_payment_methods.xml"
+    },
+    {
+        "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\mipmap-mdpi_ic_launcher_foreground.webp.flat",
+        "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\mipmap-mdpi\\ic_launcher_foreground.webp"
     },
     {
         "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\drawable_bg_circle_white.xml.flat",
@@ -162,6 +186,10 @@
     {
         "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\mipmap-hdpi_ic_launcher_foreground.webp.flat",
         "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\mipmap-hdpi\\ic_launcher_foreground.webp"
+    },
+    {
+        "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\layout_dialog_terms.xml.flat",
+        "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\layout\\dialog_terms.xml"
     },
     {
         "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\drawable_ic_nav_chat.xml.flat",
@@ -248,6 +276,10 @@
         "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\drawable\\bg_circle_light_gray.xml"
     },
     {
+        "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\layout_activity_verify_otp.xml.flat",
+        "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\layout\\activity_verify_otp.xml"
+    },
+    {
         "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\drawable_ic_add.xml.flat",
         "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\drawable\\ic_add.xml"
     },
@@ -312,6 +344,10 @@
         "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\drawable\\ic_eye_off.xml"
     },
     {
+        "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\drawable_bg_card_unread_rounded.xml.flat",
+        "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\drawable\\bg_card_unread_rounded.xml"
+    },
+    {
         "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\drawable_ic_wifi.xml.flat",
         "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\drawable\\ic_wifi.xml"
     },
@@ -320,8 +356,20 @@
         "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\drawable\\bg_circle_green.xml"
     },
     {
+        "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\layout_activity_admin_verification.xml.flat",
+        "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\layout\\activity_admin_verification.xml"
+    },
+    {
         "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\layout_create_account.xml.flat",
         "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\layout\\create_account.xml"
+    },
+    {
+        "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\layout_item_notification_card.xml.flat",
+        "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\layout\\item_notification_card.xml"
+    },
+    {
+        "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\drawable_bg_circle_gray.xml.flat",
+        "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\drawable\\bg_circle_gray.xml"
     },
     {
         "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\drawable_ic_bell.xml.flat",
@@ -344,12 +392,20 @@
         "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\drawable\\ic_location_pin.xml"
     },
     {
+        "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\layout_activity_landlord_reviews.xml.flat",
+        "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\layout\\activity_landlord_reviews.xml"
+    },
+    {
         "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\drawable_ic_chevron_right.xml.flat",
         "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\drawable\\ic_chevron_right.xml"
     },
     {
         "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\color_nav_item_color.xml.flat",
         "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\color\\nav_item_color.xml"
+    },
+    {
+        "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\layout_dialog_add_deposit.xml.flat",
+        "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\layout\\dialog_add_deposit.xml"
     },
     {
         "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\drawable_ic_directions.xml.flat",
@@ -362,6 +418,10 @@
     {
         "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\layout_dialog_full_image.xml.flat",
         "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\layout\\dialog_full_image.xml"
+    },
+    {
+        "merged": "com.dormigo.app-debug-44:/layout_gcash_qr_bottom_sheet.xml.flat",
+        "source": "com.dormigo.app-main-46:/layout/gcash_qr_bottom_sheet.xml"
     },
     {
         "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\drawable_ic_message_square.xml.flat",
@@ -436,6 +496,10 @@
         "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\layout\\activity_verification.xml"
     },
     {
+        "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\layout_activity_reset_password.xml.flat",
+        "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\layout\\activity_reset_password.xml"
+    },
+    {
         "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\drawable_ic_banknote.xml.flat",
         "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\drawable\\ic_banknote.xml"
     },
@@ -468,6 +532,10 @@
         "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\drawable\\ic_alert_circle.xml"
     },
     {
+        "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\layout_activity_tenant_profile_view.xml.flat",
+        "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\layout\\activity_tenant_profile_view.xml"
+    },
+    {
         "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\drawable_ic_launcher_foreground.xml.flat",
         "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\drawable\\ic_launcher_foreground.xml"
     },
@@ -486,6 +554,10 @@
     {
         "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\mipmap-xxxhdpi_ic_launcher_foreground.webp.flat",
         "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\mipmap-xxxhdpi\\ic_launcher_foreground.webp"
+    },
+    {
+        "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\drawable_bg_circle_orange.xml.flat",
+        "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\drawable\\bg_circle_orange.xml"
     },
     {
         "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\mipmap-anydpi-v26_ic_launcher_round.xml.flat",
@@ -548,6 +620,10 @@
         "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\drawable\\ic_smartphone.xml"
     },
     {
+        "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\drawable_bg_circle_purple.xml.flat",
+        "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\drawable\\bg_circle_purple.xml"
+    },
+    {
         "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\drawable_ic_close.xml.flat",
         "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\drawable\\ic_close.xml"
     },
@@ -558,6 +634,10 @@
     {
         "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\layout_activity_admin_verification_detail.xml.flat",
         "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\layout\\activity_admin_verification_detail.xml"
+    },
+    {
+        "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\layout_dialog_billing_preview.xml.flat",
+        "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\layout\\dialog_billing_preview.xml"
     },
     {
         "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\drawable_ic_shield.xml.flat",
@@ -588,6 +668,10 @@
         "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\drawable\\ic_search.xml"
     },
     {
+        "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\layout_dialog_fullscreen_qr.xml.flat",
+        "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\layout\\dialog_fullscreen_qr.xml"
+    },
+    {
         "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\mipmap-xxxhdpi_ic_launcher_round.webp.flat",
         "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\mipmap-xxxhdpi\\ic_launcher_round.webp"
     },
@@ -596,20 +680,32 @@
         "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\mipmap-xhdpi\\ic_launcher_round.webp"
     },
     {
+        "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\layout_dialog_add_fee.xml.flat",
+        "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\layout\\dialog_add_fee.xml"
+    },
+    {
         "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\anim_slide_in_right.xml.flat",
         "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\anim\\slide_in_right.xml"
+    },
+    {
+        "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\layout_activity_landlord_rental_charges.xml.flat",
+        "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\layout\\activity_landlord_rental_charges.xml"
+    },
+    {
+        "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\drawable_bg_circle_red.xml.flat",
+        "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\drawable\\bg_circle_red.xml"
     },
     {
         "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\layout_forgot_password_page.xml.flat",
         "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\layout\\forgot_password_page.xml"
     },
     {
-        "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\drawable_ic_qr_code.xml.flat",
-        "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\drawable\\ic_qr_code.xml"
-    },
-    {
         "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\layout_activity_landlord_transaction_history.xml.flat",
         "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\layout\\activity_landlord_transaction_history.xml"
+    },
+    {
+        "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\drawable_ic_qr_code.xml.flat",
+        "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\drawable\\ic_qr_code.xml"
     },
     {
         "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\drawable_bg_card_rounded.xml.flat",

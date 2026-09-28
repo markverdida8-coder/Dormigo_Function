@@ -402,6 +402,7 @@
                     android:textStyle="bold" />
 
                 <LinearLayout
+                    android:id="@+id/houseRulesContainer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
@@ -637,24 +638,42 @@
                     android:textStyle="bold" />
 
                 <LinearLayout
+                    android:id="@+id/landlordCard"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:background="@drawable/bg_card_rounded"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:padding="16dp">
 
-                    <TextView
-                        android:id="@+id/landlordInitials"
+                    <FrameLayout
                         android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:background="@drawable/bg_circle_green"
-                        android:gravity="center"
-                        android:text="@string/landlord_initials"
-                        android:textColor="#FFFFFF"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
+                        android:layout_height="48dp">
+
+                        <ImageView
+                            android:id="@+id/landlordAvatarImage"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:contentDescription="Landlord Avatar"
+                            android:scaleType="centerCrop"
+                            android:visibility="gone" />
+
+                        <TextView
+                            android:id="@+id/landlordInitials"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/bg_circle_green"
+                            android:gravity="center"
+                            android:text="@string/landlord_initials"
+                            android:textColor="#FFFFFF"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                    </FrameLayout>
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -679,30 +698,38 @@
                                 android:textStyle="bold" />
 
                             <ImageView
+                                android:id="@+id/landlordVerifiedBadge"
                                 android:layout_width="14dp"
                                 android:layout_height="14dp"
                                 android:layout_marginStart="4dp"
+                                android:contentDescription="@string/verification"
                                 android:src="@drawable/ic_verified"
-                                android:contentDescription="@string/verification" />
+                                android:visibility="gone" />
 
                         </LinearLayout>
 
                         <TextView
+                            android:id="@+id/landlordSubtitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="@string/landlord_stats"
+                            android:text="Verified Landlord"
                             android:textColor="#9A9A9E"
                             android:textSize="11sp" />
 
                     </LinearLayout>
 
                     <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
+                        android:id="@+id/landlordChatBtn"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:clickable="true"
+                        android:contentDescription="@string/message"
+                        android:focusable="true"
+                        android:padding="6dp"
                         android:src="@drawable/ic_message_square"
-                        app:tint="#1B5E4C"
-                        android:contentDescription="@string/message" />
+                        app:tint="#1B5E4C" />
 
                 </LinearLayout>
 

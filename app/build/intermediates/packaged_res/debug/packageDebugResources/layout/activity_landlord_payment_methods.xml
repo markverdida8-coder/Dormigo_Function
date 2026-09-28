@@ -21,10 +21,10 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:clickable="true"
+            android:contentDescription="Back"
             android:focusable="true"
             android:src="@drawable/ic_arrow_back"
-            app:tint="#1A1A1A"
-            android:contentDescription="Back" />
+            app:tint="#1A1A1A" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -49,10 +49,64 @@
             android:orientation="vertical"
             android:padding="16dp">
 
+            <!-- Summary Card -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_card_green"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:id="@+id/textSummaryHouseName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="House 1"
+                    android:textColor="#FFFFFF"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/textSummaryCashStatus"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Cash: Enabled"
+                        android:textColor="#D7E9E1"
+                        android:textSize="13sp" />
+
+                    <TextView
+                        android:id="@+id/textSummaryGcashStatus"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="GCash: Configured"
+                        android:textColor="#D7E9E1"
+                        android:textSize="13sp" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/textSummaryLastUpdated"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Last Updated: Today • 3:15 PM"
+                    android:textColor="#D7E9E1"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
             <!-- Cash on Hand Card -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
                 android:background="@drawable/bg_card_rounded"
                 android:orientation="vertical"
                 android:padding="16dp">
@@ -77,10 +131,11 @@
                             android:textStyle="bold" />
 
                         <TextView
+                            android:id="@+id/textCashDesc"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="Accept physical cash payments from tenants"
+                            android:text="Students may pay rent directly to you in person."
                             android:textColor="#9A9A9E"
                             android:textSize="12sp" />
                     </LinearLayout>
@@ -113,18 +168,19 @@
                     android:textStyle="bold" />
 
                 <TextView
+                    android:id="@+id/textGcashDesc"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="Upload your GCash QR code so students/tenants can scan and pay rent or reservation fees."
+                    android:text="Upload your GCash QR code so students can scan and pay rent."
                     android:textColor="#9A9A9E"
                     android:textSize="12sp" />
 
-                <!-- QR Upload Dropzone -->
+                <!-- QR Upload Dropzone / Preview Frame -->
                 <FrameLayout
                     android:id="@+id/qrUploadBox"
                     android:layout_width="match_parent"
-                    android:layout_height="180dp"
+                    android:layout_height="220dp"
                     android:layout_marginTop="16dp"
                     android:background="@drawable/bg_upload_dropzone"
                     android:clickable="true"
@@ -140,15 +196,15 @@
                         <ImageView
                             android:layout_width="36dp"
                             android:layout_height="36dp"
+                            android:contentDescription="Upload QR"
                             android:src="@drawable/ic_upload_cloud"
-                            app:tint="#1B5E4C"
-                            android:contentDescription="Upload QR" />
+                            app:tint="#1B5E4C" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
-                            android:text="Tap to upload GCash QR Code image"
+                            android:text="No GCash QR uploaded yet."
                             android:textColor="#1B5E4C"
                             android:textSize="13sp"
                             android:textStyle="bold" />
@@ -157,7 +213,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="PNG, JPG up to 10MB"
+                            android:text="PNG, JPG, WEBP up to 10MB"
                             android:textColor="#9A9A9E"
                             android:textSize="11sp" />
                     </LinearLayout>
@@ -166,10 +222,65 @@
                         android:id="@+id/qrPreview"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:contentDescription="QR Preview"
                         android:scaleType="fitCenter"
-                        android:visibility="gone"
-                        android:contentDescription="QR Preview" />
+                        android:visibility="gone" />
                 </FrameLayout>
+
+                <!-- Action Buttons for QR -->
+                <LinearLayout
+                    android:id="@+id/qrActionButtons"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/btnReplaceQr"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_marginEnd="4dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_button_outline"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:text="Replace QR"
+                        android:textColor="#1A1A1A"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/btnPreviewQr"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_marginHorizontal="4dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_button_outline"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:text="Preview"
+                        android:textColor="#1A1A1A"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/btnRemoveQr"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_marginStart="4dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_button_outline_red"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:text="Remove QR"
+                        android:textColor="#C53030"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
 
             </LinearLayout>
 
@@ -193,7 +304,7 @@
             android:clickable="true"
             android:focusable="true"
             android:gravity="center"
-            android:text="Save Payment Settings"
+            android:text="Save Changes"
             android:textColor="#FFFFFF"
             android:textSize="15sp"
             android:textStyle="bold" />

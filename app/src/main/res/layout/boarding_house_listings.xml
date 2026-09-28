@@ -245,25 +245,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:src="@drawable/ic_map"
-                        app:tint="#1B5E4C"
-                        android:contentDescription="@string/map_view" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="6dp"
-                        android:text="@string/map_view"
-                        android:textColor="#1B5E4C"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
-
-                </LinearLayout>
+                    android:orientation="horizontal"/>
 
             </LinearLayout>
 
@@ -508,16 +490,15 @@
                     android:orientation="vertical"
                     android:padding="16dp">
 
-                    <RelativeLayout
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
 
                         <TextView
                             android:id="@+id/houseName2"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentStart="true"
-                            android:layout_toStartOf="@id/priceLabel2"
                             android:text="@string/villa_esperanza_name"
                             android:textColor="#1A1A1A"
                             android:textSize="17sp"
@@ -525,15 +506,15 @@
 
                         <TextView
                             android:id="@+id/priceLabel2"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
+                            android:layout_marginTop="4dp"
                             android:text="@string/rent_1200_mo"
-                            android:textColor="#1A1A1A"
-                            android:textSize="17sp"
+                            android:textColor="#1B5E4C"
+                            android:textSize="15sp"
                             android:textStyle="bold" />
 
-                    </RelativeLayout>
+                    </LinearLayout>
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -690,16 +671,15 @@
                     android:orientation="vertical"
                     android:padding="16dp">
 
-                    <RelativeLayout
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
 
                         <TextView
                             android:id="@+id/houseName3"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentStart="true"
-                            android:layout_toStartOf="@id/priceLabel3"
                             android:text="@string/casa_amiga_name"
                             android:textColor="#1A1A1A"
                             android:textSize="17sp"
@@ -707,15 +687,15 @@
 
                         <TextView
                             android:id="@+id/priceLabel3"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
+                            android:layout_marginTop="4dp"
                             android:text="@string/price_3200"
-                            android:textColor="#1A1A1A"
-                            android:textSize="17sp"
+                            android:textColor="#1B5E4C"
+                            android:textSize="15sp"
                             android:textStyle="bold" />
 
-                    </RelativeLayout>
+                    </LinearLayout>
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -872,16 +852,15 @@
                     android:orientation="vertical"
                     android:padding="16dp">
 
-                    <RelativeLayout
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
 
                         <TextView
                             android:id="@+id/houseName4"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentStart="true"
-                            android:layout_toStartOf="@id/priceLabel4"
                             android:text="@string/san_jose_residence_name"
                             android:textColor="#1A1A1A"
                             android:textSize="17sp"
@@ -889,15 +868,15 @@
 
                         <TextView
                             android:id="@+id/priceLabel4"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
+                            android:layout_marginTop="4dp"
                             android:text="@string/rent_2500_mo"
-                            android:textColor="#1A1A1A"
-                            android:textSize="17sp"
+                            android:textColor="#1B5E4C"
+                            android:textSize="15sp"
                             android:textStyle="bold" />
 
-                    </RelativeLayout>
+                    </LinearLayout>
 
                     <LinearLayout
                         android:layout_width="match_parent"

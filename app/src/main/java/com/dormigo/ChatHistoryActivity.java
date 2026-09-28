@@ -2,24 +2,25 @@ package com.dormigo;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
-import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -27,14 +28,36 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import okhttp3.Response;
 
-public class ChatHistoryActivity extends AppCompatActivity {
+public class ChatHistoryActivity extends AppCompatActivity implements ChatConversationAdapter.OnConversationClickListener {
 
     private ApiClient apiClient;
+    private final List<JSONObject> conversationList = new ArrayList<>();
+    private final List<JSONObject> filteredList = new ArrayList<>();
+    private ChatConversationAdapter adapter;
+    private RecyclerView recyclerView;
+    private String lastResponseJson = "";
+    private String currentSearchQuery = "";
+    private boolean isUserSearchMode = false;
+
+    private final Handler pollHandler = new Handler(Looper.getMainLooper());
+    private final Runnable pollRunnable = new Runnable() {
+        @Override
+        public void run() {
+            loadLiveChats();
+            pollHandler.postDelayed(this, 2500);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,15 +81,32 @@ public class ChatHistoryActivity extends AppCompatActivity {
             });
         }
 
+        setupRecyclerView();
         setupSearch();
         setupBottomNavigation();
+        setupBackPressed();
         loadLiveChats();
+    }
+
+    private void setupBackPressed() {
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (isUserSearchMode || !currentSearchQuery.isEmpty()) {
+                    exitSearchMode();
+                } else {
+                    setEnabled(false);
+                    getOnBackPressedDispatcher().onBackPressed();
+                }
+            }
+        });
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         loadLiveChats();
+        pollHandler.removeCallbacks(pollRunnable);
         pollHandler.postDelayed(pollRunnable, 2500);
     }
 
@@ -76,33 +116,41 @@ public class ChatHistoryActivity extends AppCompatActivity {
         pollHandler.removeCallbacks(pollRunnable);
     }
 
-    private final Handler pollHandler = new Handler(Looper.getMainLooper());
-    private final Runnable pollRunnable = new Runnable() {
-        @Override
-        public void run() {
-            loadLiveChats();
-            pollHandler.postDelayed(this, 2500);
+    private void setupRecyclerView() {
+        recyclerView = findViewById(R.id.recyclerViewChats);
+        if (recyclerView != null) {
+            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+            recyclerView.setItemAnimator(new DefaultItemAnimator());
+            adapter = new ChatConversationAdapter(this, filteredList, this);
+            recyclerView.setAdapter(adapter);
         }
-    };
+    }
 
     private void loadLiveChats() {
         SharedPreferences prefs = getSharedPreferences("DormigoPrefs", MODE_PRIVATE);
         int userId = prefs.getInt("userId", -1);
         if (userId <= 0) return;
 
+        if (isUserSearchMode && !currentSearchQuery.isEmpty()) {
+            return;
+        }
+
         apiClient.getChatConversations(userId, new Callback() {
             @Override
-            public void onFailure(Call call, IOException e) {}
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {}
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (!response.isSuccessful()) return;
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                if (!response.isSuccessful() || response.body() == null) return;
                 try {
-                    String body = response.body() != null ? response.body().string() : "";
+                    String body = response.body().string();
+                    if (body.equals(lastResponseJson)) return;
+                    lastResponseJson = body;
+
                     JSONObject json = new JSONObject(body);
                     if (json.optBoolean("success", false)) {
                         JSONArray chats = json.optJSONArray("data");
-                        runOnUiThread(() -> renderChatList(chats != null ? chats : new JSONArray(), false));
+                        runOnUiThread(() -> updateChatData(chats != null ? chats : new JSONArray(), false));
                     }
                 } catch (Exception ignored) {}
             }
@@ -111,6 +159,12 @@ public class ChatHistoryActivity extends AppCompatActivity {
 
     private void setupSearch() {
         EditText searchInput = findViewById(R.id.chatSearchInput);
+        View btnClear = findViewById(R.id.btnClearSearch);
+
+        if (btnClear != null) {
+            btnClear.setOnClickListener(v -> exitSearchMode());
+        }
+
         if (searchInput == null) return;
 
         searchInput.addTextChangedListener(new TextWatcher() {
@@ -119,40 +173,18 @@ public class ChatHistoryActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                String query = s.toString().trim().toLowerCase();
-                if (query.isEmpty()) {
-                    loadLiveChats();
+                currentSearchQuery = s.toString().trim().toLowerCase();
+                if (currentSearchQuery.isEmpty()) {
+                    exitSearchMode();
                     return;
                 }
 
-                apiClient.getUsers(new Callback() {
-                    @Override
-                    public void onFailure(Call call, IOException e) {}
+                if (btnClear != null) {
+                    btnClear.setVisibility(View.VISIBLE);
+                }
 
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        if (!response.isSuccessful()) return;
-                        String body = response.body() != null ? response.body().string() : "";
-                        try {
-                            JSONObject json = new JSONObject(body);
-                            if (json.optBoolean("success", false)) {
-                                JSONArray users = json.optJSONArray("data");
-                                JSONArray filtered = new JSONArray();
-                                if (users != null) {
-                                    for (int i = 0; i < users.length(); i++) {
-                                        JSONObject u = users.getJSONObject(i);
-                                        String name = u.optString("full_name", "");
-                                        String userType = u.optString("user_type", "");
-                                        if (name.toLowerCase().contains(query) && userType.equalsIgnoreCase("LANDLORD")) {
-                                            filtered.put(u);
-                                        }
-                                    }
-                                }
-                                runOnUiThread(() -> renderChatList(filtered, true));
-                            }
-                        } catch (Exception ignored) {}
-                    }
-                });
+                isUserSearchMode = true;
+                performCombinedSearch(currentSearchQuery, "LANDLORD");
             }
 
             @Override
@@ -160,118 +192,203 @@ public class ChatHistoryActivity extends AppCompatActivity {
         });
     }
 
-    private void renderChatList(JSONArray items, boolean isUserSearch) {
-        LinearLayout container = findViewById(R.id.chatListContainer);
-        if (container == null) return;
-        container.removeAllViews();
+    private void exitSearchMode() {
+        isUserSearchMode = false;
+        currentSearchQuery = "";
+        EditText searchInput = findViewById(R.id.chatSearchInput);
+        if (searchInput != null && !searchInput.getText().toString().isEmpty()) {
+            searchInput.setText("");
+            searchInput.clearFocus();
+        }
+        View btnClear = findViewById(R.id.btnClearSearch);
+        if (btnClear != null) {
+            btnClear.setVisibility(View.GONE);
+        }
+        filteredList.clear();
+        filteredList.addAll(conversationList);
+        if (adapter != null) {
+            adapter.notifyDataSetChanged();
+        }
+        loadLiveChats();
+    }
 
-        if (items.length() == 0) {
-            TextView empty = new TextView(this);
-            empty.setText(isUserSearch ? "No landlords found." : "No conversations yet. Use search above to find landlords.");
-            empty.setTextColor(0xFF6E6E73);
-            empty.setTextSize(14);
-            empty.setPadding(dp(16), dp(24), dp(16), dp(24));
-            container.addView(empty);
-            return;
+    private void performCombinedSearch(String query, String targetRole) {
+        SharedPreferences prefs = getSharedPreferences("DormigoPrefs", MODE_PRIVATE);
+        int currentUserId = prefs.getInt("userId", -1);
+
+        // Step 1: Filter existing active conversations
+        List<JSONObject> matchedChats = new ArrayList<>();
+        Set<Integer> existingUserIds = new HashSet<>();
+
+        for (JSONObject item : conversationList) {
+            String name = item.optString("other_user_name", "");
+            int otherId = item.optInt("other_user_id", 0);
+            if (otherId > 0) existingUserIds.add(otherId);
+
+            if (name.toLowerCase().contains(query)) {
+                matchedChats.add(item);
+            }
         }
 
-        for (int i = 0; i < items.length(); i++) {
-            try {
-                JSONObject obj = items.getJSONObject(i);
-                int otherId = isUserSearch ? obj.optInt("user_id", 0) : obj.optInt("other_user_id", 0);
-                String name = isUserSearch ? obj.optString("full_name", "") : obj.optString("other_user_name", "");
-                String lastMsg = isUserSearch ? obj.optString("email", "") : obj.optString("message_text", "Tap to chat");
+        // Step 2: Query eligible users from users.php
+        String url = "http://10.149.229.109/Dormigo_Backend/api/users.php?search=" + Uri.encode(query) + "&user_type=" + targetRole + "&exclude_user_id=" + currentUserId;
+        Request request = new Request.Builder().url(url).get().build();
+        new OkHttpClient().newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                runOnUiThread(() -> renderSearchCombinedResults(matchedChats, new ArrayList<>()));
+            }
 
-                LinearLayout itemLayout = new LinearLayout(this);
-                itemLayout.setLayoutParams(new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
-                ));
-                itemLayout.setOrientation(LinearLayout.HORIZONTAL);
-                itemLayout.setGravity(Gravity.CENTER_VERTICAL);
-                itemLayout.setPadding(dp(16), dp(16), dp(16), dp(16));
-
-                TextView avatar = new TextView(this);
-                LinearLayout.LayoutParams avatarParams = new LinearLayout.LayoutParams(dp(40), dp(40));
-                avatar.setLayoutParams(avatarParams);
-                avatar.setGravity(Gravity.CENTER);
-                avatar.setBackgroundResource(R.drawable.bg_circle_green);
-                String initials = name.isEmpty() ? "L" : name.substring(0, Math.min(2, name.length())).toUpperCase();
-                avatar.setText(initials);
-                avatar.setTextColor(0xFFFFFFFF);
-                avatar.setTextSize(12);
-                avatar.setTypeface(null, Typeface.BOLD);
-
-                LinearLayout textLayout = new LinearLayout(this);
-                LinearLayout.LayoutParams textParams = new LinearLayout.LayoutParams(
-                        0,
-                        LinearLayout.LayoutParams.WRAP_CONTENT,
-                        1f
-                );
-                textParams.setMarginStart(dp(12));
-                textLayout.setLayoutParams(textParams);
-                textLayout.setOrientation(LinearLayout.VERTICAL);
-
-                TextView tvName = new TextView(this);
-                tvName.setText(name);
-                tvName.setTextColor(0xFF1A1A1A);
-                tvName.setTextSize(15);
-                tvName.setTypeface(null, Typeface.BOLD);
-
-                TextView tvSub = new TextView(this);
-                tvSub.setText(lastMsg);
-                tvSub.setTextColor(0xFF6E6E73);
-                tvSub.setTextSize(13);
-                tvSub.setSingleLine(true);
-                tvSub.setEllipsize(TextUtils.TruncateAt.END);
-                LinearLayout.LayoutParams subParams = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
-                );
-                subParams.topMargin = dp(4);
-                tvSub.setLayoutParams(subParams);
-
-                boolean isRead = isUserSearch || obj.optBoolean("is_read", true);
-                if (!isRead) {
-                    tvName.setTypeface(null, Typeface.BOLD);
-                    tvSub.setTypeface(null, Typeface.BOLD);
-                    tvSub.setTextColor(0xFF1B5E4C);
-                } else {
-                    tvName.setTypeface(null, Typeface.NORMAL);
-                    tvSub.setTypeface(null, Typeface.NORMAL);
-                    tvSub.setTextColor(0xFF6E6E73);
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                List<JSONObject> matchedPeople = new ArrayList<>();
+                if (response.isSuccessful() && response.body() != null) {
+                    try {
+                        JSONObject json = new JSONObject(response.body().string());
+                        if (json.optBoolean("success", false)) {
+                            JSONArray users = json.optJSONArray("data");
+                            if (users != null) {
+                                for (int i = 0; i < users.length(); i++) {
+                                    JSONObject u = users.optJSONObject(i);
+                                    if (u != null) {
+                                        int uid = u.optInt("user_id", 0);
+                                        if (uid > 0 && !existingUserIds.contains(uid)) {
+                                            u.put("is_people_user", true);
+                                            matchedPeople.add(u);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } catch (Exception ignored) {}
                 }
+                runOnUiThread(() -> renderSearchCombinedResults(matchedChats, matchedPeople));
+            }
+        });
+    }
 
-                textLayout.addView(tvName);
-                textLayout.addView(tvSub);
+    private void renderSearchCombinedResults(List<JSONObject> chats, List<JSONObject> people) {
+        filteredList.clear();
 
-                itemLayout.addView(avatar);
-                itemLayout.addView(textLayout);
-
-                itemLayout.setOnClickListener(v -> {
-                    Intent intent = new Intent(this, ChatMessageActivity.class);
-                    intent.putExtra("LANDLORD_ID", otherId);
-                    intent.putExtra("LANDLORD_NAME", name);
-                    intent.putExtra("HOUSE_NAME", "Boarding House");
-                    startActivity(intent);
-                });
-
-                container.addView(itemLayout);
-
-                View divider = new View(this);
-                divider.setLayoutParams(new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        dp(1)
-                ));
-                divider.setBackgroundColor(0xFFEFEFEF);
-                container.addView(divider);
-
+        if (chats.isEmpty() && people.isEmpty()) {
+            try {
+                JSONObject emptyHeader = new JSONObject();
+                emptyHeader.put("is_section_header", true);
+                emptyHeader.put("header_title", "No users found.");
+                filteredList.add(emptyHeader);
             } catch (Exception ignored) {}
+        } else {
+            if (!chats.isEmpty()) {
+                try {
+                    JSONObject header1 = new JSONObject();
+                    header1.put("is_section_header", true);
+                    header1.put("header_title", "Existing Conversations");
+                    filteredList.add(header1);
+                } catch (Exception ignored) {}
+                filteredList.addAll(chats);
+            }
+
+            if (!people.isEmpty()) {
+                try {
+                    JSONObject header2 = new JSONObject();
+                    header2.put("is_section_header", true);
+                    header2.put("header_title", "People");
+                    filteredList.add(header2);
+                } catch (Exception ignored) {}
+                filteredList.addAll(people);
+            }
+        }
+
+        if (adapter != null) {
+            adapter.notifyDataSetChanged();
         }
     }
 
-    private int dp(int value) {
-        return Math.round(value * getResources().getDisplayMetrics().density);
+    private void updateChatData(JSONArray items, boolean isUserSearch) {
+        if (!isUserSearch) {
+            conversationList.clear();
+            for (int i = 0; i < items.length(); i++) {
+                JSONObject obj = items.optJSONObject(i);
+                if (obj != null) {
+                    conversationList.add(obj);
+                }
+            }
+            if (!isUserSearchMode) {
+                filteredList.clear();
+                filteredList.addAll(conversationList);
+            }
+        } else {
+            filteredList.clear();
+            for (int i = 0; i < items.length(); i++) {
+                JSONObject obj = items.optJSONObject(i);
+                if (obj != null) {
+                    filteredList.add(obj);
+                }
+            }
+        }
+
+        if (adapter != null) {
+            adapter.notifyDataSetChanged();
+        }
+    }
+
+    @Override
+    public void onConversationClick(JSONObject chatItem, int position) {
+        if (chatItem.optBoolean("is_section_header", false)) {
+            return;
+        }
+
+        boolean isPeopleUser = chatItem.optBoolean("is_people_user", false);
+        int otherId = isPeopleUser ? chatItem.optInt("user_id", 0) : chatItem.optInt("other_user_id", 0);
+        String name = isPeopleUser ? chatItem.optString("full_name", "") : chatItem.optString("other_user_name", "");
+        int houseId = chatItem.optInt("house_id", 0);
+        String houseName = chatItem.optString("house_name", "Boarding House");
+
+        if (isPeopleUser && houseId <= 0) {
+            apiClient.getBoardingHouses(new Callback() {
+                @Override
+                public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                    launchChat(otherId, name, 0, houseName);
+                }
+
+                @Override
+                public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                    if (!response.isSuccessful() || response.body() == null) {
+                        launchChat(otherId, name, 0, houseName);
+                        return;
+                    }
+                    try {
+                        JSONObject json = new JSONObject(response.body().string());
+                        if (json.optBoolean("success", false)) {
+                            JSONArray data = json.optJSONArray("data");
+                            if (data != null) {
+                                for (int i = 0; i < data.length(); i++) {
+                                    JSONObject h = data.optJSONObject(i);
+                                    if (h != null && h.optInt("landlord_id", 0) == otherId) {
+                                        int hId = h.optInt("house_id", 0);
+                                        String hName = h.optString("house_name", houseName);
+                                        runOnUiThread(() -> launchChat(otherId, name, hId, hName));
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                    } catch (Exception ignored) {}
+                    runOnUiThread(() -> launchChat(otherId, name, 0, houseName));
+                }
+            });
+        } else {
+            launchChat(otherId, name, houseId, houseName);
+        }
+    }
+
+    private void launchChat(int otherId, String name, int houseId, String houseName) {
+        Intent intent = new Intent(this, ChatMessageActivity.class);
+        intent.putExtra("LANDLORD_ID", otherId);
+        intent.putExtra("LANDLORD_NAME", name);
+        intent.putExtra("HOUSE_ID", houseId);
+        intent.putExtra("HOUSE_NAME", houseName);
+        startActivity(intent);
     }
 
     private void setupBottomNavigation() {

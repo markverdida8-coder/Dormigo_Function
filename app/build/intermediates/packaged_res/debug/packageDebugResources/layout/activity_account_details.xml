@@ -215,37 +215,7 @@
                         android:textStyle="bold" />
                 </LinearLayout>
 
-                <View
-                    android:id="@+id/dividerProgram"
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginVertical="12dp"
-                    android:background="#EFEFEF" />
 
-                <!-- Program -->
-                <LinearLayout
-                    android:id="@+id/layoutProgram"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/program_label"
-                        android:textColor="#9A9A9E"
-                        android:textSize="13sp" />
-
-                    <TextView
-                        android:id="@+id/accountProgram"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="@string/program_val"
-                        android:textColor="#1A1A1A"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
 
             </LinearLayout>
 

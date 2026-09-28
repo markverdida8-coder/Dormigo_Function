@@ -16,7 +16,7 @@
         android:layout_gravity="center_horizontal"
         android:background="@drawable/bg_drag_handle" />
 
-    <!-- Header -->
+    <!-- Header (Pinned at top) -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -28,7 +28,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/scan_to_pay_gcash"
+            android:text="Pay via GCash QR"
             android:textColor="#1A1A1A"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -37,72 +37,283 @@
             android:id="@+id/btnCloseQr"
             android:layout_width="24dp"
             android:layout_height="24dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
+            android:contentDescription="@string/desc_close_filter"
             android:focusable="true"
             android:src="@drawable/ic_close"
-            app:tint="#1A1A1A"
-            android:contentDescription="@string/desc_close_filter" />
+            app:tint="#1A1A1A" />
 
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/landlordNameLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:text="@string/landlord_name"
-        android:textColor="#9A9A9E"
-        android:textSize="14sp" />
-
-    <LinearLayout
+    <!-- Scrollable Form Content -->
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:gravity="center"
-        android:orientation="vertical">
+        android:layout_marginTop="12dp"
+        android:fillViewport="true">
 
-        <ImageView
-            android:id="@+id/imgGcashQr"
-            android:layout_width="240dp"
-            android:layout_height="240dp"
-            android:background="@drawable/bg_card_rounded"
-            android:padding="32dp"
-            android:src="@drawable/ic_qr_code"
-            android:scaleType="fitCenter"
-            android:contentDescription="@string/gcash" />
-
-        <TextView
-            android:id="@+id/amountToPayLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:textColor="#1A1A1A"
-            android:textSize="24sp"
-            android:textStyle="bold" />
-
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:gravity="center"
-            android:text="@string/gcash_instruction"
-            android:textColor="#9A9A9E"
-            android:textSize="13sp" />
+            android:orientation="vertical"
+            android:paddingBottom="16dp">
 
-    </LinearLayout>
+            <!-- Property & Room Info Card -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_card_rounded"
+                android:orientation="horizontal"
+                android:padding="14dp">
 
-    <TextView
-        android:id="@+id/btnDonePayment"
-        android:layout_width="match_parent"
-        android:layout_height="52dp"
-        android:layout_marginTop="32dp"
-        android:background="@drawable/bg_button_filled"
-        android:clickable="true"
-        android:focusable="true"
-        android:gravity="center"
-        android:text="@string/already_paid"
-        android:textColor="#FFFFFF"
-        android:textSize="15sp"
-        android:textStyle="bold" />
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/houseNameLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Boarding House"
+                        android:textColor="#1A1A1A"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/roomNameLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Room"
+                        android:textColor="#6E6E73"
+                        android:textSize="13sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Amount to Pay"
+                        android:textColor="#9A9A9E"
+                        android:textSize="11sp" />
+
+                    <TextView
+                        android:id="@+id/amountToPayLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="₱0.00"
+                        android:textColor="#1B5E4C"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- QR Code Section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <!-- QR Code Container Card -->
+                <FrameLayout
+                    android:id="@+id/qrContainerCard"
+                    android:layout_width="220dp"
+                    android:layout_height="220dp"
+                    android:background="@drawable/bg_card_rounded"
+                    android:elevation="2dp"
+                    android:padding="12dp">
+
+                    <ProgressBar
+                        android:id="@+id/qrProgressBar"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_gravity="center"
+                        android:visibility="gone" />
+
+                    <ImageView
+                        android:id="@+id/imgGcashQr"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:clickable="true"
+                        android:contentDescription="@string/gcash"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_qr_code" />
+
+                </FrameLayout>
+
+                <!-- Tap to zoom label -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
+                        android:contentDescription="Search"
+                        android:src="@drawable/ic_search"
+                        app:tint="#9A9A9E" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:text="Tap QR to view full size"
+                        android:textColor="#9A9A9E"
+                        android:textSize="12sp" />
+
+                </LinearLayout>
+
+                <!-- Payment Reminder Note -->
+                <TextView
+                    android:id="@+id/textQrReminder"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/bg_info_box"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="⚠️ Please verify that the GCash account name matches the landlord before sending payment."
+                    android:textColor="#1B5E4C"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
+            <!-- GCash Reference Number Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="GCash Reference Number"
+                android:textColor="#1A1A1A"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/inputGcashRef"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/bg_input_field"
+                android:hint="Enter GCash reference number"
+                android:inputType="number"
+                android:paddingHorizontal="14dp"
+                android:textColor="#1A1A1A"
+                android:textColorHint="#9A9A9E"
+                android:textSize="14sp" />
+
+            <!-- Proof of Payment Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Proof of Payment"
+                android:textColor="#1A1A1A"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <FrameLayout
+                android:id="@+id/btnUploadReceipt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/bg_card_rounded"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:padding="14dp">
+
+                <!-- Upload Placeholder -->
+                <LinearLayout
+                    android:id="@+id/layoutUploadPlaceholder"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:paddingVertical="8dp">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:contentDescription="Upload Screenshot"
+                        android:src="@drawable/ic_search"
+                        app:tint="#1B5E4C" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="+ Upload Receipt Screenshot"
+                        android:textColor="#1B5E4C"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <!-- Receipt Image Preview -->
+                <LinearLayout
+                    android:id="@+id/layoutReceiptPreview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:id="@+id/imgReceiptPreview"
+                        android:layout_width="match_parent"
+                        android:layout_height="160dp"
+                        android:scaleType="fitCenter"
+                        android:contentDescription="Receipt Screenshot Preview" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Tap to change screenshot"
+                        android:textColor="#1B5E4C"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+            </FrameLayout>
+
+            <!-- Action Button -->
+            <TextView
+                android:id="@+id/btnDonePayment"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/bg_button_filled"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:text="Submit Payment for Verification"
+                android:textColor="#FFFFFF"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
 
 </LinearLayout>

@@ -129,9 +129,10 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void loadStudentVerificationStatus(int userId) {
         TextView tvStatus = findViewById(R.id.textVerificationStatus);
+        LinearLayout btnVerification = findViewById(R.id.btnVerification);
         if (tvStatus == null) return;
 
-        String url = "http://10.129.224.109/Dormigo_Backend/api/get_student_verification_status.php?user_id=" + userId;
+        String url = "http://10.149.229.109/Dormigo_Backend/api/get_student_verification_status.php?user_id=" + userId;
         Request request = new Request.Builder().url(url).get().build();
         new OkHttpClient().newCall(request).enqueue(new Callback() {
             @Override
@@ -148,18 +149,42 @@ public class ProfileActivity extends AppCompatActivity {
                         if (data != null) {
                             String status = data.optString("verification_status", "NOT_SUBMITTED");
                             runOnUiThread(() -> {
-                                if (status.equals("VERIFIED")) {
-                                    tvStatus.setText("✓ Verified");
+                                if ("VERIFIED".equalsIgnoreCase(status) || "APPROVED".equalsIgnoreCase(status)) {
+                                    tvStatus.setText("🟢 Verified Student");
                                     tvStatus.setTextColor(0xFF2E7D32);
-                                } else if (status.equals("PENDING")) {
-                                    tvStatus.setText("Pending Verification");
-                                    tvStatus.setTextColor(0xFF8A6D0B);
-                                } else if (status.equals("REJECTED")) {
-                                    tvStatus.setText("Rejected - Tap to Resubmit");
-                                    tvStatus.setTextColor(0xFFD32F2F);
+
+                                    if (btnVerification != null) {
+                                        btnVerification.setOnClickListener(null);
+                                        btnVerification.setClickable(false);
+                                        btnVerification.setFocusable(false);
+                                        btnVerification.setBackground(null);
+                                    }
                                 } else {
-                                    tvStatus.setText("Not Verified");
-                                    tvStatus.setTextColor(0xFF9A9A9E);
+                                    if ("PENDING".equalsIgnoreCase(status)) {
+                                        tvStatus.setText("🟡 Verification Pending");
+                                        tvStatus.setTextColor(0xFF8A6D0B);
+                                        if (btnVerification != null) {
+                                            btnVerification.setOnClickListener(null);
+                                            btnVerification.setClickable(false);
+                                            btnVerification.setFocusable(false);
+                                            btnVerification.setBackground(null);
+                                        }
+                                    } else if ("REJECTED".equalsIgnoreCase(status)) {
+                                        tvStatus.setText("🔴 Verification Rejected");
+                                        tvStatus.setTextColor(0xFFD32F2F);
+                                        if (btnVerification != null) {
+                                            btnVerification.setClickable(true);
+                                            btnVerification.setFocusable(true);
+                                            btnVerification.setBackgroundResource(R.drawable.bg_card_rounded);
+                                            btnVerification.setOnClickListener(v -> {
+                                                Intent intent = new Intent(ProfileActivity.this, VerificationActivity.class);
+                                                startActivity(intent);
+                                            });
+                                        }
+                                    } else {
+                                        tvStatus.setText("🔴 Not Verified");
+                                        tvStatus.setTextColor(0xFFD32F2F);
+                                    }
                                 }
                             });
                         }

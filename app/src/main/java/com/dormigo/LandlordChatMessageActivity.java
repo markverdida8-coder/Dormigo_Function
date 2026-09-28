@@ -1,6 +1,7 @@
 package com.dormigo;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -17,13 +18,17 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -35,6 +40,7 @@ public class LandlordChatMessageActivity extends AppCompatActivity {
     private SwipeRefreshLayout swipeRefreshLayout;
     private int currentLandlordId;
     private int currentStudentId;
+    private int houseId = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,6 +115,17 @@ public class LandlordChatMessageActivity extends AppCompatActivity {
         LinearLayout container = findViewById(R.id.messagesContainer);
         if (container == null) return;
         container.removeAllViews();
+
+        if (messages.length() == 0) {
+            TextView emptyText = new TextView(this);
+            emptyText.setText("💬\n\nNo messages yet.\nStart the conversation by sending a message.");
+            emptyText.setTextColor(0xFF9A9A9E);
+            emptyText.setTextSize(14);
+            emptyText.setGravity(Gravity.CENTER);
+            emptyText.setPadding(0, dp(60), 0, 0);
+            container.addView(emptyText);
+            return;
+        }
 
         for (int i = 0; i < messages.length(); i++) {
             try {
@@ -210,12 +227,96 @@ public class LandlordChatMessageActivity extends AppCompatActivity {
         return "";
     }
 
+    private String getInitials(String name) {
+        if (name == null || name.trim().isEmpty()) return "ST";
+        String[] parts = name.trim().split("\\s+");
+        if (parts.length >= 2) {
+            return ("" + parts[0].charAt(0) + parts[1].charAt(0)).toUpperCase(Locale.US);
+        } else if (parts[0].length() >= 2) {
+            return parts[0].substring(0, 2).toUpperCase(Locale.US);
+        }
+        return parts[0].toUpperCase(Locale.US);
+    }
+
+    private boolean isMutedState = false;
+
+    private void loadMuteStatus() {
+        if (currentLandlordId <= 0 || currentStudentId <= 0) return;
+        apiClient.getMuteStatus(currentLandlordId, currentStudentId, new Callback() {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {}
+
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                if (!response.isSuccessful() || response.body() == null) return;
+                try {
+                    JSONObject json = new JSONObject(response.body().string());
+                    boolean muted = json.optBoolean("is_muted", false);
+                    runOnUiThread(() -> updateMuteUI(muted));
+                } catch (Exception ignored) {}
+            }
+        });
+    }
+
+    private void updateMuteUI(boolean isMuted) {
+        this.isMutedState = isMuted;
+        View muteBanner = findViewById(R.id.muteBanner);
+        if (muteBanner != null) {
+            muteBanner.setVisibility(isMuted ? View.VISIBLE : View.GONE);
+        }
+    }
+
+    private void showMuteDurationDialog() {
+        String[] options = {"1 Hour", "8 Hours", "24 Hours", "Until I Turn It Back On"};
+        int[] hours = {1, 8, 24, 876000};
+
+        new AlertDialog.Builder(this)
+                .setTitle("Mute Notifications For")
+                .setItems(options, (dialog, which) -> {
+                    int duration = hours[which];
+                    apiClient.muteConversation(currentLandlordId, currentStudentId, duration, new Callback() {
+                        @Override
+                        public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                            runOnUiThread(() -> Toast.makeText(LandlordChatMessageActivity.this, "Unable to mute chat.", Toast.LENGTH_SHORT).show());
+                        }
+
+                        @Override
+                        public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                            runOnUiThread(() -> {
+                                updateMuteUI(true);
+                                Toast.makeText(LandlordChatMessageActivity.this, "Conversation muted.", Toast.LENGTH_SHORT).show();
+                            });
+                        }
+                    });
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void unmuteChat() {
+        apiClient.unmuteConversation(currentLandlordId, currentStudentId, new Callback() {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                runOnUiThread(() -> Toast.makeText(LandlordChatMessageActivity.this, "Unable to unmute chat.", Toast.LENGTH_SHORT).show());
+            }
+
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                runOnUiThread(() -> {
+                    updateMuteUI(false);
+                    Toast.makeText(LandlordChatMessageActivity.this, "Conversation unmuted.", Toast.LENGTH_SHORT).show();
+                });
+            }
+        });
+    }
+
     private void setupUI() {
         Intent intent = getIntent();
         String studentName = intent.getStringExtra("STUDENT_NAME");
         String roomInfo = intent.getStringExtra("ROOM_INFO");
         currentStudentId = intent.getIntExtra("STUDENT_ID", 1);
         currentLandlordId = getSharedPreferences("DormigoPrefs", MODE_PRIVATE).getInt("userId", 2);
+        houseId = intent.getIntExtra("HOUSE_ID", 0);
 
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
         if (swipeRefreshLayout != null) {
@@ -223,20 +324,82 @@ public class LandlordChatMessageActivity extends AppCompatActivity {
         }
 
         loadChatThread(currentLandlordId, currentStudentId);
+        loadMuteStatus();
+
+        View btnUnmuteBanner = findViewById(R.id.btnUnmuteBanner);
+        if (btnUnmuteBanner != null) {
+            btnUnmuteBanner.setOnClickListener(v -> unmuteChat());
+        }
 
         if (studentName != null) {
             TextView nameLabel = findViewById(R.id.chatStudentName);
             if (nameLabel != null) nameLabel.setText(studentName);
+
+            TextView avatar = findViewById(R.id.headerAvatar);
+            if (avatar != null) {
+                avatar.setText(getInitials(studentName));
+            }
         }
 
-        if (roomInfo != null) {
-            TextView roomLabel = findViewById(R.id.chatRoomInfo);
-            if (roomLabel != null) roomLabel.setText(roomInfo);
-        }
+        String roomStr = (roomInfo != null && !roomInfo.trim().isEmpty()) ? roomInfo : "Tenant Renter";
+        String subtitle = roomStr.contains("•") ? roomStr : roomStr + " • Tenant Renter";
+        TextView roomLabel = findViewById(R.id.chatRoomInfo);
+        if (roomLabel != null) roomLabel.setText(subtitle);
 
         View btnBack = findViewById(R.id.btnBack);
         if (btnBack != null) {
             btnBack.setOnClickListener(v -> finish());
+        }
+
+        View btnOverflowMenu = findViewById(R.id.btnOverflowMenu);
+        if (btnOverflowMenu != null) {
+            btnOverflowMenu.setOnClickListener(v -> {
+                PopupMenu popup = new PopupMenu(this, v);
+                popup.getMenu().add("👤 View Tenant Profile");
+                popup.getMenu().add(isMutedState ? "🔔 Unmute Conversation" : "🔕 Mute Conversation");
+                popup.getMenu().add("🗑 Clear Conversation");
+
+                popup.setOnMenuItemClickListener(item -> {
+                    CharSequence title = item.getTitle();
+                    if (title != null) {
+                        String str = title.toString();
+                        if (str.contains("View Tenant Profile")) {
+                            Intent profileIntent = new Intent(this, TenantProfileViewActivity.class);
+                            profileIntent.putExtra("STUDENT_ID", currentStudentId);
+                            profileIntent.putExtra("STUDENT_NAME", studentName);
+                            startActivity(profileIntent);
+                        } else if (str.contains("Unmute")) {
+                            unmuteChat();
+                        } else if (str.contains("Mute")) {
+                            showMuteDurationDialog();
+                        } else if (str.contains("Clear Conversation")) {
+                            new AlertDialog.Builder(this)
+                                    .setTitle("Clear Conversation?")
+                                    .setMessage("This will permanently remove all messages in this conversation.\n\nThis action cannot be undone.")
+                                    .setNegativeButton("Cancel", null)
+                                    .setPositiveButton("Clear", (dialog, which) -> {
+                                        apiClient.clearConversationThread(currentLandlordId, currentStudentId, new Callback() {
+                                            @Override
+                                            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                                                runOnUiThread(() -> Toast.makeText(LandlordChatMessageActivity.this, "Failed to clear conversation.", Toast.LENGTH_SHORT).show());
+                                            }
+
+                                            @Override
+                                            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                                                runOnUiThread(() -> {
+                                                    Toast.makeText(LandlordChatMessageActivity.this, "Conversation cleared.", Toast.LENGTH_SHORT).show();
+                                                    loadChatThread(currentLandlordId, currentStudentId);
+                                                });
+                                            }
+                                        });
+                                    })
+                                    .show();
+                        }
+                    }
+                    return true;
+                });
+                popup.show();
+            });
         }
 
         EditText chatInput = findViewById(R.id.chatInput);
@@ -247,7 +410,8 @@ public class LandlordChatMessageActivity extends AppCompatActivity {
                 if (chatInput != null) {
                     String message = chatInput.getText().toString().trim();
                     if (!message.isEmpty()) {
-                        apiClient.sendMessage(currentLandlordId, currentStudentId, null, message, new Callback() {
+                        Integer hId = (houseId > 0) ? houseId : null;
+                        apiClient.sendMessage(currentLandlordId, currentStudentId, hId, message, new Callback() {
                             @Override
                             public void onFailure(Call call, IOException e) {
                                 runOnUiThread(() -> Toast.makeText(LandlordChatMessageActivity.this, "Failed to send message.", Toast.LENGTH_SHORT).show());

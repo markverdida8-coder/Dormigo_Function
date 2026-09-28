@@ -427,11 +427,12 @@
                     app:useMaterialThemeColors="false" />
 
                 <TextView
+                    android:id="@+id/termsText"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_marginStart="4dp"
-                    android:text="@string/terms_agreement"
+                    android:text="I have read and agree to the Terms &amp; Conditions and Privacy Policy."
                     android:textColor="#6E6E73"
                     android:textSize="13sp"
                     android:lineSpacingExtra="2dp" />

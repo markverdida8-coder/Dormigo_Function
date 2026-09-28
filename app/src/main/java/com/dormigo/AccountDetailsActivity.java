@@ -29,7 +29,6 @@ public class AccountDetailsActivity extends AppCompatActivity {
     private TextView accountContactNumber;
     private TextView accountEmail;
     private TextView accountSchool;
-    private TextView accountProgram;
     private TextView btnEditProfile;
 
     private ApiClient apiClient;
@@ -57,7 +56,6 @@ public class AccountDetailsActivity extends AppCompatActivity {
         accountContactNumber = findViewById(R.id.accountContactNumber);
         accountEmail = findViewById(R.id.accountEmail);
         accountSchool = findViewById(R.id.accountSchool);
-        accountProgram = findViewById(R.id.accountProgram);
         btnEditProfile = findViewById(R.id.btnEditProfile);
 
         setupUI();
@@ -147,23 +145,18 @@ public class AccountDetailsActivity extends AppCompatActivity {
         if (!isStudent) {
             View layoutSchool = findViewById(R.id.layoutSchool);
             View dividerSchool = findViewById(R.id.dividerSchool);
-            View layoutProgram = findViewById(R.id.layoutProgram);
-            View dividerProgram = findViewById(R.id.dividerProgram);
 
             if (layoutSchool != null) layoutSchool.setVisibility(View.GONE);
             if (dividerSchool != null) dividerSchool.setVisibility(View.GONE);
-            if (layoutProgram != null) layoutProgram.setVisibility(View.GONE);
-            if (dividerProgram != null) dividerProgram.setVisibility(View.GONE);
         }
 
         String name = prefs.getString("fullName", "User");
         String email = prefs.getString("email", "");
         String phone = prefs.getString("phone", "");
         String school = prefs.getString("school", "Southwestern University Phinma");
-        String program = prefs.getString("program", "BS Information Technology");
         int userId = prefs.getInt("userId", -1);
 
-        displayInfo(name, email, phone, school, program);
+        displayInfo(name, email, phone, school);
 
         if (userId > 0) {
             apiClient.getUserById(userId, new Callback() {
@@ -188,7 +181,7 @@ public class AccountDetailsActivity extends AppCompatActivity {
                                 ed.putString("phone", uPhone);
                                 ed.apply();
 
-                                runOnUiThread(() -> displayInfo(uName, uEmail, uPhone, school, program));
+                                runOnUiThread(() -> displayInfo(uName, uEmail, uPhone, school));
                             }
                         }
                     } catch (Exception ignored) {}
@@ -197,7 +190,7 @@ public class AccountDetailsActivity extends AppCompatActivity {
         }
     }
 
-    private void displayInfo(String name, String email, String phone, String school, String program) {
+    private void displayInfo(String name, String email, String phone, String school) {
         if (accountInitials != null) {
             accountInitials.setText(getInitials(name));
         }
@@ -212,9 +205,6 @@ public class AccountDetailsActivity extends AppCompatActivity {
         }
         if (accountSchool != null) {
             accountSchool.setText(school.isEmpty() ? "None" : school);
-        }
-        if (accountProgram != null) {
-            accountProgram.setText(program.isEmpty() ? "None" : program);
         }
     }
 

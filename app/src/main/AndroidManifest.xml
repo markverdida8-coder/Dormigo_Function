@@ -29,6 +29,7 @@
     </queries>
 
     <application
+        android:name=".DormigoApplication"
         android:allowBackup="true"
         android:usesCleartextTraffic="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -55,6 +56,11 @@
             android:windowSoftInputMode="adjustResize" />
 
         <activity
+            android:name=".AdminVerificationActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
             android:name=".AdminVerificationDetailActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
@@ -70,6 +76,16 @@
             android:windowSoftInputMode="adjustResize" />
 
         <activity
+            android:name=".LandlordProfileViewActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".TenantProfileViewActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
             android:name=".CreateAccountActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
@@ -81,6 +97,16 @@
 
         <activity
             android:name=".ForgotPasswordActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".VerifyOtpActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".ResetPasswordActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 
@@ -150,6 +176,11 @@
             android:windowSoftInputMode="adjustResize" />
 
         <activity
+            android:name=".LandlordReviewsActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
             android:name=".WriteReviewActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
@@ -211,6 +242,11 @@
 
         <activity
             android:name=".LandlordPaymentMethodsActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".LandlordRentalChargesActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 

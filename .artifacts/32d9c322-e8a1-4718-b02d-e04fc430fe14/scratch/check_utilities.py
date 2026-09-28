@@ -1,7 +1,7 @@
 import urllib.request
 import json
 
-url = "http://10.129.224.109/Dormigo_Backend/api/boarding_houses.php"
+url = "http://10.149.229.109/Dormigo_Backend/api/boarding_houses.php"
 try:
     with urllib.request.urlopen(url) as resp:
         data = json.loads(resp.read().decode('utf-8'))
