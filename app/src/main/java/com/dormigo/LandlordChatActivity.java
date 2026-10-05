@@ -230,7 +230,7 @@ public class LandlordChatActivity extends AppCompatActivity implements ChatConve
         }
 
         // Step 2: Query eligible users from users.php
-        String url = "http://10.149.229.109/Dormigo_Backend/api/users.php?search=" + Uri.encode(query) + "&user_type=" + targetRole + "&exclude_user_id=" + currentUserId;
+        String url = "http://10.209.52.109/Dormigo_Backend/api/users.php?search=" + Uri.encode(query) + "&user_type=" + targetRole + "&exclude_user_id=" + currentUserId;
         Request request = new Request.Builder().url(url).get().build();
         new OkHttpClient().newCall(request).enqueue(new Callback() {
             @Override

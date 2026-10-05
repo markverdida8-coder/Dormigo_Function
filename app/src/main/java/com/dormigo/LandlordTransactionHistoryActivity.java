@@ -249,8 +249,11 @@ public class LandlordTransactionHistoryActivity extends AppCompatActivity implem
             dialogAmountText.setText("₱" + NumberFormat.getNumberInstance(Locale.US).format(amt));
         }
 
+        boolean isCashPending = ("CASH".equals(method) || "ONSITE".equals(method)) && "PENDING".equals(status);
+        boolean isSubmitted = "SUBMITTED".equals(status);
+
         if (dialogStatusBadge != null) {
-            if ("SUBMITTED".equals(status)) {
+            if (isSubmitted || isCashPending) {
                 dialogStatusBadge.setText("Awaiting Verification");
                 dialogStatusBadge.setBackgroundResource(R.drawable.bg_circle_orange);
                 dialogStatusBadge.setTextColor(0xFFFD7E14);
@@ -290,7 +293,7 @@ public class LandlordTransactionHistoryActivity extends AppCompatActivity implem
         if (layoutProofContainer != null && dialogProofImage != null) {
             if (proofImage != null && !proofImage.trim().isEmpty() && !"null".equalsIgnoreCase(proofImage.trim())) {
                 layoutProofContainer.setVisibility(View.VISIBLE);
-                String fullUrl = proofImage.startsWith("http") ? proofImage : "http://10.149.229.109/Dormigo_Backend/" + proofImage;
+                String fullUrl = proofImage.startsWith("http") ? proofImage : "http://10.209.52.109/Dormigo_Backend/" + proofImage;
                 Glide.with(this)
                         .load(fullUrl)
                         .placeholder(R.drawable.bg_image_placeholder)
@@ -322,95 +325,140 @@ public class LandlordTransactionHistoryActivity extends AppCompatActivity implem
             }
         }
 
-        // Verification Actions for SUBMITTED
+        // Verification Actions for SUBMITTED or PENDING Cash
         if (layoutVerificationActions != null) {
-            if ("SUBMITTED".equals(status)) {
+            if (isSubmitted || isCashPending) {
                 layoutVerificationActions.setVisibility(View.VISIBLE);
 
-                if (btnConfirmPayment != null) {
-                    btnConfirmPayment.setOnClickListener(v -> {
-                        new AlertDialog.Builder(this)
-                                .setTitle("Confirm Payment")
-                                .setMessage("Confirm this payment? Please ensure that the transaction reference and receipt match the payment received in your actual payment account.")
-                                .setPositiveButton("Confirm", (d, w) -> {
-                                    apiClient.verifyPayment(paymentId, "PAID", null, new Callback() {
-                                        @Override
-                                        public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                                            runOnUiThread(() -> Toast.makeText(LandlordTransactionHistoryActivity.this, "Network error confirming payment.", Toast.LENGTH_SHORT).show());
-                                        }
+                if (isCashPending) {
+                    if (btnRejectPayment != null) btnRejectPayment.setVisibility(View.GONE);
+                    if (btnConfirmPayment != null) {
+                        if (btnConfirmPayment instanceof TextView) {
+                            ((TextView) btnConfirmPayment).setText("Confirm Cash Received");
+                        }
+                        btnConfirmPayment.setOnClickListener(v -> {
+                            new AlertDialog.Builder(this)
+                                    .setTitle("Confirm Cash Payment")
+                                    .setMessage("Confirm that you have physically received ₱" + NumberFormat.getNumberInstance(Locale.US).format(amt) + " from the student.")
+                                    .setPositiveButton("Confirm Received", (d, w) -> {
+                                        apiClient.verifyPayment(paymentId, "PAID", null, new Callback() {
+                                            @Override
+                                            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                                                runOnUiThread(() -> Toast.makeText(LandlordTransactionHistoryActivity.this, "Network error confirming payment.", Toast.LENGTH_SHORT).show());
+                                            }
 
-                                        @Override
-                                        public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                                            String body = response.body() != null ? response.body().string() : "";
-                                            runOnUiThread(() -> {
-                                                try {
-                                                    JSONObject j = new JSONObject(body);
-                                                    if (j.optBoolean("success", false)) {
-                                                        Toast.makeText(LandlordTransactionHistoryActivity.this, "Payment confirmed successfully.", Toast.LENGTH_SHORT).show();
-                                                        bottomSheetDialog.dismiss();
-                                                        loadLandlordTransactions();
-                                                    } else {
-                                                        Toast.makeText(LandlordTransactionHistoryActivity.this, j.optString("message", "Failed to confirm payment."), Toast.LENGTH_SHORT).show();
+                                            @Override
+                                            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                                                String body = response.body() != null ? response.body().string() : "";
+                                                runOnUiThread(() -> {
+                                                    try {
+                                                        JSONObject j = new JSONObject(body);
+                                                        if (j.optBoolean("success", false)) {
+                                                            Toast.makeText(LandlordTransactionHistoryActivity.this, "Payment confirmed successfully.", Toast.LENGTH_SHORT).show();
+                                                            bottomSheetDialog.dismiss();
+                                                            loadLandlordTransactions();
+                                                        } else {
+                                                            Toast.makeText(LandlordTransactionHistoryActivity.this, j.optString("message", "Failed to confirm payment."), Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    } catch (Exception e) {
+                                                        Toast.makeText(LandlordTransactionHistoryActivity.this, "Failed to parse confirmation response.", Toast.LENGTH_SHORT).show();
                                                     }
-                                                } catch (Exception e) {
-                                                    Toast.makeText(LandlordTransactionHistoryActivity.this, "Failed to parse confirmation response.", Toast.LENGTH_SHORT).show();
-                                                }
-                                            });
+                                                });
+                                            }
+                                        });
+                                    })
+                                    .setNegativeButton("Cancel", null)
+                                    .show();
+                        });
+                    }
+                } else {
+                    if (btnRejectPayment != null) {
+                        btnRejectPayment.setVisibility(View.VISIBLE);
+                        btnRejectPayment.setOnClickListener(v -> {
+                            EditText inputReason = new EditText(this);
+                            inputReason.setHint("Enter reason (e.g., Reference mismatch)");
+                            inputReason.setPadding(32, 32, 32, 32);
+
+                            new AlertDialog.Builder(this)
+                                    .setTitle("Reject Payment")
+                                    .setMessage("Please enter the reason for rejecting this payment proof:")
+                                    .setView(inputReason)
+                                    .setPositiveButton("Reject", (d, w) -> {
+                                        String reason = inputReason.getText().toString().trim();
+                                        if (reason.isEmpty()) {
+                                            Toast.makeText(this, "Rejection reason cannot be empty.", Toast.LENGTH_SHORT).show();
+                                            return;
                                         }
-                                    });
-                                })
-                                .setNegativeButton("Cancel", null)
-                                .show();
-                    });
-                }
+                                        apiClient.verifyPayment(paymentId, "REJECTED", reason, new Callback() {
+                                            @Override
+                                            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                                                runOnUiThread(() -> Toast.makeText(LandlordTransactionHistoryActivity.this, "Network error rejecting payment.", Toast.LENGTH_SHORT).show());
+                                            }
 
-                if (btnRejectPayment != null) {
-                    btnRejectPayment.setOnClickListener(v -> {
-                        EditText inputReason = new EditText(this);
-                        inputReason.setHint("Enter reason (e.g., Reference mismatch)");
-                        inputReason.setPadding(32, 32, 32, 32);
-
-                        new AlertDialog.Builder(this)
-                                .setTitle("Reject Payment")
-                                .setMessage("Please enter the reason for rejecting this payment proof:")
-                                .setView(inputReason)
-                                .setPositiveButton("Reject", (d, w) -> {
-                                    String reason = inputReason.getText().toString().trim();
-                                    if (reason.isEmpty()) {
-                                        Toast.makeText(this, "Rejection reason cannot be empty.", Toast.LENGTH_SHORT).show();
-                                        return;
-                                    }
-                                    apiClient.verifyPayment(paymentId, "REJECTED", reason, new Callback() {
-                                        @Override
-                                        public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                                            runOnUiThread(() -> Toast.makeText(LandlordTransactionHistoryActivity.this, "Network error rejecting payment.", Toast.LENGTH_SHORT).show());
-                                        }
-
-                                        @Override
-                                        public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                                            String body = response.body() != null ? response.body().string() : "";
-                                            runOnUiThread(() -> {
-                                                try {
-                                                    JSONObject j = new JSONObject(body);
-                                                    if (j.optBoolean("success", false)) {
-                                                        Toast.makeText(LandlordTransactionHistoryActivity.this, "Payment rejected.", Toast.LENGTH_SHORT).show();
-                                                        bottomSheetDialog.dismiss();
-                                                        loadLandlordTransactions();
-                                                    } else {
-                                                        Toast.makeText(LandlordTransactionHistoryActivity.this, j.optString("message", "Failed to reject payment."), Toast.LENGTH_SHORT).show();
+                                            @Override
+                                            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                                                String body = response.body() != null ? response.body().string() : "";
+                                                runOnUiThread(() -> {
+                                                    try {
+                                                        JSONObject j = new JSONObject(body);
+                                                        if (j.optBoolean("success", false)) {
+                                                            Toast.makeText(LandlordTransactionHistoryActivity.this, "Payment rejected.", Toast.LENGTH_SHORT).show();
+                                                            bottomSheetDialog.dismiss();
+                                                            loadLandlordTransactions();
+                                                        } else {
+                                                            Toast.makeText(LandlordTransactionHistoryActivity.this, j.optString("message", "Failed to reject payment."), Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    } catch (Exception e) {
+                                                        Toast.makeText(LandlordTransactionHistoryActivity.this, "Failed to parse rejection response.", Toast.LENGTH_SHORT).show();
                                                     }
-                                                } catch (Exception e) {
-                                                    Toast.makeText(LandlordTransactionHistoryActivity.this, "Failed to parse rejection response.", Toast.LENGTH_SHORT).show();
-                                                }
-                                            });
-                                        }
-                                    });
-                                })
-                                .setNegativeButton("Cancel", null)
-                                .show();
-                    });
-                }
+                                                });
+                                            }
+                                        });
+                                    })
+                                    .setNegativeButton("Cancel", null)
+                                    .show();
+                        });
+                    }
+                    if (btnConfirmPayment != null) {
+                        if (btnConfirmPayment instanceof TextView) {
+                            ((TextView) btnConfirmPayment).setText("Confirm Payment");
+                        }
+                        btnConfirmPayment.setOnClickListener(v -> {
+                            new AlertDialog.Builder(this)
+                                    .setTitle("Confirm Payment")
+                                    .setMessage("Confirm this payment? Please ensure that the transaction reference and receipt match the payment received in your actual payment account.")
+                                    .setPositiveButton("Confirm", (d, w) -> {
+                                        apiClient.verifyPayment(paymentId, "PAID", null, new Callback() {
+                                            @Override
+                                            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                                                runOnUiThread(() -> Toast.makeText(LandlordTransactionHistoryActivity.this, "Network error confirming payment.", Toast.LENGTH_SHORT).show());
+                                            }
 
+                                            @Override
+                                            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                                                String body = response.body() != null ? response.body().string() : "";
+                                                runOnUiThread(() -> {
+                                                    try {
+                                                        JSONObject j = new JSONObject(body);
+                                                        if (j.optBoolean("success", false)) {
+                                                            Toast.makeText(LandlordTransactionHistoryActivity.this, "Payment confirmed successfully.", Toast.LENGTH_SHORT).show();
+                                                            bottomSheetDialog.dismiss();
+                                                            loadLandlordTransactions();
+                                                        } else {
+                                                            Toast.makeText(LandlordTransactionHistoryActivity.this, j.optString("message", "Failed to confirm payment."), Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    } catch (Exception e) {
+                                                        Toast.makeText(LandlordTransactionHistoryActivity.this, "Failed to parse confirmation response.", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    })
+                                    .setNegativeButton("Cancel", null)
+                                    .show();
+                        });
+                    }
+                }
             } else {
                 layoutVerificationActions.setVisibility(View.GONE);
             }

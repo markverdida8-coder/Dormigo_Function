@@ -217,7 +217,7 @@ public class BoardingHouseListingsActivity extends AppCompatActivity {
 
     private void loadBoardingHouses() {
 
-        apiClient.getBoardingHouses(new Callback() {
+        apiClient.getAvailableBoardingHouses(new Callback() {
 
             @Override
             public void onFailure(
@@ -639,7 +639,7 @@ public class BoardingHouseListingsActivity extends AppCompatActivity {
 
             if (houseImages[index] != null) {
                 if (house.firstPhoto != null && !house.firstPhoto.isEmpty()) {
-                    String imgUrl = "http://10.149.229.109/Dormigo_Backend/" + house.firstPhoto;
+                    String imgUrl = "http://10.209.52.109/Dormigo_Backend/" + house.firstPhoto;
                     Glide.with(this)
                             .load(imgUrl)
                             .placeholder(R.drawable.bg_image_placeholder)

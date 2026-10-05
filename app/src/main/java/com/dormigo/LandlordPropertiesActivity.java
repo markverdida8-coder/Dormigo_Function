@@ -22,6 +22,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -297,6 +298,21 @@ public class LandlordPropertiesActivity extends AppCompatActivity {
                                             houseLandlordId
                                                     == landlordId
                                     ) {
+
+                                        String status =
+                                                house.optString(
+                                                        "status",
+                                                        "ACTIVE"
+                                                ).toUpperCase(
+                                                        Locale.ROOT
+                                                );
+
+                                        if (
+                                                "INACTIVE"
+                                                        .equals(status)
+                                        ) {
+                                            continue;
+                                        }
 
                                         ownedProperties.put(
                                                 house

@@ -98,455 +98,454 @@
 54-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:39:9-54
 55        android:supportsRtl="true"
 55-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:40:9-35
-56        android:testOnly="true"
-57        android:theme="@style/Theme.Dormigo"
-57-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:41:9-45
-58        android:usesCleartextTraffic="true" >
-58-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:34:9-44
-59        <activity
-59-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:43:9-51:20
-60            android:name="com.dormigo.LoginActivity"
-60-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:44:13-42
-61            android:exported="true"
-61-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:45:13-36
-62            android:windowSoftInputMode="adjustResize" >
-62-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:46:13-55
-63            <intent-filter>
-63-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:47:13-50:29
-64                <action android:name="android.intent.action.MAIN" />
-64-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:48:17-69
-64-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:48:25-66
-65
-66                <category android:name="android.intent.category.LAUNCHER" />
-66-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:49:17-77
-66-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:49:27-74
-67            </intent-filter>
-68        </activity>
-69        <activity
-69-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:53:9-56:58
-70            android:name="com.dormigo.AdminDashboardActivity"
-70-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:54:13-51
-71            android:exported="false"
-71-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:55:13-37
-72            android:windowSoftInputMode="adjustResize" />
-72-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:56:13-55
-73        <activity
-73-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:58:9-61:58
-74            android:name="com.dormigo.AdminVerificationActivity"
-74-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:59:13-54
-75            android:exported="false"
-75-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:60:13-37
-76            android:windowSoftInputMode="adjustResize" />
-76-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:61:13-55
-77        <activity
-77-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:63:9-66:58
-78            android:name="com.dormigo.AdminVerificationDetailActivity"
-78-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:64:13-60
-79            android:exported="false"
-79-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:65:13-37
-80            android:windowSoftInputMode="adjustResize" />
-80-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:66:13-55
-81        <activity
-81-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:68:9-71:58
-82            android:name="com.dormigo.AdminStudentVerificationDetailActivity"
-82-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:69:13-67
-83            android:exported="false"
-83-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:70:13-37
-84            android:windowSoftInputMode="adjustResize" />
-84-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:71:13-55
-85        <activity
-85-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:73:9-76:58
-86            android:name="com.dormigo.HomeActivity"
-86-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:74:13-41
-87            android:exported="false"
-87-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:75:13-37
-88            android:windowSoftInputMode="adjustResize" />
-88-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:76:13-55
-89        <activity
-89-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:78:9-81:58
-90            android:name="com.dormigo.LandlordProfileViewActivity"
-90-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:79:13-56
-91            android:exported="false"
-91-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:80:13-37
-92            android:windowSoftInputMode="adjustResize" />
-92-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:81:13-55
-93        <activity
-93-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:83:9-86:58
-94            android:name="com.dormigo.TenantProfileViewActivity"
-94-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:84:13-54
-95            android:exported="false"
-95-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:85:13-37
-96            android:windowSoftInputMode="adjustResize" />
-96-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:86:13-55
-97        <activity
-97-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:88:9-91:58
-98            android:name="com.dormigo.CreateAccountActivity"
-98-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:89:13-50
-99            android:exported="false"
-99-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:90:13-37
-100            android:windowSoftInputMode="adjustResize" />
-100-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:91:13-55
-101        <activity
-101-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:93:9-96:58
-102            android:name="com.dormigo.LandlordRegistrationActivity"
-102-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:94:13-57
-103            android:exported="false"
-103-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:95:13-37
-104            android:windowSoftInputMode="adjustResize" />
-104-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:96:13-55
-105        <activity
-105-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:98:9-101:58
-106            android:name="com.dormigo.ForgotPasswordActivity"
-106-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:99:13-51
-107            android:exported="false"
-107-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:100:13-37
-108            android:windowSoftInputMode="adjustResize" />
-108-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:101:13-55
-109        <activity
-109-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:103:9-106:58
-110            android:name="com.dormigo.VerifyOtpActivity"
-110-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:104:13-46
-111            android:exported="false"
-111-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:105:13-37
-112            android:windowSoftInputMode="adjustResize" />
-112-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:106:13-55
-113        <activity
-113-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:108:9-111:58
-114            android:name="com.dormigo.ResetPasswordActivity"
-114-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:109:13-50
-115            android:exported="false"
-115-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:110:13-37
-116            android:windowSoftInputMode="adjustResize" />
-116-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:111:13-55
-117        <activity
-117-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:113:9-116:58
-118            android:name="com.dormigo.ProfileActivity"
-118-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:114:13-44
-119            android:exported="false"
-119-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:115:13-37
-120            android:windowSoftInputMode="adjustResize" />
-120-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:116:13-55
-121        <activity
-121-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:118:9-121:58
-122            android:name="com.dormigo.ViewBoardingHouseActivity"
-122-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:119:13-54
-123            android:exported="false"
-123-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:120:13-37
-124            android:windowSoftInputMode="adjustResize" />
-124-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:121:13-55
-125        <activity
-125-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:123:9-126:58
-126            android:name="com.dormigo.BoardingHouseListingsActivity"
-126-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:124:13-58
-127            android:exported="false"
-127-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:125:13-37
-128            android:windowSoftInputMode="adjustResize" />
-128-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:126:13-55
-129        <activity
-129-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:128:9-131:58
-130            android:name="com.dormigo.RequestSentActivity"
-130-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:129:13-48
-131            android:exported="false"
-131-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:130:13-37
-132            android:windowSoftInputMode="adjustResize" />
-132-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:131:13-55
-133        <activity
-133-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:133:9-136:58
-134            android:name="com.dormigo.PaymentActivity"
-134-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:134:13-44
-135            android:exported="false"
-135-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:135:13-37
-136            android:windowSoftInputMode="adjustResize" />
-136-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:136:13-55
-137        <activity
-137-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:138:9-141:58
-138            android:name="com.dormigo.PaymentSuccessActivity"
-138-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:139:13-51
-139            android:exported="false"
-139-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:140:13-37
-140            android:windowSoftInputMode="adjustResize" />
-140-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:141:13-55
-141        <activity
-141-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:143:9-146:58
-142            android:name="com.dormigo.TransactionHistoryActivity"
-142-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:144:13-55
-143            android:exported="false"
-143-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:145:13-37
-144            android:windowSoftInputMode="adjustResize" />
-144-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:146:13-55
-145        <activity
-145-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:148:9-151:58
-146            android:name="com.dormigo.BookingRequestsActivity"
-146-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:149:13-52
-147            android:exported="false"
-147-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:150:13-37
-148            android:windowSoftInputMode="adjustResize" />
-148-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:151:13-55
-149        <activity
-149-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:153:9-156:58
-150            android:name="com.dormigo.ChatHistoryActivity"
-150-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:154:13-48
-151            android:exported="false"
-151-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:155:13-37
-152            android:windowSoftInputMode="adjustResize" />
-152-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:156:13-55
-153        <activity
-153-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:158:9-161:58
-154            android:name="com.dormigo.ChatMessageActivity"
-154-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:159:13-48
-155            android:exported="false"
-155-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:160:13-37
-156            android:windowSoftInputMode="adjustResize" />
-156-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:161:13-55
-157        <activity
-157-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:163:9-166:58
-158            android:name="com.dormigo.NotificationsActivity"
-158-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:164:13-50
-159            android:exported="false"
-159-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:165:13-37
-160            android:windowSoftInputMode="adjustResize" />
-160-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:166:13-55
-161        <activity
-161-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:168:9-171:58
-162            android:name="com.dormigo.VerificationActivity"
-162-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:169:13-49
-163            android:exported="false"
-163-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:170:13-37
-164            android:windowSoftInputMode="adjustResize" />
-164-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:171:13-55
-165        <activity
-165-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:173:9-176:58
-166            android:name="com.dormigo.MyReviewsActivity"
-166-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:174:13-46
-167            android:exported="false"
-167-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:175:13-37
-168            android:windowSoftInputMode="adjustResize" />
-168-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:176:13-55
-169        <activity
-169-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:178:9-181:58
-170            android:name="com.dormigo.LandlordReviewsActivity"
-170-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:179:13-52
-171            android:exported="false"
-171-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:180:13-37
-172            android:windowSoftInputMode="adjustResize" />
-172-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:181:13-55
-173        <activity
-173-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:183:9-186:58
-174            android:name="com.dormigo.WriteReviewActivity"
-174-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:184:13-48
-175            android:exported="false"
-175-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:185:13-37
-176            android:windowSoftInputMode="adjustResize" />
-176-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:186:13-55
-177        <activity
-177-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:188:9-191:58
-178            android:name="com.dormigo.AccountDetailsActivity"
-178-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:189:13-51
-179            android:exported="false"
-179-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:190:13-37
-180            android:windowSoftInputMode="adjustResize" />
-180-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:191:13-55
-181        <activity
-181-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:193:9-196:58
-182            android:name="com.dormigo.LandlordHomeActivity"
-182-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:194:13-49
-183            android:exported="false"
-183-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:195:13-37
-184            android:windowSoftInputMode="adjustResize" />
-184-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:196:13-55
-185        <activity
-185-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:198:9-201:58
-186            android:name="com.dormigo.AddBoardingHouseActivity"
-186-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:199:13-53
-187            android:exported="false"
-187-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:200:13-37
-188            android:windowSoftInputMode="adjustResize" />
-188-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:201:13-55
-189        <activity
-189-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:203:9-206:58
-190            android:name="com.dormigo.LandlordChatActivity"
-190-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:204:13-49
-191            android:exported="false"
-191-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:205:13-37
-192            android:windowSoftInputMode="adjustResize" />
-192-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:206:13-55
-193        <activity
-193-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:208:9-211:58
-194            android:name="com.dormigo.LandlordProfileActivity"
-194-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:209:13-52
-195            android:exported="false"
-195-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:210:13-37
-196            android:windowSoftInputMode="adjustResize" />
-196-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:211:13-55
-197        <activity
-197-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:213:9-216:58
-198            android:name="com.dormigo.LandlordTenantsActivity"
-198-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:214:13-52
-199            android:exported="false"
-199-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:215:13-37
-200            android:windowSoftInputMode="adjustResize" />
-200-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:216:13-55
-201        <activity
-201-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:218:9-221:58
-202            android:name="com.dormigo.LandlordPropertiesActivity"
-202-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:219:13-55
-203            android:exported="false"
-203-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:220:13-37
-204            android:windowSoftInputMode="adjustResize" />
-204-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:221:13-55
-205        <activity
-205-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:223:9-226:58
-206            android:name="com.dormigo.LandlordPropertyDetailsActivity"
-206-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:224:13-60
-207            android:exported="false"
-207-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:225:13-37
-208            android:windowSoftInputMode="adjustResize" />
-208-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:226:13-55
-209        <activity
-209-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:228:9-231:58
-210            android:name="com.dormigo.LandlordEditPropertyActivity"
-210-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:229:13-57
-211            android:exported="false"
-211-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:230:13-37
-212            android:windowSoftInputMode="adjustResize" />
-212-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:231:13-55
-213        <activity
-213-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:233:9-236:58
-214            android:name="com.dormigo.LandlordRequestsActivity"
-214-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:234:13-53
-215            android:exported="false"
-215-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:235:13-37
-216            android:windowSoftInputMode="adjustResize" />
-216-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:236:13-55
-217        <activity
-217-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:238:9-241:58
-218            android:name="com.dormigo.LandlordNotificationsActivity"
-218-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:239:13-58
-219            android:exported="false"
-219-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:240:13-37
-220            android:windowSoftInputMode="adjustResize" />
-220-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:241:13-55
-221        <activity
-221-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:243:9-246:58
-222            android:name="com.dormigo.LandlordPaymentMethodsActivity"
-222-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:244:13-59
-223            android:exported="false"
-223-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:245:13-37
-224            android:windowSoftInputMode="adjustResize" />
-224-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:246:13-55
-225        <activity
-225-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:248:9-251:58
-226            android:name="com.dormigo.LandlordRentalChargesActivity"
-226-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:249:13-58
-227            android:exported="false"
-227-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:250:13-37
-228            android:windowSoftInputMode="adjustResize" />
-228-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:251:13-55
-229        <activity
-229-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:253:9-256:58
-230            android:name="com.dormigo.LandlordChatMessageActivity"
-230-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:254:13-56
-231            android:exported="false"
-231-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:255:13-37
-232            android:windowSoftInputMode="adjustResize" />
-232-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:256:13-55
-233        <activity
-233-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:258:9-261:58
-234            android:name="com.dormigo.LandlordTransactionHistoryActivity"
-234-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:259:13-63
-235            android:exported="false"
-235-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:260:13-37
-236            android:windowSoftInputMode="adjustResize" />
-236-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:261:13-55
-237        <activity
-237-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:263:9-266:58
-238            android:name="com.dormigo.EditProfileActivity"
-238-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:264:13-48
-239            android:exported="false"
-239-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:265:13-37
-240            android:windowSoftInputMode="adjustResize" />
-240-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:266:13-55
-241        <activity
-241-->[com.google.android.gms:play-services-base:18.9.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\6939e32ec437695fab099ead6d395dec\transformed\play-services-base-18.9.0\AndroidManifest.xml:20:9-22:45
-242            android:name="com.google.android.gms.common.api.GoogleApiActivity"
-242-->[com.google.android.gms:play-services-base:18.9.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\6939e32ec437695fab099ead6d395dec\transformed\play-services-base-18.9.0\AndroidManifest.xml:20:19-85
-243            android:exported="false"
-243-->[com.google.android.gms:play-services-base:18.9.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\6939e32ec437695fab099ead6d395dec\transformed\play-services-base-18.9.0\AndroidManifest.xml:22:19-43
-244            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-244-->[com.google.android.gms:play-services-base:18.9.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\6939e32ec437695fab099ead6d395dec\transformed\play-services-base-18.9.0\AndroidManifest.xml:21:19-78
-245
-246        <meta-data
-246-->[com.google.android.gms:play-services-basement:18.9.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\26fa2794fb2f35da09105dffa690f7ab\transformed\play-services-basement-18.9.0\AndroidManifest.xml:21:9-23:69
-247            android:name="com.google.android.gms.version"
-247-->[com.google.android.gms:play-services-basement:18.9.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\26fa2794fb2f35da09105dffa690f7ab\transformed\play-services-basement-18.9.0\AndroidManifest.xml:22:13-58
-248            android:value="@integer/google_play_services_version" />
-248-->[com.google.android.gms:play-services-basement:18.9.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\26fa2794fb2f35da09105dffa690f7ab\transformed\play-services-basement-18.9.0\AndroidManifest.xml:23:13-66
-249
-250        <provider
-250-->[androidx.emoji2:emoji2:1.3.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\6ee8d7baee748433fea3f33d2eaa2a13\transformed\emoji2-1.3.0\AndroidManifest.xml:24:9-32:20
-251            android:name="androidx.startup.InitializationProvider"
-251-->[androidx.emoji2:emoji2:1.3.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\6ee8d7baee748433fea3f33d2eaa2a13\transformed\emoji2-1.3.0\AndroidManifest.xml:25:13-67
-252            android:authorities="com.dormigo.androidx-startup"
-252-->[androidx.emoji2:emoji2:1.3.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\6ee8d7baee748433fea3f33d2eaa2a13\transformed\emoji2-1.3.0\AndroidManifest.xml:26:13-68
-253            android:exported="false" >
-253-->[androidx.emoji2:emoji2:1.3.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\6ee8d7baee748433fea3f33d2eaa2a13\transformed\emoji2-1.3.0\AndroidManifest.xml:27:13-37
-254            <meta-data
-254-->[androidx.emoji2:emoji2:1.3.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\6ee8d7baee748433fea3f33d2eaa2a13\transformed\emoji2-1.3.0\AndroidManifest.xml:29:13-31:52
-255                android:name="androidx.emoji2.text.EmojiCompatInitializer"
-255-->[androidx.emoji2:emoji2:1.3.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\6ee8d7baee748433fea3f33d2eaa2a13\transformed\emoji2-1.3.0\AndroidManifest.xml:30:17-75
-256                android:value="androidx.startup" />
-256-->[androidx.emoji2:emoji2:1.3.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\6ee8d7baee748433fea3f33d2eaa2a13\transformed\emoji2-1.3.0\AndroidManifest.xml:31:17-49
-257            <meta-data
-257-->[androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\markv\.gradle\caches\9.6.0\transforms\c1632073058dc1fe4906a03028407ba2\transformed\lifecycle-process-2.6.2\AndroidManifest.xml:29:13-31:52
-258                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
-258-->[androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\markv\.gradle\caches\9.6.0\transforms\c1632073058dc1fe4906a03028407ba2\transformed\lifecycle-process-2.6.2\AndroidManifest.xml:30:17-78
-259                android:value="androidx.startup" />
-259-->[androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\markv\.gradle\caches\9.6.0\transforms\c1632073058dc1fe4906a03028407ba2\transformed\lifecycle-process-2.6.2\AndroidManifest.xml:31:17-49
-260            <meta-data
-260-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\e255d7520848c7153c69dac5d3ae5750\transformed\profileinstaller-1.4.0\AndroidManifest.xml:29:13-31:52
-261                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
-261-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\e255d7520848c7153c69dac5d3ae5750\transformed\profileinstaller-1.4.0\AndroidManifest.xml:30:17-85
-262                android:value="androidx.startup" />
-262-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\e255d7520848c7153c69dac5d3ae5750\transformed\profileinstaller-1.4.0\AndroidManifest.xml:31:17-49
-263        </provider>
-264
-265        <receiver
-265-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\e255d7520848c7153c69dac5d3ae5750\transformed\profileinstaller-1.4.0\AndroidManifest.xml:34:9-52:20
-266            android:name="androidx.profileinstaller.ProfileInstallReceiver"
-266-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\e255d7520848c7153c69dac5d3ae5750\transformed\profileinstaller-1.4.0\AndroidManifest.xml:35:13-76
-267            android:directBootAware="false"
-267-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\e255d7520848c7153c69dac5d3ae5750\transformed\profileinstaller-1.4.0\AndroidManifest.xml:36:13-44
-268            android:enabled="true"
-268-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\e255d7520848c7153c69dac5d3ae5750\transformed\profileinstaller-1.4.0\AndroidManifest.xml:37:13-35
-269            android:exported="true"
-269-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\e255d7520848c7153c69dac5d3ae5750\transformed\profileinstaller-1.4.0\AndroidManifest.xml:38:13-36
-270            android:permission="android.permission.DUMP" >
-270-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\e255d7520848c7153c69dac5d3ae5750\transformed\profileinstaller-1.4.0\AndroidManifest.xml:39:13-57
-271            <intent-filter>
-271-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\e255d7520848c7153c69dac5d3ae5750\transformed\profileinstaller-1.4.0\AndroidManifest.xml:40:13-42:29
-272                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
-272-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\e255d7520848c7153c69dac5d3ae5750\transformed\profileinstaller-1.4.0\AndroidManifest.xml:41:17-91
-272-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\e255d7520848c7153c69dac5d3ae5750\transformed\profileinstaller-1.4.0\AndroidManifest.xml:41:25-88
-273            </intent-filter>
-274            <intent-filter>
-274-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\e255d7520848c7153c69dac5d3ae5750\transformed\profileinstaller-1.4.0\AndroidManifest.xml:43:13-45:29
-275                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
-275-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\e255d7520848c7153c69dac5d3ae5750\transformed\profileinstaller-1.4.0\AndroidManifest.xml:44:17-85
-275-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\e255d7520848c7153c69dac5d3ae5750\transformed\profileinstaller-1.4.0\AndroidManifest.xml:44:25-82
-276            </intent-filter>
-277            <intent-filter>
-277-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\e255d7520848c7153c69dac5d3ae5750\transformed\profileinstaller-1.4.0\AndroidManifest.xml:46:13-48:29
-278                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
-278-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\e255d7520848c7153c69dac5d3ae5750\transformed\profileinstaller-1.4.0\AndroidManifest.xml:47:17-88
-278-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\e255d7520848c7153c69dac5d3ae5750\transformed\profileinstaller-1.4.0\AndroidManifest.xml:47:25-85
-279            </intent-filter>
-280            <intent-filter>
-280-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\e255d7520848c7153c69dac5d3ae5750\transformed\profileinstaller-1.4.0\AndroidManifest.xml:49:13-51:29
-281                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
-281-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\e255d7520848c7153c69dac5d3ae5750\transformed\profileinstaller-1.4.0\AndroidManifest.xml:50:17-95
-281-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\e255d7520848c7153c69dac5d3ae5750\transformed\profileinstaller-1.4.0\AndroidManifest.xml:50:25-92
-282            </intent-filter>
-283        </receiver>
-284    </application>
-285
-286</manifest>
+56        android:theme="@style/Theme.Dormigo"
+56-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:41:9-45
+57        android:usesCleartextTraffic="true" >
+57-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:34:9-44
+58        <activity
+58-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:43:9-51:20
+59            android:name="com.dormigo.LoginActivity"
+59-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:44:13-42
+60            android:exported="true"
+60-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:45:13-36
+61            android:windowSoftInputMode="adjustResize" >
+61-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:46:13-55
+62            <intent-filter>
+62-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:47:13-50:29
+63                <action android:name="android.intent.action.MAIN" />
+63-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:48:17-69
+63-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:48:25-66
+64
+65                <category android:name="android.intent.category.LAUNCHER" />
+65-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:49:17-77
+65-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:49:27-74
+66            </intent-filter>
+67        </activity>
+68        <activity
+68-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:53:9-56:58
+69            android:name="com.dormigo.AdminDashboardActivity"
+69-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:54:13-51
+70            android:exported="false"
+70-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:55:13-37
+71            android:windowSoftInputMode="adjustResize" />
+71-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:56:13-55
+72        <activity
+72-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:58:9-61:58
+73            android:name="com.dormigo.AdminVerificationActivity"
+73-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:59:13-54
+74            android:exported="false"
+74-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:60:13-37
+75            android:windowSoftInputMode="adjustResize" />
+75-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:61:13-55
+76        <activity
+76-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:63:9-66:58
+77            android:name="com.dormigo.AdminVerificationDetailActivity"
+77-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:64:13-60
+78            android:exported="false"
+78-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:65:13-37
+79            android:windowSoftInputMode="adjustResize" />
+79-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:66:13-55
+80        <activity
+80-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:68:9-71:58
+81            android:name="com.dormigo.AdminStudentVerificationDetailActivity"
+81-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:69:13-67
+82            android:exported="false"
+82-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:70:13-37
+83            android:windowSoftInputMode="adjustResize" />
+83-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:71:13-55
+84        <activity
+84-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:73:9-76:58
+85            android:name="com.dormigo.HomeActivity"
+85-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:74:13-41
+86            android:exported="false"
+86-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:75:13-37
+87            android:windowSoftInputMode="adjustResize" />
+87-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:76:13-55
+88        <activity
+88-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:78:9-81:58
+89            android:name="com.dormigo.LandlordProfileViewActivity"
+89-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:79:13-56
+90            android:exported="false"
+90-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:80:13-37
+91            android:windowSoftInputMode="adjustResize" />
+91-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:81:13-55
+92        <activity
+92-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:83:9-86:58
+93            android:name="com.dormigo.TenantProfileViewActivity"
+93-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:84:13-54
+94            android:exported="false"
+94-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:85:13-37
+95            android:windowSoftInputMode="adjustResize" />
+95-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:86:13-55
+96        <activity
+96-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:88:9-91:58
+97            android:name="com.dormigo.CreateAccountActivity"
+97-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:89:13-50
+98            android:exported="false"
+98-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:90:13-37
+99            android:windowSoftInputMode="adjustResize" />
+99-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:91:13-55
+100        <activity
+100-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:93:9-96:58
+101            android:name="com.dormigo.LandlordRegistrationActivity"
+101-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:94:13-57
+102            android:exported="false"
+102-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:95:13-37
+103            android:windowSoftInputMode="adjustResize" />
+103-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:96:13-55
+104        <activity
+104-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:98:9-101:58
+105            android:name="com.dormigo.ForgotPasswordActivity"
+105-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:99:13-51
+106            android:exported="false"
+106-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:100:13-37
+107            android:windowSoftInputMode="adjustResize" />
+107-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:101:13-55
+108        <activity
+108-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:103:9-106:58
+109            android:name="com.dormigo.VerifyOtpActivity"
+109-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:104:13-46
+110            android:exported="false"
+110-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:105:13-37
+111            android:windowSoftInputMode="adjustResize" />
+111-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:106:13-55
+112        <activity
+112-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:108:9-111:58
+113            android:name="com.dormigo.ResetPasswordActivity"
+113-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:109:13-50
+114            android:exported="false"
+114-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:110:13-37
+115            android:windowSoftInputMode="adjustResize" />
+115-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:111:13-55
+116        <activity
+116-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:113:9-116:58
+117            android:name="com.dormigo.ProfileActivity"
+117-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:114:13-44
+118            android:exported="false"
+118-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:115:13-37
+119            android:windowSoftInputMode="adjustResize" />
+119-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:116:13-55
+120        <activity
+120-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:118:9-121:58
+121            android:name="com.dormigo.ViewBoardingHouseActivity"
+121-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:119:13-54
+122            android:exported="false"
+122-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:120:13-37
+123            android:windowSoftInputMode="adjustResize" />
+123-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:121:13-55
+124        <activity
+124-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:123:9-126:58
+125            android:name="com.dormigo.BoardingHouseListingsActivity"
+125-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:124:13-58
+126            android:exported="false"
+126-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:125:13-37
+127            android:windowSoftInputMode="adjustResize" />
+127-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:126:13-55
+128        <activity
+128-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:128:9-131:58
+129            android:name="com.dormigo.RequestSentActivity"
+129-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:129:13-48
+130            android:exported="false"
+130-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:130:13-37
+131            android:windowSoftInputMode="adjustResize" />
+131-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:131:13-55
+132        <activity
+132-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:133:9-136:58
+133            android:name="com.dormigo.PaymentActivity"
+133-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:134:13-44
+134            android:exported="false"
+134-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:135:13-37
+135            android:windowSoftInputMode="adjustResize" />
+135-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:136:13-55
+136        <activity
+136-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:138:9-141:58
+137            android:name="com.dormigo.PaymentSuccessActivity"
+137-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:139:13-51
+138            android:exported="false"
+138-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:140:13-37
+139            android:windowSoftInputMode="adjustResize" />
+139-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:141:13-55
+140        <activity
+140-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:143:9-146:58
+141            android:name="com.dormigo.TransactionHistoryActivity"
+141-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:144:13-55
+142            android:exported="false"
+142-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:145:13-37
+143            android:windowSoftInputMode="adjustResize" />
+143-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:146:13-55
+144        <activity
+144-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:148:9-151:58
+145            android:name="com.dormigo.BookingRequestsActivity"
+145-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:149:13-52
+146            android:exported="false"
+146-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:150:13-37
+147            android:windowSoftInputMode="adjustResize" />
+147-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:151:13-55
+148        <activity
+148-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:153:9-156:58
+149            android:name="com.dormigo.ChatHistoryActivity"
+149-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:154:13-48
+150            android:exported="false"
+150-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:155:13-37
+151            android:windowSoftInputMode="adjustResize" />
+151-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:156:13-55
+152        <activity
+152-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:158:9-161:58
+153            android:name="com.dormigo.ChatMessageActivity"
+153-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:159:13-48
+154            android:exported="false"
+154-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:160:13-37
+155            android:windowSoftInputMode="adjustResize" />
+155-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:161:13-55
+156        <activity
+156-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:163:9-166:58
+157            android:name="com.dormigo.NotificationsActivity"
+157-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:164:13-50
+158            android:exported="false"
+158-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:165:13-37
+159            android:windowSoftInputMode="adjustResize" />
+159-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:166:13-55
+160        <activity
+160-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:168:9-171:58
+161            android:name="com.dormigo.VerificationActivity"
+161-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:169:13-49
+162            android:exported="false"
+162-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:170:13-37
+163            android:windowSoftInputMode="adjustResize" />
+163-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:171:13-55
+164        <activity
+164-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:173:9-176:58
+165            android:name="com.dormigo.MyReviewsActivity"
+165-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:174:13-46
+166            android:exported="false"
+166-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:175:13-37
+167            android:windowSoftInputMode="adjustResize" />
+167-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:176:13-55
+168        <activity
+168-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:178:9-181:58
+169            android:name="com.dormigo.LandlordReviewsActivity"
+169-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:179:13-52
+170            android:exported="false"
+170-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:180:13-37
+171            android:windowSoftInputMode="adjustResize" />
+171-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:181:13-55
+172        <activity
+172-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:183:9-186:58
+173            android:name="com.dormigo.WriteReviewActivity"
+173-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:184:13-48
+174            android:exported="false"
+174-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:185:13-37
+175            android:windowSoftInputMode="adjustResize" />
+175-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:186:13-55
+176        <activity
+176-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:188:9-191:58
+177            android:name="com.dormigo.AccountDetailsActivity"
+177-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:189:13-51
+178            android:exported="false"
+178-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:190:13-37
+179            android:windowSoftInputMode="adjustResize" />
+179-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:191:13-55
+180        <activity
+180-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:193:9-196:58
+181            android:name="com.dormigo.LandlordHomeActivity"
+181-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:194:13-49
+182            android:exported="false"
+182-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:195:13-37
+183            android:windowSoftInputMode="adjustResize" />
+183-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:196:13-55
+184        <activity
+184-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:198:9-201:58
+185            android:name="com.dormigo.AddBoardingHouseActivity"
+185-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:199:13-53
+186            android:exported="false"
+186-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:200:13-37
+187            android:windowSoftInputMode="adjustResize" />
+187-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:201:13-55
+188        <activity
+188-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:203:9-206:58
+189            android:name="com.dormigo.LandlordChatActivity"
+189-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:204:13-49
+190            android:exported="false"
+190-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:205:13-37
+191            android:windowSoftInputMode="adjustResize" />
+191-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:206:13-55
+192        <activity
+192-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:208:9-211:58
+193            android:name="com.dormigo.LandlordProfileActivity"
+193-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:209:13-52
+194            android:exported="false"
+194-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:210:13-37
+195            android:windowSoftInputMode="adjustResize" />
+195-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:211:13-55
+196        <activity
+196-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:213:9-216:58
+197            android:name="com.dormigo.LandlordTenantsActivity"
+197-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:214:13-52
+198            android:exported="false"
+198-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:215:13-37
+199            android:windowSoftInputMode="adjustResize" />
+199-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:216:13-55
+200        <activity
+200-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:218:9-221:58
+201            android:name="com.dormigo.LandlordPropertiesActivity"
+201-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:219:13-55
+202            android:exported="false"
+202-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:220:13-37
+203            android:windowSoftInputMode="adjustResize" />
+203-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:221:13-55
+204        <activity
+204-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:223:9-226:58
+205            android:name="com.dormigo.LandlordPropertyDetailsActivity"
+205-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:224:13-60
+206            android:exported="false"
+206-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:225:13-37
+207            android:windowSoftInputMode="adjustResize" />
+207-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:226:13-55
+208        <activity
+208-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:228:9-231:58
+209            android:name="com.dormigo.LandlordEditPropertyActivity"
+209-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:229:13-57
+210            android:exported="false"
+210-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:230:13-37
+211            android:windowSoftInputMode="adjustResize" />
+211-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:231:13-55
+212        <activity
+212-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:233:9-236:58
+213            android:name="com.dormigo.LandlordRequestsActivity"
+213-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:234:13-53
+214            android:exported="false"
+214-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:235:13-37
+215            android:windowSoftInputMode="adjustResize" />
+215-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:236:13-55
+216        <activity
+216-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:238:9-241:58
+217            android:name="com.dormigo.LandlordNotificationsActivity"
+217-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:239:13-58
+218            android:exported="false"
+218-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:240:13-37
+219            android:windowSoftInputMode="adjustResize" />
+219-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:241:13-55
+220        <activity
+220-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:243:9-246:58
+221            android:name="com.dormigo.LandlordPaymentMethodsActivity"
+221-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:244:13-59
+222            android:exported="false"
+222-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:245:13-37
+223            android:windowSoftInputMode="adjustResize" />
+223-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:246:13-55
+224        <activity
+224-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:248:9-251:58
+225            android:name="com.dormigo.LandlordRentalChargesActivity"
+225-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:249:13-58
+226            android:exported="false"
+226-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:250:13-37
+227            android:windowSoftInputMode="adjustResize" />
+227-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:251:13-55
+228        <activity
+228-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:253:9-256:58
+229            android:name="com.dormigo.LandlordChatMessageActivity"
+229-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:254:13-56
+230            android:exported="false"
+230-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:255:13-37
+231            android:windowSoftInputMode="adjustResize" />
+231-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:256:13-55
+232        <activity
+232-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:258:9-261:58
+233            android:name="com.dormigo.LandlordTransactionHistoryActivity"
+233-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:259:13-63
+234            android:exported="false"
+234-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:260:13-37
+235            android:windowSoftInputMode="adjustResize" />
+235-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:261:13-55
+236        <activity
+236-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:263:9-266:58
+237            android:name="com.dormigo.EditProfileActivity"
+237-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:264:13-48
+238            android:exported="false"
+238-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:265:13-37
+239            android:windowSoftInputMode="adjustResize" />
+239-->C:\Users\markv\AndroidStudioProjects\DormigoVA\app\src\main\AndroidManifest.xml:266:13-55
+240        <activity
+240-->[com.google.android.gms:play-services-base:18.9.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\6939e32ec437695fab099ead6d395dec\transformed\play-services-base-18.9.0\AndroidManifest.xml:20:9-22:45
+241            android:name="com.google.android.gms.common.api.GoogleApiActivity"
+241-->[com.google.android.gms:play-services-base:18.9.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\6939e32ec437695fab099ead6d395dec\transformed\play-services-base-18.9.0\AndroidManifest.xml:20:19-85
+242            android:exported="false"
+242-->[com.google.android.gms:play-services-base:18.9.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\6939e32ec437695fab099ead6d395dec\transformed\play-services-base-18.9.0\AndroidManifest.xml:22:19-43
+243            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+243-->[com.google.android.gms:play-services-base:18.9.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\6939e32ec437695fab099ead6d395dec\transformed\play-services-base-18.9.0\AndroidManifest.xml:21:19-78
+244
+245        <meta-data
+245-->[com.google.android.gms:play-services-basement:18.9.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\26fa2794fb2f35da09105dffa690f7ab\transformed\play-services-basement-18.9.0\AndroidManifest.xml:21:9-23:69
+246            android:name="com.google.android.gms.version"
+246-->[com.google.android.gms:play-services-basement:18.9.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\26fa2794fb2f35da09105dffa690f7ab\transformed\play-services-basement-18.9.0\AndroidManifest.xml:22:13-58
+247            android:value="@integer/google_play_services_version" />
+247-->[com.google.android.gms:play-services-basement:18.9.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\26fa2794fb2f35da09105dffa690f7ab\transformed\play-services-basement-18.9.0\AndroidManifest.xml:23:13-66
+248
+249        <provider
+249-->[androidx.emoji2:emoji2:1.3.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\6ee8d7baee748433fea3f33d2eaa2a13\transformed\emoji2-1.3.0\AndroidManifest.xml:24:9-32:20
+250            android:name="androidx.startup.InitializationProvider"
+250-->[androidx.emoji2:emoji2:1.3.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\6ee8d7baee748433fea3f33d2eaa2a13\transformed\emoji2-1.3.0\AndroidManifest.xml:25:13-67
+251            android:authorities="com.dormigo.androidx-startup"
+251-->[androidx.emoji2:emoji2:1.3.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\6ee8d7baee748433fea3f33d2eaa2a13\transformed\emoji2-1.3.0\AndroidManifest.xml:26:13-68
+252            android:exported="false" >
+252-->[androidx.emoji2:emoji2:1.3.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\6ee8d7baee748433fea3f33d2eaa2a13\transformed\emoji2-1.3.0\AndroidManifest.xml:27:13-37
+253            <meta-data
+253-->[androidx.emoji2:emoji2:1.3.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\6ee8d7baee748433fea3f33d2eaa2a13\transformed\emoji2-1.3.0\AndroidManifest.xml:29:13-31:52
+254                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+254-->[androidx.emoji2:emoji2:1.3.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\6ee8d7baee748433fea3f33d2eaa2a13\transformed\emoji2-1.3.0\AndroidManifest.xml:30:17-75
+255                android:value="androidx.startup" />
+255-->[androidx.emoji2:emoji2:1.3.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\6ee8d7baee748433fea3f33d2eaa2a13\transformed\emoji2-1.3.0\AndroidManifest.xml:31:17-49
+256            <meta-data
+256-->[androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\markv\.gradle\caches\9.6.0\transforms\c1632073058dc1fe4906a03028407ba2\transformed\lifecycle-process-2.6.2\AndroidManifest.xml:29:13-31:52
+257                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+257-->[androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\markv\.gradle\caches\9.6.0\transforms\c1632073058dc1fe4906a03028407ba2\transformed\lifecycle-process-2.6.2\AndroidManifest.xml:30:17-78
+258                android:value="androidx.startup" />
+258-->[androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\markv\.gradle\caches\9.6.0\transforms\c1632073058dc1fe4906a03028407ba2\transformed\lifecycle-process-2.6.2\AndroidManifest.xml:31:17-49
+259            <meta-data
+259-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\e255d7520848c7153c69dac5d3ae5750\transformed\profileinstaller-1.4.0\AndroidManifest.xml:29:13-31:52
+260                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+260-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\e255d7520848c7153c69dac5d3ae5750\transformed\profileinstaller-1.4.0\AndroidManifest.xml:30:17-85
+261                android:value="androidx.startup" />
+261-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\e255d7520848c7153c69dac5d3ae5750\transformed\profileinstaller-1.4.0\AndroidManifest.xml:31:17-49
+262        </provider>
+263
+264        <receiver
+264-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\e255d7520848c7153c69dac5d3ae5750\transformed\profileinstaller-1.4.0\AndroidManifest.xml:34:9-52:20
+265            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+265-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\e255d7520848c7153c69dac5d3ae5750\transformed\profileinstaller-1.4.0\AndroidManifest.xml:35:13-76
+266            android:directBootAware="false"
+266-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\e255d7520848c7153c69dac5d3ae5750\transformed\profileinstaller-1.4.0\AndroidManifest.xml:36:13-44
+267            android:enabled="true"
+267-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\e255d7520848c7153c69dac5d3ae5750\transformed\profileinstaller-1.4.0\AndroidManifest.xml:37:13-35
+268            android:exported="true"
+268-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\e255d7520848c7153c69dac5d3ae5750\transformed\profileinstaller-1.4.0\AndroidManifest.xml:38:13-36
+269            android:permission="android.permission.DUMP" >
+269-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\e255d7520848c7153c69dac5d3ae5750\transformed\profileinstaller-1.4.0\AndroidManifest.xml:39:13-57
+270            <intent-filter>
+270-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\e255d7520848c7153c69dac5d3ae5750\transformed\profileinstaller-1.4.0\AndroidManifest.xml:40:13-42:29
+271                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+271-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\e255d7520848c7153c69dac5d3ae5750\transformed\profileinstaller-1.4.0\AndroidManifest.xml:41:17-91
+271-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\e255d7520848c7153c69dac5d3ae5750\transformed\profileinstaller-1.4.0\AndroidManifest.xml:41:25-88
+272            </intent-filter>
+273            <intent-filter>
+273-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\e255d7520848c7153c69dac5d3ae5750\transformed\profileinstaller-1.4.0\AndroidManifest.xml:43:13-45:29
+274                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+274-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\e255d7520848c7153c69dac5d3ae5750\transformed\profileinstaller-1.4.0\AndroidManifest.xml:44:17-85
+274-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\e255d7520848c7153c69dac5d3ae5750\transformed\profileinstaller-1.4.0\AndroidManifest.xml:44:25-82
+275            </intent-filter>
+276            <intent-filter>
+276-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\e255d7520848c7153c69dac5d3ae5750\transformed\profileinstaller-1.4.0\AndroidManifest.xml:46:13-48:29
+277                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+277-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\e255d7520848c7153c69dac5d3ae5750\transformed\profileinstaller-1.4.0\AndroidManifest.xml:47:17-88
+277-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\e255d7520848c7153c69dac5d3ae5750\transformed\profileinstaller-1.4.0\AndroidManifest.xml:47:25-85
+278            </intent-filter>
+279            <intent-filter>
+279-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\e255d7520848c7153c69dac5d3ae5750\transformed\profileinstaller-1.4.0\AndroidManifest.xml:49:13-51:29
+280                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+280-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\e255d7520848c7153c69dac5d3ae5750\transformed\profileinstaller-1.4.0\AndroidManifest.xml:50:17-95
+280-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\markv\.gradle\caches\9.6.0\transforms\e255d7520848c7153c69dac5d3ae5750\transformed\profileinstaller-1.4.0\AndroidManifest.xml:50:25-92
+281            </intent-filter>
+282        </receiver>
+283    </application>
+284
+285</manifest>

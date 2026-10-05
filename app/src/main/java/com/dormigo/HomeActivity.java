@@ -620,7 +620,7 @@ public class HomeActivity extends AppCompatActivity {
     // =========================================================
 
     private void setupListingCards() {
-        apiClient.getBoardingHouses(new Callback() {
+        apiClient.getAvailableBoardingHouses(new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {}
 
@@ -675,7 +675,7 @@ public class HomeActivity extends AppCompatActivity {
 
                             String pPath = getFirstPhotoPath(h);
                             if (img1 != null && !pPath.isEmpty()) {
-                                String imgUrl = "http://10.149.229.109/Dormigo_Backend/" + pPath;
+                                String imgUrl = "http://10.209.52.109/Dormigo_Backend/" + pPath;
                                 Glide.with(this)
                                         .load(imgUrl)
                                         .placeholder(R.drawable.bg_image_placeholder)
@@ -719,7 +719,7 @@ public class HomeActivity extends AppCompatActivity {
 
                             String pPath = getFirstPhotoPath(h);
                             if (img2 != null && !pPath.isEmpty()) {
-                                String imgUrl = "http://10.149.229.109/Dormigo_Backend/" + pPath;
+                                String imgUrl = "http://10.209.52.109/Dormigo_Backend/" + pPath;
                                 Glide.with(this)
                                         .load(imgUrl)
                                         .placeholder(R.drawable.bg_image_placeholder)
@@ -763,7 +763,7 @@ public class HomeActivity extends AppCompatActivity {
 
                             String pPath = getFirstPhotoPath(h);
                             if (img3 != null && !pPath.isEmpty()) {
-                                String imgUrl = "http://10.149.229.109/Dormigo_Backend/" + pPath;
+                                String imgUrl = "http://10.209.52.109/Dormigo_Backend/" + pPath;
                                 Glide.with(this)
                                         .load(imgUrl)
                                         .placeholder(R.drawable.bg_image_placeholder)
@@ -807,7 +807,7 @@ public class HomeActivity extends AppCompatActivity {
 
                             String pPath = getFirstPhotoPath(h);
                             if (img4 != null && !pPath.isEmpty()) {
-                                String imgUrl = "http://10.149.229.109/Dormigo_Backend/" + pPath;
+                                String imgUrl = "http://10.209.52.109/Dormigo_Backend/" + pPath;
                                 Glide.with(this)
                                         .load(imgUrl)
                                         .placeholder(R.drawable.bg_image_placeholder)

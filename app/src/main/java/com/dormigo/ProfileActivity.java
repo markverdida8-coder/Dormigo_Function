@@ -132,7 +132,7 @@ public class ProfileActivity extends AppCompatActivity {
         LinearLayout btnVerification = findViewById(R.id.btnVerification);
         if (tvStatus == null) return;
 
-        String url = "http://10.149.229.109/Dormigo_Backend/api/get_student_verification_status.php?user_id=" + userId;
+        String url = "http://10.209.52.109/Dormigo_Backend/api/get_student_verification_status.php?user_id=" + userId;
         Request request = new Request.Builder().url(url).get().build();
         new OkHttpClient().newCall(request).enqueue(new Callback() {
             @Override

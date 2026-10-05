@@ -86,7 +86,7 @@ public class AdminVerificationDetailActivity extends AppCompatActivity {
         if (proofPath != null && !proofPath.isEmpty()) {
             if (imgProof != null) {
                 imgProof.setOnClickListener(v -> {
-                    String url = "http://10.149.229.109/Dormigo_Backend/" + proofPath;
+                    String url = "http://10.209.52.109/Dormigo_Backend/" + proofPath;
                     Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                     startActivity(browserIntent);
                 });
@@ -124,7 +124,7 @@ public class AdminVerificationDetailActivity extends AppCompatActivity {
 
             RequestBody body = RequestBody.create(json.toString(), MediaType.get("application/json; charset=utf-8"));
             Request request = new Request.Builder()
-                    .url("http://10.149.229.109/Dormigo_Backend/api/approve_verification.php")
+                    .url("http://10.209.52.109/Dormigo_Backend/api/approve_verification.php")
                     .post(body)
                     .build();
 
@@ -187,7 +187,7 @@ public class AdminVerificationDetailActivity extends AppCompatActivity {
 
             RequestBody body = RequestBody.create(json.toString(), MediaType.get("application/json; charset=utf-8"));
             Request request = new Request.Builder()
-                    .url("http://10.149.229.109/Dormigo_Backend/api/reject_verification.php")
+                    .url("http://10.209.52.109/Dormigo_Backend/api/reject_verification.php")
                     .post(body)
                     .build();
 

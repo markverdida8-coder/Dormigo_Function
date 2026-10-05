@@ -43,7 +43,7 @@ public class NotificationStyleManager {
         if ("PAYMENT".equals(type) && (title.contains("APPROV") || title.contains("CONFIRM") || title.contains("PAID") || title.contains("SUCCESS")
                 || message.contains("APPROV") || message.contains("CONFIRM") || message.contains("PAID") || message.contains("SUCCESS"))) {
             return new NotificationStyle(
-                    R.drawable.bg_circle_green,
+                    R.drawable.bg_circle_green_light,
                     R.drawable.ic_verified,
                     Color.parseColor("#1B5E4C")
             );
@@ -52,7 +52,7 @@ public class NotificationStyleManager {
         // 3. BOOKING APPROVED (Green)
         if ("BOOKING".equals(type) && (title.contains("APPROV") || message.contains("APPROV"))) {
             return new NotificationStyle(
-                    R.drawable.bg_circle_green,
+                    R.drawable.bg_circle_green_light,
                     R.drawable.ic_verified,
                     Color.parseColor("#1B5E4C")
             );

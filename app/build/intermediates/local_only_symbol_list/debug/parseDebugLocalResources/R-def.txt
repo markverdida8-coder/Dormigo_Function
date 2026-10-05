@@ -402,6 +402,7 @@ id landlordSubText
 id landlordSubtitle
 id landlordVerifiedBadge
 id lastNameInput
+id layoutBreakdownRows
 id layoutEmptyState
 id layoutFeeNameContainer
 id layoutProofContainer
@@ -569,7 +570,6 @@ id tenantsSubheader
 id termsCheckbox
 id termsText
 id textAddress
-id textAdvanceBreakdown
 id textAmount
 id textAvatar
 id textAvatar1
@@ -580,7 +580,6 @@ id textCashDesc
 id textChatsCount
 id textContactName
 id textDateMethod
-id textDepositBreakdown
 id textDetailBookingStatus
 id textDetailEmail
 id textDetailHouseRoom
@@ -622,7 +621,6 @@ id textMessage
 id textName
 id textOccupancyFraction
 id textOccupiedUnits
-id textOtherFeesBreakdown
 id textPaymentAmount1
 id textPaymentAmount2
 id textPaymentDetails1
@@ -674,7 +672,6 @@ id textTotalUnits
 id textUnreadBadge
 id textUnreadCount
 id textUtilitiesSummary
-id textUtilityBreakdown
 id textVerificationStatus
 id textWaterUtility
 id timerText
