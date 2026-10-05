@@ -36,7 +36,7 @@ public class ApiClient {
     // Phone and PC must be connected to the same Wi-Fi/network.
 
     private static final String BASE_URL =
-            "http://10.149.229.109/Dormigo_Backend/api/";
+            "http://10.242.38.109/Dormigo_Backend/api/";
 
 
     private static final MediaType JSON =
@@ -385,6 +385,44 @@ public class ApiClient {
         String url =
                 BASE_URL
                         + "boarding_houses.php";
+
+        Request request =
+                new Request.Builder()
+                        .url(url)
+                        .get()
+                        .build();
+
+        client.newCall(request)
+                .enqueue(callback);
+    }
+
+    public void getAvailableBoardingHouses(
+            Callback callback
+    ) {
+
+        String url =
+                BASE_URL
+                        + "boarding_houses.php?available_only=1";
+
+        Request request =
+                new Request.Builder()
+                        .url(url)
+                        .get()
+                        .build();
+
+        client.newCall(request)
+                .enqueue(callback);
+    }
+
+    public void getHouseCharges(
+            int houseId,
+            Callback callback
+    ) {
+
+        String url =
+                BASE_URL
+                        + "property_charges.php?house_id="
+                        + houseId;
 
         Request request =
                 new Request.Builder()

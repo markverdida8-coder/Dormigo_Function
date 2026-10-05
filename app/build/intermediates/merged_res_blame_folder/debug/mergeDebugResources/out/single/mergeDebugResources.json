@@ -176,6 +176,10 @@
         "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\mipmap-xhdpi\\ic_launcher.webp"
     },
     {
+        "merged": "com.dormigo.app-debug-44:/layout_create_account.xml.flat",
+        "source": "com.dormigo.app-main-46:/layout/create_account.xml"
+    },
+    {
         "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\drawable_ic_inbox.xml.flat",
         "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\drawable\\ic_inbox.xml"
     },
@@ -420,10 +424,6 @@
         "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\layout\\dialog_full_image.xml"
     },
     {
-        "merged": "com.dormigo.app-debug-44:/layout_gcash_qr_bottom_sheet.xml.flat",
-        "source": "com.dormigo.app-main-46:/layout/gcash_qr_bottom_sheet.xml"
-    },
-    {
         "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\drawable_ic_message_square.xml.flat",
         "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\drawable\\ic_message_square.xml"
     },
@@ -632,8 +632,16 @@
         "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\drawable\\ic_document.xml"
     },
     {
+        "merged": "com.dormigo.app-debug-44:/layout_landlord_login_page.xml.flat",
+        "source": "com.dormigo.app-main-46:/layout/landlord_login_page.xml"
+    },
+    {
         "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\layout_activity_admin_verification_detail.xml.flat",
         "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\layout\\activity_admin_verification_detail.xml"
+    },
+    {
+        "merged": "com.dormigo.app-debug-44:/layout_forgot_password_page.xml.flat",
+        "source": "com.dormigo.app-main-46:/layout/forgot_password_page.xml"
     },
     {
         "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\layout_dialog_billing_preview.xml.flat",
@@ -678,6 +686,10 @@
     {
         "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\mipmap-xhdpi_ic_launcher_round.webp.flat",
         "source": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-main-46:\\mipmap-xhdpi\\ic_launcher_round.webp"
+    },
+    {
+        "merged": "com.dormigo.app-debug-44:/layout_login_page.xml.flat",
+        "source": "com.dormigo.app-main-46:/layout/login_page.xml"
     },
     {
         "merged": "C:\\Users\\markv\\.gradle\\daemon\\9.6.0\\com.dormigo.app-debug-44:\\layout_dialog_add_fee.xml.flat",

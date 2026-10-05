@@ -400,6 +400,7 @@ int id landlordSubText 0x0
 int id landlordSubtitle 0x0
 int id landlordVerifiedBadge 0x0
 int id lastNameInput 0x0
+int id layoutBreakdownRows 0x0
 int id layoutEmptyState 0x0
 int id layoutFeeNameContainer 0x0
 int id layoutProofContainer 0x0
@@ -567,7 +568,6 @@ int id tenantsSubheader 0x0
 int id termsCheckbox 0x0
 int id termsText 0x0
 int id textAddress 0x0
-int id textAdvanceBreakdown 0x0
 int id textAmount 0x0
 int id textAvatar 0x0
 int id textAvatar1 0x0
@@ -578,7 +578,6 @@ int id textCashDesc 0x0
 int id textChatsCount 0x0
 int id textContactName 0x0
 int id textDateMethod 0x0
-int id textDepositBreakdown 0x0
 int id textDetailBookingStatus 0x0
 int id textDetailEmail 0x0
 int id textDetailHouseRoom 0x0
@@ -620,7 +619,6 @@ int id textMessage 0x0
 int id textName 0x0
 int id textOccupancyFraction 0x0
 int id textOccupiedUnits 0x0
-int id textOtherFeesBreakdown 0x0
 int id textPaymentAmount1 0x0
 int id textPaymentAmount2 0x0
 int id textPaymentDetails1 0x0
@@ -672,7 +670,6 @@ int id textTotalUnits 0x0
 int id textUnreadBadge 0x0
 int id textUnreadCount 0x0
 int id textUtilitiesSummary 0x0
-int id textUtilityBreakdown 0x0
 int id textVerificationStatus 0x0
 int id textWaterUtility 0x0
 int id timerText 0x0

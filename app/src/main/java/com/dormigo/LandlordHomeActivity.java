@@ -143,6 +143,10 @@ public class LandlordHomeActivity extends AppCompatActivity {
                             for (int i = 0; i < houses.length(); i++) {
                                 JSONObject h = houses.getJSONObject(i);
                                 if (h.optInt("landlord_id", 0) == landlordId) {
+                                    String status = h.optString("status", "ACTIVE").toUpperCase(Locale.ROOT);
+                                    if ("INACTIVE".equals(status)) {
+                                        continue;
+                                    }
                                     myHouses.put(h);
                                 }
                             }
@@ -154,6 +158,19 @@ public class LandlordHomeActivity extends AppCompatActivity {
                                 currentHouseIndex = 0;
                             }
                             runOnUiThread(() -> displayHouseAtIndex(currentHouseIndex));
+                        } else {
+                            runOnUiThread(() -> {
+                                TextView nameView = findViewById(R.id.textLandlordHouseName);
+                                TextView addrView = findViewById(R.id.textLandlordHouseAddress);
+                                TextView totalView = findViewById(R.id.textTotalUnits);
+                                TextView occupiedView = findViewById(R.id.textOccupiedUnits);
+                                TextView fracView = findViewById(R.id.textOccupancyFraction);
+                                if (nameView != null) nameView.setText("No Active Properties");
+                                if (addrView != null) addrView.setText("Tap '+ Add Property' to list a property");
+                                if (totalView != null) totalView.setText("0");
+                                if (occupiedView != null) occupiedView.setText("0");
+                                if (fracView != null) fracView.setText("0%");
+                            });
                         }
                     }
                 } catch (Exception ignored) {}

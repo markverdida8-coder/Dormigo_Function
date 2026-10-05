@@ -29,6 +29,16 @@ public class NotificationStyleManager {
         String title = notification.optString("title", "").toUpperCase(Locale.ROOT);
         String message = notification.optString("message", "").toUpperCase(Locale.ROOT);
 
+        // 0. RENTAL_CHARGE_UPDATED / PRICE CHANGE (Teal)
+        if ("RENTAL_UPDATE".equals(type) || "RENTAL_CHARGE_UPDATED".equals(type)
+                || title.contains("RENTAL") || title.contains("CHARGE") || title.contains("PRICE")) {
+            return new NotificationStyle(
+                    R.drawable.bg_circle_green_light,
+                    R.drawable.ic_receipt,
+                    Color.parseColor("#00897B")
+            );
+        }
+
         // 1. REJECTED / DECLINED / CANCELLED / FAILED (Red)
         if (title.contains("REJECT") || title.contains("DECLIN") || title.contains("CANCEL") || title.contains("FAIL")
                 || message.contains("REJECT") || message.contains("DECLIN") || message.contains("CANCEL") || message.contains("FAIL")) {
@@ -43,7 +53,7 @@ public class NotificationStyleManager {
         if ("PAYMENT".equals(type) && (title.contains("APPROV") || title.contains("CONFIRM") || title.contains("PAID") || title.contains("SUCCESS")
                 || message.contains("APPROV") || message.contains("CONFIRM") || message.contains("PAID") || message.contains("SUCCESS"))) {
             return new NotificationStyle(
-                    R.drawable.bg_circle_green,
+                    R.drawable.bg_circle_green_light,
                     R.drawable.ic_verified,
                     Color.parseColor("#1B5E4C")
             );
@@ -52,7 +62,7 @@ public class NotificationStyleManager {
         // 3. BOOKING APPROVED (Green)
         if ("BOOKING".equals(type) && (title.contains("APPROV") || message.contains("APPROV"))) {
             return new NotificationStyle(
-                    R.drawable.bg_circle_green,
+                    R.drawable.bg_circle_green_light,
                     R.drawable.ic_verified,
                     Color.parseColor("#1B5E4C")
             );

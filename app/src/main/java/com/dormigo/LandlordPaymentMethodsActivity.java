@@ -266,7 +266,7 @@ public class LandlordPaymentMethodsActivity extends AppCompatActivity {
             if (qrPlaceholder != null) qrPlaceholder.setVisibility(View.GONE);
             if (qrPreview != null) {
                 qrPreview.setVisibility(View.VISIBLE);
-                String fullUrl = gcashQrCodePath.startsWith("http") ? gcashQrCodePath : "http://10.149.229.109/Dormigo_Backend/" + gcashQrCodePath;
+                String fullUrl = gcashQrCodePath.startsWith("http") ? gcashQrCodePath : "http://10.242.38.109/Dormigo_Backend/" + gcashQrCodePath;
                 Glide.with(this)
                         .load(fullUrl)
                         .placeholder(R.drawable.bg_image_placeholder)
@@ -302,7 +302,7 @@ public class LandlordPaymentMethodsActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         ImageView fullImageView = new ImageView(this);
         fullImageView.setPadding(24, 24, 24, 24);
-        String fullUrl = gcashQrCodePath.startsWith("http") ? gcashQrCodePath : "http://10.149.229.109/Dormigo_Backend/" + gcashQrCodePath;
+        String fullUrl = gcashQrCodePath.startsWith("http") ? gcashQrCodePath : "http://10.242.38.109/Dormigo_Backend/" + gcashQrCodePath;
         Glide.with(this).load(fullUrl).into(fullImageView);
 
         builder.setView(fullImageView)

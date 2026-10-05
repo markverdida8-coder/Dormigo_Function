@@ -264,7 +264,7 @@ public class TransactionHistoryActivity extends AppCompatActivity implements Tra
                     filteredList.add(obj);
                 }
             } else if ("PENDING".equals(currentFilter)) {
-                if ("PENDING".equals(status)) {
+                if ("PENDING".equals(status) || "SUBMITTED".equals(status)) {
                     filteredList.add(obj);
                 }
             } else if ("FAILED".equals(currentFilter)) {

@@ -150,7 +150,7 @@ public class VerificationActivity extends AppCompatActivity {
                                 RequestBody.create(file, MediaType.get("application/octet-stream")));
 
                 Request request = new Request.Builder()
-                        .url("http://10.149.229.109/Dormigo_Backend/api/submit_landlord_verification.php")
+                        .url("http://10.242.38.109/Dormigo_Backend/api/submit_landlord_verification.php")
                         .post(builder.build())
                         .build();
 
@@ -216,7 +216,7 @@ public class VerificationActivity extends AppCompatActivity {
                                 RequestBody.create(file, MediaType.get("application/octet-stream")));
 
                 Request request = new Request.Builder()
-                        .url("http://10.149.229.109/Dormigo_Backend/api/submit_student_verification.php")
+                        .url("http://10.242.38.109/Dormigo_Backend/api/submit_student_verification.php")
                         .post(builder.build())
                         .build();
 

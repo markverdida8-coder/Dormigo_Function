@@ -70,6 +70,7 @@ public class ViewBoardingHouseActivity extends AppCompatActivity {
     private double selectedOtherFees = 0;
     private String selectedOtherFeesDesc = "";
     private String selectedRefundPolicy = "";
+    private double lastCalculatedTotalInitial = 0.0;
 
     private static class RoomItem {
         int roomId;
@@ -398,7 +399,7 @@ public class ViewBoardingHouseActivity extends AppCompatActivity {
         if (landlordAvatarImage != null && profileImage != null && !profileImage.trim().isEmpty() && !"null".equalsIgnoreCase(profileImage.trim())) {
             landlordAvatarImage.setVisibility(View.VISIBLE);
             if (landlordInitials != null) landlordInitials.setVisibility(View.GONE);
-            String fullUrl = profileImage.startsWith("http") ? profileImage : "http://10.149.229.109/Dormigo_Backend/" + profileImage;
+            String fullUrl = profileImage.startsWith("http") ? profileImage : "http://10.242.38.109/Dormigo_Backend/" + profileImage;
             Glide.with(this)
                     .load(fullUrl)
                     .placeholder(R.drawable.bg_image_placeholder)
@@ -1007,6 +1008,45 @@ public class ViewBoardingHouseActivity extends AppCompatActivity {
                 "₱%,.2f/month",
                 amount
         );
+    }
+
+    private String formatMoveInAmount(
+            double amount
+    ) {
+
+        return String.format(
+                Locale.US,
+                "₱%,.2f",
+                amount
+        );
+    }
+
+    private void addBreakdownRow(LinearLayout container, String label, String value) {
+        LinearLayout row = new LinearLayout(this);
+        row.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) row.getLayoutParams();
+        if (container.getChildCount() > 0) {
+            lp.topMargin = dp(6);
+        }
+        row.setLayoutParams(lp);
+
+        TextView lbl = new TextView(this);
+        lbl.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1.0f));
+        lbl.setText(label + ":");
+        lbl.setTextColor(Color.parseColor("#6E6E73"));
+        lbl.setTextSize(13);
+
+        TextView val = new TextView(this);
+        val.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        val.setText(value);
+        val.setTextColor(Color.parseColor("#1A1A1A"));
+        val.setTextSize(13);
+        val.setTypeface(null, Typeface.BOLD);
+
+        row.addView(lbl);
+        row.addView(val);
+        container.addView(row);
     }
 
 
@@ -1730,23 +1770,42 @@ public class ViewBoardingHouseActivity extends AppCompatActivity {
             selectedRoomPrice.setText(formatRent(monthlyRent));
         }
 
-        TextView tvAdvance = view.findViewById(R.id.textAdvanceBreakdown);
-        TextView tvDeposit = view.findViewById(R.id.textDepositBreakdown);
-        TextView tvUtility = view.findViewById(R.id.textUtilityBreakdown);
-        TextView tvOther = view.findViewById(R.id.textOtherFeesBreakdown);
+        LinearLayout breakdownContainer = view.findViewById(R.id.layoutBreakdownRows);
         TextView tvTotal = view.findViewById(R.id.textTotalInitialPayment);
         TextView tvPolicy = view.findViewById(R.id.textRefundPolicy);
 
-        double advAmt = monthlyRent * selectedAdvanceMonths;
-        double depAmt = monthlyRent * selectedDepositMonths;
-        double totalInitial = monthlyRent + advAmt + depAmt + selectedUtilityDeposit + selectedOtherFees;
+        double totalInitial = monthlyRent + selectedOtherFees;
+        lastCalculatedTotalInitial = totalInitial;
 
-        if (tvAdvance != null) tvAdvance.setText(formatRent(advAmt) + " (" + selectedAdvanceMonths + " mo)");
-        if (tvDeposit != null) tvDeposit.setText(formatRent(depAmt) + " (" + selectedDepositMonths + " mo)");
-        if (tvUtility != null) tvUtility.setText(formatRent(selectedUtilityDeposit));
-        boolean hasOtherDesc = !selectedOtherFeesDesc.isEmpty() && !"null".equalsIgnoreCase(selectedOtherFeesDesc.trim());
-        if (tvOther != null) tvOther.setText(formatRent(selectedOtherFees) + (hasOtherDesc ? " (" + selectedOtherFeesDesc.trim() + ")" : ""));
-        if (tvTotal != null) tvTotal.setText(formatRent(totalInitial));
+        if (breakdownContainer != null) {
+            breakdownContainer.removeAllViews();
+            addBreakdownRow(breakdownContainer, "Monthly Rent", formatMoveInAmount(monthlyRent));
+
+            if (selectedOtherFeesDesc != null && !selectedOtherFeesDesc.trim().isEmpty() && !"null".equalsIgnoreCase(selectedOtherFeesDesc.trim())) {
+                String[] parts = selectedOtherFeesDesc.split(";");
+                for (String part : parts) {
+                    String p = part.trim();
+                    if (p.isEmpty()) continue;
+                    int colonIdx = p.indexOf(':');
+                    if (colonIdx != -1) {
+                        String name = p.substring(0, colonIdx).trim();
+                        String valStr = p.substring(colonIdx + 1).trim().replace("₱", "").replace(",", "").trim();
+                        double amt = 0;
+                        try {
+                            amt = Double.parseDouble(valStr);
+                        } catch (Exception ignored) {}
+
+                        if (!name.isEmpty()) {
+                            addBreakdownRow(breakdownContainer, name, formatMoveInAmount(amt));
+                        }
+                    }
+                }
+            } else if (selectedOtherFees > 0) {
+                addBreakdownRow(breakdownContainer, "Other Move-in Fees", formatMoveInAmount(selectedOtherFees));
+            }
+        }
+
+        if (tvTotal != null) tvTotal.setText(formatMoveInAmount(totalInitial));
         if (tvPolicy != null) tvPolicy.setText("Refund Policy: " + (selectedRefundPolicy.isEmpty() ? "As specified by landlord." : selectedRefundPolicy));
 
         EditText inputDate =
@@ -1927,7 +1986,9 @@ public class ViewBoardingHouseActivity extends AppCompatActivity {
         }
 
         double totalAmount =
-                monthlyRent * durationMonths;
+                lastCalculatedTotalInitial > 0
+                        ? lastCalculatedTotalInitial
+                        : monthlyRent * durationMonths;
 
         btnSubmit.setEnabled(false);
 
@@ -2325,7 +2386,7 @@ public class ViewBoardingHouseActivity extends AppCompatActivity {
         final int[] currentSelectedIndex = {0};
 
         if (!paths.isEmpty() && imgMain != null) {
-            String mainUrl = "http://10.149.229.109/Dormigo_Backend/" + paths.get(0);
+            String mainUrl = "http://10.242.38.109/Dormigo_Backend/" + paths.get(0);
             Glide.with(this)
                     .load(mainUrl)
                     .placeholder(R.drawable.bg_image_placeholder)
@@ -2336,7 +2397,7 @@ public class ViewBoardingHouseActivity extends AppCompatActivity {
         for (int i = 0; i < thumbs.length; i++) {
             if (thumbs[i] != null) {
                 if (i + 1 < paths.size()) {
-                    String thumbUrl = "http://10.149.229.109/Dormigo_Backend/" + paths.get(i + 1);
+                    String thumbUrl = "http://10.242.38.109/Dormigo_Backend/" + paths.get(i + 1);
                     thumbs[i].setVisibility(View.VISIBLE);
                     Glide.with(this)
                             .load(thumbUrl)
@@ -2347,7 +2408,7 @@ public class ViewBoardingHouseActivity extends AppCompatActivity {
                     thumbs[i].setOnClickListener(v -> {
                         if (imgMain != null && index < paths.size()) {
                             currentSelectedIndex[0] = index;
-                            String url = "http://10.149.229.109/Dormigo_Backend/" + paths.get(index);
+                            String url = "http://10.242.38.109/Dormigo_Backend/" + paths.get(index);
                             Glide.with(this).load(url).into(imgMain);
                         }
                     });
@@ -2408,7 +2469,7 @@ public class ViewBoardingHouseActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-            String url = "http://10.149.229.109/Dormigo_Backend/" + paths.get(position);
+            String url = "http://10.242.38.109/Dormigo_Backend/" + paths.get(position);
             Glide.with(holder.itemView.getContext())
                     .load(url)
                     .placeholder(R.drawable.bg_image_placeholder)

@@ -5,9 +5,13 @@
     android:layout_height="match_parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#F5F6F5">
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#F5F6F5"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.core.widget.NestedScrollView
             android:layout_width="0dp"
@@ -31,11 +35,11 @@
                     android:id="@+id/btnBack"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
+                    android:background="?attr/selectableItemBackground"
                     android:clickable="true"
                     android:focusable="true"
-                    android:background="?attr/selectableItemBackground">
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
                     <ImageView
                         android:layout_width="36dp"
@@ -50,11 +54,11 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="10dp"
+                        android:letterSpacing="0.02"
                         android:text="@string/app_name"
                         android:textColor="#1A1A1A"
                         android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:letterSpacing="0.02" />
+                        android:textStyle="bold" />
 
                 </LinearLayout>
 
@@ -118,7 +122,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
-                android:text="@string/i_am_a_student"
+                            android:text="@string/i_am_a_student"
                             android:textColor="#1A1A1A"
                             android:textSize="14sp"
                             android:textStyle="bold" />
@@ -127,7 +131,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                android:text="@string/looking_for_a_room"
+                            android:text="@string/looking_for_a_room"
                             android:textColor="#6E6E73"
                             android:textSize="12sp" />
 
@@ -157,7 +161,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
-                android:text="@string/i_am_a_landlord"
+                            android:text="@string/i_am_a_landlord"
                             android:textColor="#1A1A1A"
                             android:textSize="14sp"
                             android:textStyle="bold" />
@@ -166,7 +170,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                android:text="@string/renting_out_rooms"
+                            android:text="@string/renting_out_rooms"
                             android:textColor="#6E6E73"
                             android:textSize="12sp" />
 
@@ -202,10 +206,10 @@
                             android:layout_width="match_parent"
                             android:layout_height="50dp"
                             android:layout_marginTop="8dp"
+                            android:autofillHints="personGivenName"
                             android:background="@drawable/bg_input_field"
                             android:hint="@string/first_name"
                             android:inputType="textPersonName"
-                            android:autofillHints="personGivenName"
                             android:paddingHorizontal="14dp"
                             android:singleLine="true"
                             android:textColor="#1A1A1A"
@@ -234,10 +238,10 @@
                             android:layout_width="match_parent"
                             android:layout_height="50dp"
                             android:layout_marginTop="8dp"
+                            android:autofillHints="personFamilyName"
                             android:background="@drawable/bg_input_field"
                             android:hint="@string/last_name"
                             android:inputType="textPersonName"
-                            android:autofillHints="personFamilyName"
                             android:paddingHorizontal="14dp"
                             android:singleLine="true"
                             android:textColor="#1A1A1A"
@@ -263,10 +267,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
                     android:layout_marginTop="8dp"
+                    android:autofillHints="personMiddleName"
                     android:background="@drawable/bg_input_field"
                     android:hint="@string/middle_name_optional"
                     android:inputType="textPersonName"
-                    android:autofillHints="personMiddleName"
                     android:paddingHorizontal="14dp"
                     android:singleLine="true"
                     android:textColor="#1A1A1A"
@@ -288,10 +292,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
                     android:layout_marginTop="8dp"
+                    android:autofillHints="emailAddress"
                     android:background="@drawable/bg_input_field"
                     android:hint="@string/email"
                     android:inputType="textEmailAddress"
-                    android:autofillHints="emailAddress"
                     android:paddingHorizontal="14dp"
                     android:singleLine="true"
                     android:textColor="#1A1A1A"
@@ -315,12 +319,12 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     app:boxBackgroundColor="#FFFFFF"
-                    app:boxCornerRadiusTopStart="10dp"
-                    app:boxCornerRadiusTopEnd="10dp"
-                    app:boxCornerRadiusBottomStart="10dp"
                     app:boxCornerRadiusBottomEnd="10dp"
-                    app:boxStrokeWidth="1dp"
+                    app:boxCornerRadiusBottomStart="10dp"
+                    app:boxCornerRadiusTopEnd="10dp"
+                    app:boxCornerRadiusTopStart="10dp"
                     app:boxStrokeColor="#DDDDDD"
+                    app:boxStrokeWidth="1dp"
                     app:hintEnabled="false">
 
                     <AutoCompleteTextView
@@ -351,10 +355,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
                     android:layout_marginTop="8dp"
+                    android:autofillHints="phoneNumber"
                     android:background="@drawable/bg_input_field"
                     android:hint="@string/mobile_number_hint"
                     android:inputType="phone"
-                    android:autofillHints="phoneNumber"
                     android:paddingHorizontal="14dp"
                     android:singleLine="true"
                     android:textColor="#1A1A1A"
@@ -420,10 +424,10 @@
                         android:id="@+id/passwordInput"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:autofillHints="password"
                         android:background="@drawable/bg_input_field"
                         android:hint="@string/password"
                         android:inputType="textPassword"
-                        android:autofillHints="password"
                         android:paddingStart="14dp"
                         android:paddingEnd="44dp"
                         android:singleLine="true"
@@ -464,10 +468,10 @@
                         android:id="@+id/confirmPasswordInput"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:autofillHints="password"
                         android:background="@drawable/bg_input_field"
                         android:hint="@string/password"
                         android:inputType="textPassword"
-                        android:autofillHints="password"
                         android:paddingStart="14dp"
                         android:paddingEnd="44dp"
                         android:singleLine="true"
@@ -540,13 +544,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:orientation="horizontal"
-                    android:gravity="center">
+                    android:gravity="center"
+                    android:orientation="horizontal">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                    android:text="@string/already_have_account"
+                        android:text="@string/already_have_account"
                         android:textColor="#6E6E73"
                         android:textSize="14sp" />
 
@@ -554,9 +558,10 @@
                         android:id="@+id/signInLink"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
                         android:clickable="true"
                         android:focusable="true"
-                    android:text="@string/sign_in"
+                        android:text="@string/sign_in"
                         android:textColor="#1B5E4C"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -568,5 +573,12 @@
         </androidx.core.widget.NestedScrollView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <androidx.constraintlayout.widget.Barrier android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
