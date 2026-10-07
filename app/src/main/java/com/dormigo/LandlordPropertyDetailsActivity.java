@@ -195,10 +195,30 @@ public class LandlordPropertyDetailsActivity extends AppCompatActivity {
                                 }
 
                                 @Override
-                                public void onResponse(@NonNull Call call, @NonNull Response response) {
+                                public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                                    String body = response.body() != null ? response.body().string() : "";
+                                    boolean success = false;
+                                    String message = "Failed to delete property.";
+                                    try {
+                                        JSONObject json = new JSONObject(body);
+                                        success = response.isSuccessful() && json.optBoolean("success", false);
+                                        if (json.has("message")) {
+                                            message = json.optString("message");
+                                        }
+                                    } catch (Exception e) {
+                                        success = false;
+                                        message = "Invalid server response.";
+                                    }
+
+                                    final boolean isSuccess = success;
+                                    final String finalMsg = message;
                                     runOnUiThread(() -> {
-                                        Toast.makeText(LandlordPropertyDetailsActivity.this, "Property deleted successfully.", Toast.LENGTH_SHORT).show();
-                                        finish();
+                                        if (isSuccess) {
+                                            Toast.makeText(LandlordPropertyDetailsActivity.this, "Property deleted successfully.", Toast.LENGTH_SHORT).show();
+                                            finish();
+                                        } else {
+                                            Toast.makeText(LandlordPropertyDetailsActivity.this, finalMsg, Toast.LENGTH_LONG).show();
+                                        }
                                     });
                                 }
                             });

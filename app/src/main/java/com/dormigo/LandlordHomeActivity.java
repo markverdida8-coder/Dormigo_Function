@@ -84,6 +84,13 @@ public class LandlordHomeActivity extends AppCompatActivity {
         }
 
         setupUI();
+        TextView btnLandlordMaintenance = findViewById(R.id.btnLandlordMaintenance);
+        if (btnLandlordMaintenance != null) {
+            btnLandlordMaintenance.setOnClickListener(v -> {
+                Intent intent = new Intent(this, LandlordMaintenanceRequestsActivity.class);
+                startActivity(intent);
+            });
+        }
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
         if (swipeRefreshLayout != null) {
             swipeRefreshLayout.setOnRefreshListener(this::loadLandlordData);
@@ -703,38 +710,45 @@ public class LandlordHomeActivity extends AppCompatActivity {
     private void approveCard(View cardView, int bookingId, int roomId, String studentName) {
         apiClient.updateBookingStatus(bookingId, "APPROVED", new Callback() {
             @Override
-            public void onFailure(Call call, IOException e) {}
+            public void onFailure(Call call, IOException e) {
+                runOnUiThread(() ->
+                        Toast.makeText(LandlordHomeActivity.this, "Unable to approve booking.", Toast.LENGTH_SHORT).show()
+                );
+            }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                if (roomId > 0) {
-                    apiClient.updateRoomStatus(roomId, "OCCUPIED", new Callback() {
-                        @Override
-                        public void onFailure(Call call, IOException e) {}
+                String body = response.body() != null ? response.body().string() : "";
+                boolean approved = false;
+                try {
+                    approved = response.isSuccessful()
+                            && new JSONObject(body).optBoolean("success", false);
+                } catch (Exception ignored) {
+                }
 
-                        @Override
-                        public void onResponse(Call call, Response response) throws IOException {
-                            SharedPreferences prefs = getSharedPreferences("DormigoPrefs", MODE_PRIVATE);
-                            int landlordId = prefs.getInt("userId", -1);
-                            if (landlordId > 0) {
-                                runOnUiThread(() -> loadLandlordPropertiesAndStats(landlordId));
-                            }
+                if (approved) {
+                    SharedPreferences prefs = getSharedPreferences("DormigoPrefs", MODE_PRIVATE);
+                    int landlordId = prefs.getInt("userId", -1);
+                    runOnUiThread(() -> {
+                        cardView.setVisibility(View.GONE);
+                        Toast.makeText(LandlordHomeActivity.this, "Accepted " + studentName, Toast.LENGTH_SHORT).show();
+                        if (landlordId > 0) {
+                            loadLandlordPropertiesAndStats(landlordId);
                         }
                     });
+                } else {
+                    String errorMsg = "Booking could not be approved.";
+                    try {
+                        JSONObject errJson = new JSONObject(body);
+                        if (errJson.has("message")) {
+                            errorMsg = errJson.optString("message");
+                        }
+                    } catch (Exception ignored) {}
+                    final String finalMsg = errorMsg;
+                    runOnUiThread(() -> Toast.makeText(LandlordHomeActivity.this, finalMsg, Toast.LENGTH_LONG).show());
                 }
             }
         });
-
-        ObjectAnimator animator = ObjectAnimator.ofFloat(cardView, "alpha", 1f, 0f);
-        animator.setDuration(300);
-        animator.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                cardView.setVisibility(View.GONE);
-                Toast.makeText(LandlordHomeActivity.this, "Accepted " + studentName, Toast.LENGTH_SHORT).show();
-            }
-        });
-        animator.start();
     }
 
     private void setupBottomNavigation() {

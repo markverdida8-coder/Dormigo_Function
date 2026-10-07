@@ -297,6 +297,22 @@
 
             </LinearLayout>
 
+            <!-- Maintenance Requests Entry Point -->
+            <TextView
+                android:id="@+id/btnLandlordMaintenance"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/bg_card_rounded"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="16dp"
+                android:text="🛠️ Tenant Maintenance Requests"
+                android:textColor="#1B5E4C"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
             <!-- Pending Requests Section -->
             <RelativeLayout
                 android:id="@+id/pendingSection"

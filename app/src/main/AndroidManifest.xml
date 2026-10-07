@@ -151,6 +151,11 @@
             android:windowSoftInputMode="adjustResize" />
 
         <activity
+            android:name=".StudentMaintenanceRequestsActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
             android:name=".ChatHistoryActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
@@ -232,6 +237,11 @@
 
         <activity
             android:name=".LandlordRequestsActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".LandlordMaintenanceRequestsActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 

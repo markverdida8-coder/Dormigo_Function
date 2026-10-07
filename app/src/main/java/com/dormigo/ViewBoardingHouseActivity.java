@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -71,6 +72,7 @@ public class ViewBoardingHouseActivity extends AppCompatActivity {
     private String selectedOtherFeesDesc = "";
     private String selectedRefundPolicy = "";
     private double lastCalculatedTotalInitial = 0.0;
+    private boolean isBookingSubmitting = false;
 
     private static class RoomItem {
         int roomId;
@@ -399,7 +401,7 @@ public class ViewBoardingHouseActivity extends AppCompatActivity {
         if (landlordAvatarImage != null && profileImage != null && !profileImage.trim().isEmpty() && !"null".equalsIgnoreCase(profileImage.trim())) {
             landlordAvatarImage.setVisibility(View.VISIBLE);
             if (landlordInitials != null) landlordInitials.setVisibility(View.GONE);
-            String fullUrl = profileImage.startsWith("http") ? profileImage : "http://10.242.38.109/Dormigo_Backend/" + profileImage;
+            String fullUrl = profileImage.startsWith("http") ? profileImage : "http://10.32.189.109/Dormigo_Backend/" + profileImage;
             Glide.with(this)
                     .load(fullUrl)
                     .placeholder(R.drawable.bg_image_placeholder)
@@ -1990,6 +1992,8 @@ public class ViewBoardingHouseActivity extends AppCompatActivity {
                         ? lastCalculatedTotalInitial
                         : monthlyRent * durationMonths;
 
+        if (isBookingSubmitting) return;
+        isBookingSubmitting = true;
         btnSubmit.setEnabled(false);
 
         apiClient.createBooking(
@@ -2010,14 +2014,9 @@ public class ViewBoardingHouseActivity extends AppCompatActivity {
                     ) {
 
                         runOnUiThread(() -> {
-
-                            btnSubmit.setEnabled(
-                                    true
-                            );
-
-                            showToast(
-                                    "Unable to connect to server."
-                            );
+                            isBookingSubmitting = false;
+                            btnSubmit.setEnabled(true);
+                            showToast("Unable to connect to server.");
                         });
                     }
 
@@ -2030,40 +2029,30 @@ public class ViewBoardingHouseActivity extends AppCompatActivity {
                         String body = "";
 
                         if (response.body() != null) {
-                            body =
-                                    response.body().string();
+                            body = response.body().string();
                         }
 
                         String result = body;
 
                         runOnUiThread(() -> {
-
-                            btnSubmit.setEnabled(
-                                    true
-                            );
+                            isBookingSubmitting = false;
+                            btnSubmit.setEnabled(true);
 
                             try {
-
-                                JSONObject json =
-                                        new JSONObject(
-                                                result
-                                        );
-
-                                boolean success =
-                                        json.optBoolean(
-                                                "success",
-                                                false
-                                        );
+                                JSONObject json = new JSONObject(result);
+                                boolean success = json.optBoolean("success", false);
 
                                 if (!success) {
-
-                                    showToast(
-                                            json.optString(
-                                                    "message",
-                                                    "Booking failed."
-                                            )
-                                    );
-
+                                    String msg = json.optString("message", "Booking failed.");
+                                    if (msg.toLowerCase(Locale.ROOT).contains("active booking") || msg.toLowerCase(Locale.ROOT).contains("ongoing booking")) {
+                                        new AlertDialog.Builder(ViewBoardingHouseActivity.this)
+                                                .setTitle("Ongoing Booking Exists")
+                                                .setMessage("You already have an ongoing booking. You can book another room once your current booking is completed, declined, or cancelled.")
+                                                .setPositiveButton("OK", null)
+                                                .show();
+                                    } else {
+                                        showToast(msg);
+                                    }
                                     return;
                                 }
 
@@ -2386,7 +2375,7 @@ public class ViewBoardingHouseActivity extends AppCompatActivity {
         final int[] currentSelectedIndex = {0};
 
         if (!paths.isEmpty() && imgMain != null) {
-            String mainUrl = "http://10.242.38.109/Dormigo_Backend/" + paths.get(0);
+            String mainUrl = "http://10.32.189.109/Dormigo_Backend/" + paths.get(0);
             Glide.with(this)
                     .load(mainUrl)
                     .placeholder(R.drawable.bg_image_placeholder)
@@ -2397,7 +2386,7 @@ public class ViewBoardingHouseActivity extends AppCompatActivity {
         for (int i = 0; i < thumbs.length; i++) {
             if (thumbs[i] != null) {
                 if (i + 1 < paths.size()) {
-                    String thumbUrl = "http://10.242.38.109/Dormigo_Backend/" + paths.get(i + 1);
+                    String thumbUrl = "http://10.32.189.109/Dormigo_Backend/" + paths.get(i + 1);
                     thumbs[i].setVisibility(View.VISIBLE);
                     Glide.with(this)
                             .load(thumbUrl)
@@ -2408,7 +2397,7 @@ public class ViewBoardingHouseActivity extends AppCompatActivity {
                     thumbs[i].setOnClickListener(v -> {
                         if (imgMain != null && index < paths.size()) {
                             currentSelectedIndex[0] = index;
-                            String url = "http://10.242.38.109/Dormigo_Backend/" + paths.get(index);
+                            String url = "http://10.32.189.109/Dormigo_Backend/" + paths.get(index);
                             Glide.with(this).load(url).into(imgMain);
                         }
                     });
@@ -2469,7 +2458,7 @@ public class ViewBoardingHouseActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-            String url = "http://10.242.38.109/Dormigo_Backend/" + paths.get(position);
+            String url = "http://10.32.189.109/Dormigo_Backend/" + paths.get(position);
             Glide.with(holder.itemView.getContext())
                     .load(url)
                     .placeholder(R.drawable.bg_image_placeholder)

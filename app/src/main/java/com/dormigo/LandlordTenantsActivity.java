@@ -27,7 +27,9 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Set;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -40,6 +42,7 @@ public class LandlordTenantsActivity extends AppCompatActivity {
     private int houseId;
     private int landlordId;
     private String propertyName = "";
+    private final Set<Integer> moveInRequestsInProgress = new HashSet<>();
 
     private TextView tenantsSubheader;
     private TextView tenantsStatus;
@@ -184,7 +187,6 @@ public class LandlordTenantsActivity extends AppCompatActivity {
 
     private View createTenantCard(JSONObject booking) {
         int bookingId = booking.optInt("booking_id", 0);
-        int roomId = booking.optInt("room_id", 0);
         String studentName = booking.optString("full_name", "Student Tenant");
         String roomNumber = booking.optString("room_number", "Room");
         String roomType = booking.optString("room_type", "Standard");
@@ -312,18 +314,35 @@ public class LandlordTenantsActivity extends AppCompatActivity {
 
         bottomRow.addView(rentCol);
 
-        // End Tenancy Button
-        TextView btnEndTenancy = new TextView(this);
-        btnEndTenancy.setText("End Tenancy");
-        btnEndTenancy.setTextColor(Color.parseColor("#FF3B30"));
-        btnEndTenancy.setTextSize(12);
-        btnEndTenancy.setTypeface(null, Typeface.BOLD);
-        btnEndTenancy.setBackgroundResource(R.drawable.bg_button_outline_red);
-        btnEndTenancy.setPadding(dp(12), dp(6), dp(12), dp(6));
-        btnEndTenancy.setClickable(true);
-        btnEndTenancy.setFocusable(true);
-        btnEndTenancy.setOnClickListener(v -> showEndTenancyDialog(bookingId, roomId, studentName, roomNumber));
-        bottomRow.addView(btnEndTenancy);
+        if ("ACTIVE".equals(status)) {
+            TextView btnEndTenancy = new TextView(this);
+            btnEndTenancy.setText("End Tenancy");
+            btnEndTenancy.setTextColor(Color.parseColor("#FF3B30"));
+            btnEndTenancy.setTextSize(12);
+            btnEndTenancy.setTypeface(null, Typeface.BOLD);
+            btnEndTenancy.setBackgroundResource(R.drawable.bg_button_outline_red);
+            btnEndTenancy.setPadding(dp(12), dp(6), dp(12), dp(6));
+            btnEndTenancy.setClickable(true);
+            btnEndTenancy.setFocusable(true);
+            btnEndTenancy.setOnClickListener(v -> showEndTenancyDialog(bookingId, studentName, roomNumber));
+            bottomRow.addView(btnEndTenancy);
+        } else if ("APPROVED".equals(status) && bookingId > 0) {
+            TextView btnConfirmMoveIn = new TextView(this);
+            boolean requestInProgress = moveInRequestsInProgress.contains(bookingId);
+            btnConfirmMoveIn.setText(requestInProgress ? "Confirming..." : "Confirm Move-in");
+            btnConfirmMoveIn.setTextColor(Color.WHITE);
+            btnConfirmMoveIn.setTextSize(12);
+            btnConfirmMoveIn.setTypeface(null, Typeface.BOLD);
+            btnConfirmMoveIn.setBackgroundResource(R.drawable.bg_button_filled);
+            btnConfirmMoveIn.setPadding(dp(12), dp(6), dp(12), dp(6));
+            btnConfirmMoveIn.setClickable(!requestInProgress);
+            btnConfirmMoveIn.setFocusable(true);
+            btnConfirmMoveIn.setEnabled(!requestInProgress);
+            btnConfirmMoveIn.setOnClickListener(v ->
+                    showConfirmMoveInDialog(bookingId, studentName, btnConfirmMoveIn)
+            );
+            bottomRow.addView(btnConfirmMoveIn);
+        }
 
         // Chat Button
         TextView btnChat = new TextView(this);
@@ -350,10 +369,92 @@ public class LandlordTenantsActivity extends AppCompatActivity {
         return card;
     }
 
-    private void showEndTenancyDialog(int bookingId, int roomId, String studentName, String roomNumber) {
+    private void showConfirmMoveInDialog(int bookingId, String studentName, TextView button) {
+        new AlertDialog.Builder(this)
+                .setTitle("Confirm Move-in")
+                .setMessage("Confirm that " + studentName + " has moved in? This will mark the student as an active tenant.")
+                .setPositiveButton("Confirm Move-in", (dialog, which) ->
+                        confirmMoveIn(bookingId, studentName, button)
+                )
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void confirmMoveIn(int bookingId, String studentName, TextView button) {
+        if (bookingId <= 0 || !moveInRequestsInProgress.add(bookingId)) {
+            return;
+        }
+
+        button.setEnabled(false);
+        button.setClickable(false);
+        button.setText("Confirming...");
+
+        apiClient.confirmMoveIn(bookingId, new Callback() {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                runOnUiThread(() -> {
+                    moveInRequestsInProgress.remove(bookingId);
+                    button.setEnabled(true);
+                    button.setClickable(true);
+                    button.setText("Confirm Move-in");
+                    Toast.makeText(
+                            LandlordTenantsActivity.this,
+                            "Unable to confirm move-in. Please try again.",
+                            Toast.LENGTH_LONG
+                    ).show();
+                });
+            }
+
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                String body = response.body() != null ? response.body().string() : "";
+                boolean success = false;
+                String message = "Unable to confirm move-in. Please try again.";
+                try {
+                    JSONObject result = new JSONObject(body);
+                    success = response.isSuccessful() && result.optBoolean("success", false);
+                    if (!success) {
+                        message = result.optString("message", message);
+                        if (message.trim().isEmpty()) {
+                            message = "Unable to confirm move-in. Please try again.";
+                        }
+                    }
+                } catch (Exception ignored) {
+                    if (response.isSuccessful()) {
+                        message = "The server returned an invalid response. Please refresh and check the booking status.";
+                    }
+                }
+
+                final boolean moveInConfirmed = success;
+                final String resultMessage = message;
+                runOnUiThread(() -> {
+                    moveInRequestsInProgress.remove(bookingId);
+                    if (moveInConfirmed) {
+                        Toast.makeText(
+                                LandlordTenantsActivity.this,
+                                "Move-in confirmed for " + studentName + ".",
+                                Toast.LENGTH_LONG
+                        ).show();
+                        loadTenants();
+                    } else {
+                        button.setEnabled(true);
+                        button.setClickable(true);
+                        button.setText("Confirm Move-in");
+                        Toast.makeText(
+                                LandlordTenantsActivity.this,
+                                resultMessage,
+                                Toast.LENGTH_LONG
+                        ).show();
+                    }
+                });
+            }
+        });
+    }
+
+    private void showEndTenancyDialog(int bookingId, String studentName, String roomNumber) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("End Tenancy");
-        builder.setMessage("Are you sure you want to end tenancy for " + studentName + " in " + roomNumber + "?\n\nThis will mark the lease as completed and release " + roomNumber + " back to AVAILABLE.");
+        builder.setMessage("Are you sure you want to end tenancy for " + studentName + " in " + roomNumber + "?\n\nThe lease will be marked completed and room availability will be recalculated.");
 
         builder.setPositiveButton("End Tenancy", (dialog, which) -> {
             apiClient.updateBookingStatus(bookingId, "COMPLETED", new Callback() {
@@ -363,20 +464,23 @@ public class LandlordTenantsActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onResponse(@NonNull Call call, @NonNull Response response) {
-                    if (roomId > 0) {
-                        apiClient.updateRoomStatus(roomId, "AVAILABLE", new Callback() {
-                            @Override
-                            public void onFailure(@NonNull Call call, @NonNull IOException e) {}
-
-                            @Override
-                            public void onResponse(@NonNull Call call, @NonNull Response response) {}
-                        });
+                public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                    String body = response.body() != null ? response.body().string() : "";
+                    boolean completed = false;
+                    try {
+                        completed = response.isSuccessful()
+                                && new JSONObject(body).optBoolean("success", false);
+                    } catch (Exception ignored) {
                     }
-                    runOnUiThread(() -> {
-                        Toast.makeText(LandlordTenantsActivity.this, "Tenancy ended. " + roomNumber + " is now available.", Toast.LENGTH_LONG).show();
-                        loadTenants();
-                    });
+
+                    if (completed) {
+                        runOnUiThread(() -> {
+                            Toast.makeText(LandlordTenantsActivity.this, "Tenancy ended. Room availability was recalculated.", Toast.LENGTH_LONG).show();
+                            loadTenants();
+                        });
+                    } else {
+                        runOnUiThread(() -> Toast.makeText(LandlordTenantsActivity.this, "Unable to end tenancy.", Toast.LENGTH_LONG).show());
+                    }
                 }
             });
         });

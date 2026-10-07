@@ -68,6 +68,7 @@ public class HomeActivity extends AppCompatActivity {
     private String cachedHouseRoomText = "";
     private String cachedDueDateStatusText = "";
     private String cachedPayButtonText = "";
+    private int activeMaintenanceBookingId = 0;
 
     private final Runnable pollRunnable = new Runnable() {
         @Override
@@ -244,6 +245,11 @@ public class HomeActivity extends AppCompatActivity {
     private void loadStudentRentStatus() {
         if (isRentStatusLoading) return;
         isRentStatusLoading = true;
+        activeMaintenanceBookingId = 0;
+        TextView maintenanceButton = findViewById(R.id.btnMaintenanceRequest);
+        if (maintenanceButton != null) {
+            maintenanceButton.setVisibility(View.GONE);
+        }
 
         SharedPreferences prefs = getSharedPreferences("DormigoPrefs", MODE_PRIVATE);
         int userId = prefs.getInt("userId", -1);
@@ -257,7 +263,7 @@ public class HomeActivity extends AppCompatActivity {
         TextView dueDateStatus = findViewById(R.id.textDueDateAndStatus);
         TextView btnPayNow = findViewById(R.id.btnPayNow);
 
-        apiClient.getBookings(new Callback() {
+        apiClient.getBookingsForStudent(userId, new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 isRentStatusLoading = false;
@@ -288,27 +294,21 @@ public class HomeActivity extends AppCompatActivity {
                             }
 
                             if (targetBooking != null) {
-                                double monthlyRent = targetBooking.optDouble("agreed_monthly_rent", 0);
+                                int activeBookingId = "ACTIVE".equals(targetStatus)
+                                        ? targetBooking.optInt("booking_id", 0)
+                                        : 0;
                                 String houseName = targetBooking.optString("house_name", "Boarding House");
                                 String roomNumber = targetBooking.optString("room_number", "Room");
-                                int advanceMonths = targetBooking.optInt("advance_months", 1);
-                                int depositMonths = targetBooking.optInt("deposit_months", 1);
-                                double utilityDeposit = targetBooking.optDouble("utility_deposit", 0);
-                                double otherFees = targetBooking.optDouble("other_fees", 0);
-                                int paymentDueDay = targetBooking.optInt("payment_due_day", 1);
-                                String moveInDate = targetBooking.optString("move_in_date", "");
                                 boolean initialCompleted = targetBooking.optBoolean("initial_payment_completed", false);
                                 String dbNextDueDate = targetBooking.optString("next_due_date", "");
-
-                                double monthlyRecurringFees = targetBooking.optDouble("monthly_recurring_fees", 0);
-                                double utilitiesFixed = targetBooking.optDouble("utilities_fixed", 0);
-
-                                double displayAmount = monthlyRent;
-                                if ("APPROVED".equals(targetStatus) && !initialCompleted) {
-                                    displayAmount = monthlyRent + (monthlyRent * advanceMonths) + (monthlyRent * depositMonths) + utilityDeposit + otherFees;
-                                } else if (initialCompleted) {
-                                    displayAmount = monthlyRent + monthlyRecurringFees + utilitiesFixed;
-                                }
+                                boolean pricingReady = "CAPTURED_VERIFIED".equals(
+                                        targetBooking.optString("pricing_snapshot_status", "")
+                                );
+                                double displayAmount = pricingReady
+                                        ? (initialCompleted
+                                            ? targetBooking.optDouble("monthly_payment_amount", 0)
+                                            : targetBooking.optDouble("initial_payment_amount", 0))
+                                        : 0;
 
                                 String nextDue;
                                 if (initialCompleted && dbNextDueDate != null && !dbNextDueDate.isEmpty() && !"null".equals(dbNextDueDate)) {
@@ -320,16 +320,25 @@ public class HomeActivity extends AppCompatActivity {
                                         nextDue = dbNextDueDate;
                                     }
                                 } else {
-                                    nextDue = calculateNextFutureDueDate(moveInDate, paymentDueDay);
+                                    nextDue = "Not scheduled";
                                 }
 
-                                final String newRentText = "₱" + String.format(Locale.getDefault(), "%.2f", displayAmount);
+                                final String newRentText = pricingReady
+                                        ? "₱" + String.format(Locale.getDefault(), "%.2f", displayAmount)
+                                        : "Pricing under review";
                                 final String newHouseRoomText = houseName + " · Room " + roomNumber;
-                                final String newPayBtnText = "APPROVED".equals(targetStatus) ? "Pay Initial Payment" : "Pay Monthly Rent";
-                                String dueStatus = calculateDueStatus(nextDue);
-                                final String newDueStatusText = "Next Due Date: " + nextDue + " (" + dueStatus + ")";
+                                final String newPayBtnText = pricingReady
+                                        ? ("APPROVED".equals(targetStatus) ? "Pay Initial Payment" : "Pay Monthly Rent")
+                                        : "Payment unavailable";
+                                final String newDueStatusText = "Next Due Date: " + nextDue;
 
                                 runOnUiThread(() -> {
+                                    activeMaintenanceBookingId = activeBookingId;
+                                    if (maintenanceButton != null) {
+                                        maintenanceButton.setVisibility(
+                                                activeBookingId > 0 ? View.VISIBLE : View.GONE
+                                        );
+                                    }
                                     if (rentAmountView != null && !newRentText.equals(cachedRentText)) {
                                         rentAmountView.setText(newRentText);
                                         cachedRentText = newRentText;
@@ -346,8 +355,25 @@ public class HomeActivity extends AppCompatActivity {
                                         btnPayNow.setText(newPayBtnText);
                                         cachedPayButtonText = newPayBtnText;
                                     }
+                                    if (btnPayNow != null) {
+                                        btnPayNow.setEnabled(pricingReady && displayAmount > 0);
+                                    }
+                                });
+                            } else {
+                                runOnUiThread(() -> {
+                                    activeMaintenanceBookingId = 0;
+                                    if (maintenanceButton != null) {
+                                        maintenanceButton.setVisibility(View.GONE);
+                                    }
                                 });
                             }
+                        } else {
+                            runOnUiThread(() -> {
+                                activeMaintenanceBookingId = 0;
+                                if (maintenanceButton != null) {
+                                    maintenanceButton.setVisibility(View.GONE);
+                                }
+                            });
                         }
                     }
                 } catch (Exception ignored) {}
@@ -506,6 +532,8 @@ public class HomeActivity extends AppCompatActivity {
         setupListingCards();
 
         setupPaymentButton();
+
+        setupMaintenanceRequestButton();
 
         setupHistory();
 
@@ -675,7 +703,7 @@ public class HomeActivity extends AppCompatActivity {
 
                             String pPath = getFirstPhotoPath(h);
                             if (img1 != null && !pPath.isEmpty()) {
-                                String imgUrl = "http://10.242.38.109/Dormigo_Backend/" + pPath;
+                                String imgUrl = "http://10.32.189.109/Dormigo_Backend/" + pPath;
                                 Glide.with(this)
                                         .load(imgUrl)
                                         .placeholder(R.drawable.bg_image_placeholder)
@@ -719,7 +747,7 @@ public class HomeActivity extends AppCompatActivity {
 
                             String pPath = getFirstPhotoPath(h);
                             if (img2 != null && !pPath.isEmpty()) {
-                                String imgUrl = "http://10.242.38.109/Dormigo_Backend/" + pPath;
+                                String imgUrl = "http://10.32.189.109/Dormigo_Backend/" + pPath;
                                 Glide.with(this)
                                         .load(imgUrl)
                                         .placeholder(R.drawable.bg_image_placeholder)
@@ -763,7 +791,7 @@ public class HomeActivity extends AppCompatActivity {
 
                             String pPath = getFirstPhotoPath(h);
                             if (img3 != null && !pPath.isEmpty()) {
-                                String imgUrl = "http://10.242.38.109/Dormigo_Backend/" + pPath;
+                                String imgUrl = "http://10.32.189.109/Dormigo_Backend/" + pPath;
                                 Glide.with(this)
                                         .load(imgUrl)
                                         .placeholder(R.drawable.bg_image_placeholder)
@@ -807,7 +835,7 @@ public class HomeActivity extends AppCompatActivity {
 
                             String pPath = getFirstPhotoPath(h);
                             if (img4 != null && !pPath.isEmpty()) {
-                                String imgUrl = "http://10.242.38.109/Dormigo_Backend/" + pPath;
+                                String imgUrl = "http://10.32.189.109/Dormigo_Backend/" + pPath;
                                 Glide.with(this)
                                         .load(imgUrl)
                                         .placeholder(R.drawable.bg_image_placeholder)
@@ -881,6 +909,31 @@ public class HomeActivity extends AppCompatActivity {
                         btnPayNow
                 )
         );
+    }
+
+    private void setupMaintenanceRequestButton() {
+        TextView button = findViewById(R.id.btnMaintenanceRequest);
+        if (button == null) {
+            return;
+        }
+
+        button.setVisibility(View.GONE);
+        button.setOnClickListener(v -> {
+            if (activeMaintenanceBookingId <= 0) {
+                button.setVisibility(View.GONE);
+                return;
+            }
+
+            Intent intent = new Intent(
+                    HomeActivity.this,
+                    StudentMaintenanceRequestsActivity.class
+            );
+            intent.putExtra(
+                    StudentMaintenanceRequestsActivity.EXTRA_BOOKING_ID,
+                    activeMaintenanceBookingId
+            );
+            startActivity(intent);
+        });
     }
 
     // =========================================================

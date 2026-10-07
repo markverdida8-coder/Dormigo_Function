@@ -39,6 +39,15 @@ public class NotificationStyleManager {
             );
         }
 
+        // MAINTENANCE (Blue)
+        if (title.contains("MAINTENANCE") || message.contains("MAINTENANCE")) {
+            return new NotificationStyle(
+                    R.drawable.bg_circle_blue,
+                    R.drawable.ic_bell,
+                    Color.parseColor("#0D6EFD")
+            );
+        }
+
         // 1. REJECTED / DECLINED / CANCELLED / FAILED (Red)
         if (title.contains("REJECT") || title.contains("DECLIN") || title.contains("CANCEL") || title.contains("FAIL")
                 || message.contains("REJECT") || message.contains("DECLIN") || message.contains("CANCEL") || message.contains("FAIL")) {

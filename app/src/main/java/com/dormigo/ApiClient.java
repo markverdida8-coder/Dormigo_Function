@@ -36,7 +36,7 @@ public class ApiClient {
     // Phone and PC must be connected to the same Wi-Fi/network.
 
     private static final String BASE_URL =
-            "http://10.242.38.109/Dormigo_Backend/api/";
+            "http://10.32.189.109/Dormigo_Backend/api/";
 
 
     private static final MediaType JSON =
@@ -489,6 +489,19 @@ public class ApiClient {
             String status,
             Callback callback
     ) {
+        createRoom(houseId, roomNumber, roomType, capacity, monthlyRent, status, "MONTH_TO_MONTH", callback);
+    }
+
+    public void createRoom(
+            int houseId,
+            String roomNumber,
+            String roomType,
+            int capacity,
+            double monthlyRent,
+            String status,
+            String rentalType,
+            Callback callback
+    ) {
 
         try {
 
@@ -523,6 +536,11 @@ public class ApiClient {
             json.put(
                     "status",
                     status
+            );
+
+            json.put(
+                    "rental_type",
+                    rentalType != null ? rentalType : "MONTH_TO_MONTH"
             );
 
             RequestBody body =
@@ -562,6 +580,19 @@ public class ApiClient {
             String status,
             Callback callback
     ) {
+        updateRoom(roomId, roomNumber, roomType, capacity, monthlyRent, status, "MONTH_TO_MONTH", callback);
+    }
+
+    public void updateRoom(
+            int roomId,
+            String roomNumber,
+            String roomType,
+            int capacity,
+            double monthlyRent,
+            String status,
+            String rentalType,
+            Callback callback
+    ) {
 
         try {
 
@@ -596,6 +627,11 @@ public class ApiClient {
             json.put(
                     "status",
                     status
+            );
+
+            json.put(
+                    "rental_type",
+                    rentalType != null ? rentalType : "MONTH_TO_MONTH"
             );
 
             RequestBody body =
@@ -853,6 +889,46 @@ public class ApiClient {
                 .enqueue(callback);
     }
 
+    public void getMaintenanceRequests(
+            Callback callback
+    ) {
+        Request request =
+                new Request.Builder()
+                        .url(BASE_URL + "maintenance_requests.php")
+                        .get()
+                        .build();
+
+        client.newCall(request)
+                .enqueue(callback);
+    }
+
+    public void createMaintenanceRequest(
+            int bookingId,
+            String category,
+            String description,
+            Callback callback
+    ) {
+        String json = "{\"booking_id\":" + bookingId
+                + ",\"category\":" + JSONObject.quote(category)
+                + ",\"description\":" + JSONObject.quote(description)
+                + "}";
+
+        RequestBody body =
+                RequestBody.create(
+                        json,
+                        JSON
+                );
+
+        Request request =
+                new Request.Builder()
+                        .url(BASE_URL + "maintenance_requests.php")
+                        .post(body)
+                        .build();
+
+        client.newCall(request)
+                .enqueue(callback);
+    }
+
     public void getBookingsForLandlord(
             int landlordId,
             Callback callback
@@ -943,6 +1019,26 @@ public class ApiClient {
 
         } catch (Exception e) {
 
+            e.printStackTrace();
+        }
+    }
+
+    public void confirmMoveIn(
+            int bookingId,
+            Callback callback
+    ) {
+        try {
+            JSONObject json = new JSONObject();
+            json.put("booking_id", bookingId);
+
+            RequestBody body = RequestBody.create(json.toString(), JSON);
+            Request request = new Request.Builder()
+                    .url(BASE_URL + "confirm_move_in.php")
+                    .post(body)
+                    .build();
+
+            client.newCall(request).enqueue(callback);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -1430,6 +1526,30 @@ public class ApiClient {
         String url = BASE_URL + "reviews.php?user_id=" + userId;
         Request request = new Request.Builder().url(url).get().build();
         client.newCall(request).enqueue(callback);
+    }
+
+    public void reportReview(
+            int reviewId,
+            String reason,
+            String description,
+            Callback callback
+    ) {
+        try {
+            JSONObject json = new JSONObject();
+            json.put("review_id", reviewId);
+            json.put("reason", reason);
+            json.put("description", description != null ? description : "");
+
+            RequestBody body = RequestBody.create(json.toString(), JSON);
+            Request request = new Request.Builder()
+                    .url(BASE_URL + "report_review.php")
+                    .post(body)
+                    .build();
+
+            client.newCall(request).enqueue(callback);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     // =========================================================
@@ -2033,6 +2153,33 @@ public class ApiClient {
                     .url(BASE_URL + "notifications.php")
                     .patch(body)
                     .build();
+            client.newCall(request).enqueue(callback);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void getLandlordMaintenanceRequests(Callback callback) {
+        String url = BASE_URL + "landlord_maintenance_requests.php";
+        Request request = new Request.Builder().url(url).get().build();
+        client.newCall(request).enqueue(callback);
+    }
+
+    public void updateLandlordMaintenanceRequestStatus(int requestId, String status, String resolutionNotes, Callback callback) {
+        try {
+            JSONObject json = new JSONObject();
+            json.put("request_id", requestId);
+            json.put("status", status);
+            if (resolutionNotes != null) {
+                json.put("resolution_notes", resolutionNotes);
+            }
+
+            RequestBody body = RequestBody.create(json.toString(), JSON);
+            Request request = new Request.Builder()
+                    .url(BASE_URL + "landlord_maintenance_requests.php")
+                    .patch(body)
+                    .build();
+
             client.newCall(request).enqueue(callback);
         } catch (Exception e) {
             e.printStackTrace();

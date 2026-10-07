@@ -235,6 +235,9 @@ public class CreateAccountActivity extends AppCompatActivity {
                 );
 
         schoolCampusInput.setAdapter(adapter);
+        schoolCampusInput.setOnClickListener(v -> schoolCampusInput.showDropDown());
+        schoolCampusInput.setFocusable(false);
+        schoolCampusInput.setCursorVisible(false);
 
         // Upload Dropzone Logic
         LinearLayout uploadDropzone = findViewById(R.id.uploadDropzone);
@@ -737,7 +740,8 @@ public class CreateAccountActivity extends AppCompatActivity {
         if (visible) {
 
             editText.setInputType(
-                    InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                    InputType.TYPE_CLASS_TEXT
+                            | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
             );
 
             imageView.setImageResource(

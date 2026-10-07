@@ -86,10 +86,10 @@ public class AccountDetailsActivity extends AppCompatActivity {
 
     private void confirmDeleteAccount() {
         new AlertDialog.Builder(this)
-                .setTitle("Delete Account")
-                .setMessage("Are you sure you want to delete your account? This action cannot be undone and will remove all your data.")
+                .setTitle("Deactivate Account")
+                .setMessage("Are you sure you want to deactivate your account? Your account will be deactivated and historical rental records will be preserved.")
                 .setNegativeButton("Cancel", null)
-                .setPositiveButton("Delete", (dialog, which) -> executeDeleteAccount())
+                .setPositiveButton("Deactivate", (dialog, which) -> executeDeleteAccount())
                 .show();
     }
 
@@ -104,7 +104,7 @@ public class AccountDetailsActivity extends AppCompatActivity {
         apiClient.deleteUser(userId, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                runOnUiThread(() -> Toast.makeText(AccountDetailsActivity.this, "Failed to delete account.", Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(AccountDetailsActivity.this, "Failed to deactivate account.", Toast.LENGTH_SHORT).show());
             }
 
             @Override
@@ -118,16 +118,16 @@ public class AccountDetailsActivity extends AppCompatActivity {
                             editor.clear();
                             editor.apply();
 
-                            Toast.makeText(AccountDetailsActivity.this, "Account deleted successfully.", Toast.LENGTH_LONG).show();
+                            Toast.makeText(AccountDetailsActivity.this, "Account deactivated successfully.", Toast.LENGTH_LONG).show();
                             Intent intent = new Intent(AccountDetailsActivity.this, LoginActivity.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(intent);
                             finish();
                         } else {
-                            Toast.makeText(AccountDetailsActivity.this, json.optString("message", "Failed to delete account."), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(AccountDetailsActivity.this, json.optString("message", "Failed to deactivate account."), Toast.LENGTH_SHORT).show();
                         }
                     } catch (Exception e) {
-                        Toast.makeText(AccountDetailsActivity.this, "Error deleting account.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(AccountDetailsActivity.this, "Error deactivating account.", Toast.LENGTH_SHORT).show();
                     }
                 });
             }

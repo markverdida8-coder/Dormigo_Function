@@ -258,27 +258,23 @@ public class PaymentActivity extends AppCompatActivity {
                                 bookingStatus = data.optString("status", "").trim().toUpperCase(Locale.ROOT);
                                 monthlyRent = data.optDouble("agreed_monthly_rent", 0);
                                 initialPaymentCompleted = data.optBoolean("initial_payment_completed", false);
-                                advanceMonths = data.optInt("advance_months", 1);
-                                depositMonths = data.optInt("deposit_months", 1);
-                                utilityDeposit = data.optDouble("utility_deposit", 0);
-                                otherFees = data.optDouble("other_fees", 0);
-
-                                double monthlyRecurringFees = data.optDouble("monthly_recurring_fees", 0);
-                                double utilitiesFixed = data.optDouble("utilities_fixed", 0);
-
-                                if (!initialPaymentCompleted) {
-                                    double advAmt = monthlyRent * advanceMonths;
-                                    double depAmt = monthlyRent * depositMonths;
-                                    totalDueAmount = monthlyRent + advAmt + depAmt + utilityDeposit + otherFees;
-                                } else {
-                                    totalDueAmount = monthlyRent + monthlyRecurringFees + utilitiesFixed;
+                                boolean pricingReady = "CAPTURED_VERIFIED".equals(
+                                        data.optString("pricing_snapshot_status", "")
+                                );
+                                if (!pricingReady) {
+                                    setPaymentButtonEnabled(false);
+                                    showToast("Pricing terms are awaiting verification.");
+                                    return;
                                 }
+                                totalDueAmount = initialPaymentCompleted
+                                        ? data.optDouble("monthly_payment_amount", 0)
+                                        : data.optDouble("initial_payment_amount", 0);
 
                                 houseId = data.optInt("house_id", 0);
                                 houseName = data.optString("house_name", "Boarding House");
                                 roomName = data.optString("room_number", "");
                                 refreshHousePaymentSettings();
-                                paymentDueDay = data.optInt("payment_due_day", 1);
+                                paymentDueDay = data.optInt("payment_due_day", 0);
                                 nextDueDate = data.optString("next_due_date", "");
 
                                 String paymentType = getIntent().getStringExtra("payment_type");
@@ -303,6 +299,11 @@ public class PaymentActivity extends AppCompatActivity {
                                 if (monthlyRent <= 0) {
                                     setPaymentButtonEnabled(false);
                                     showToast("Invalid booking amount.");
+                                    return;
+                                }
+                                if (totalDueAmount <= 0) {
+                                    setPaymentButtonEnabled(false);
+                                    showToast("The verified payment amount is unavailable.");
                                     return;
                                 }
 
@@ -372,7 +373,10 @@ public class PaymentActivity extends AppCompatActivity {
                                     if (nextDueDate != null && !nextDueDate.isEmpty() && !"null".equals(nextDueDate)) {
                                         dueDate = nextDueDate;
                                     } else {
-                                        dueDate = calculateDueDate(moveInDate, paymentPeriod);
+                                        dueDate = "";
+                                        setPaymentButtonEnabled(false);
+                                        showToast("The verified monthly due date is unavailable.");
+                                        return;
                                     }
                                 }
 
@@ -575,7 +579,7 @@ public class PaymentActivity extends AppCompatActivity {
 
         final String fullUrl;
         if (houseGcashQrCode != null && !houseGcashQrCode.trim().isEmpty() && !"null".equalsIgnoreCase(houseGcashQrCode.trim())) {
-            fullUrl = houseGcashQrCode.startsWith("http") ? houseGcashQrCode : "http://10.242.38.109/Dormigo_Backend/" + houseGcashQrCode;
+            fullUrl = houseGcashQrCode.startsWith("http") ? houseGcashQrCode : "http://10.32.189.109/Dormigo_Backend/" + houseGcashQrCode;
         } else {
             fullUrl = "";
         }
@@ -883,24 +887,7 @@ public class PaymentActivity extends AppCompatActivity {
     }
 
     private void navigateToSuccess(String amount, String paymentDesc) {
-        if (bookingId > 0) {
-            if (!initialPaymentCompleted) {
-                launchSuccessActivity(amount, paymentDesc, currentTransactionRef);
-            } else {
-                String currentDue = (nextDueDate != null && !nextDueDate.isEmpty() && !"null".equals(nextDueDate)) ? nextDueDate : dueDate;
-                String updatedDue = addOneMonthToDate(currentDue);
-                apiClient.updateBookingNextDueDate(bookingId, updatedDue, new Callback() {
-                    @Override public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                        launchSuccessActivity(amount, paymentDesc, currentTransactionRef);
-                    }
-                    @Override public void onResponse(@NonNull Call call, @NonNull Response response) {
-                        launchSuccessActivity(amount, paymentDesc, currentTransactionRef);
-                    }
-                });
-            }
-        } else {
-            launchSuccessActivity(amount, paymentDesc, currentTransactionRef);
-        }
+        launchSuccessActivity(amount, paymentDesc, currentTransactionRef);
     }
 
     private void launchSuccessActivity(String amount, String paymentDesc, String transactionRef) {
