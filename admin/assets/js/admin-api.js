@@ -7,7 +7,12 @@
 const AdminAPI = (() => {
   const getBasePath = () => {
     const path = window.location.pathname;
+    const adminIndex = path.indexOf('/admin');
+    if (adminIndex !== -1) {
+      return path.substring(0, adminIndex);
+    }
     if (path.includes('/Dormigo_Functional')) return '/Dormigo_Functional';
+    if (path.includes('/Dormigo_Function-WEB-ADMIN')) return '/Dormigo_Function-WEB-ADMIN';
     return '';
   };
 
