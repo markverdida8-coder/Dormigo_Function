@@ -474,6 +474,7 @@
                     android:id="@+id/signInLink"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
                     android:clickable="true"
                     android:focusable="true"
                     android:text="@string/sign_in"
@@ -491,6 +492,12 @@
         android:layout_height="wrap_content" />
 
     <androidx.constraintlayout.widget.Guideline android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <androidx.constraintlayout.widget.Barrier android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <androidx.constraintlayout.widget.Barrier android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

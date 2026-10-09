@@ -29,6 +29,16 @@ public class NotificationStyleManager {
         String title = notification.optString("title", "").toUpperCase(Locale.ROOT);
         String message = notification.optString("message", "").toUpperCase(Locale.ROOT);
 
+        // 0. RENTAL_CHARGE_UPDATED / PRICE CHANGE (Teal)
+        if ("RENTAL_UPDATE".equals(type) || "RENTAL_CHARGE_UPDATED".equals(type)
+                || title.contains("RENTAL") || title.contains("CHARGE") || title.contains("PRICE")) {
+            return new NotificationStyle(
+                    R.drawable.bg_circle_green_light,
+                    R.drawable.ic_receipt,
+                    Color.parseColor("#00897B")
+            );
+        }
+
         // 1. REJECTED / DECLINED / CANCELLED / FAILED (Red)
         if (title.contains("REJECT") || title.contains("DECLIN") || title.contains("CANCEL") || title.contains("FAIL")
                 || message.contains("REJECT") || message.contains("DECLIN") || message.contains("CANCEL") || message.contains("FAIL")) {
