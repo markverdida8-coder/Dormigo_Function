@@ -614,7 +614,7 @@ public class AddBoardingHouseActivity extends AppCompatActivity {
         }
         findViewById(R.id.btnBack).setEnabled(false);
 
-        String url = "http://10.209.52.109/Dormigo_Backend/api/get_landlord_account_verification_status.php?landlord_id=" + landlordId;
+        String url = "http://172.20.10.3/Dormigo_Backend/api/get_landlord_account_verification_status.php?landlord_id=" + landlordId;
         Request request = new Request.Builder().url(url).get().build();
         new OkHttpClient().newCall(request).enqueue(new Callback() {
             @Override

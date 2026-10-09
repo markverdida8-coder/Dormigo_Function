@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Booking Requests - DORMIGO Landlord</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+</head>
+<body>
+
+  <div class="dashboard-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="../index.html" class="sidebar-brand">
+          <img src="../assets/img/logo.svg" alt="Dormigo" width="34" height="34">
+          <span>DORMIGO</span>
+        </a>
+        <button class="sidebar-close" onclick="toggleSidebar()">&times;</button>
+      </div>
+
+      <div class="sidebar-content">
+        <div class="nav-section-title">Main Portal</div>
+        <a href="dashboard.html" class="sidebar-link"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+        <a href="properties.html" class="sidebar-link"><i class="fa-solid fa-building"></i> Properties</a>
+        <a href="rooms.html" class="sidebar-link"><i class="fa-solid fa-door-closed"></i> Rooms</a>
+
+        <div class="nav-section-title">Operations</div>
+        <a href="bookings.html" class="sidebar-link active"><i class="fa-solid fa-clipboard-list"></i> Booking Requests</a>
+        <a href="tenants.html" class="sidebar-link"><i class="fa-solid fa-users"></i> Tenants</a>
+        <a href="payments.html" class="sidebar-link"><i class="fa-solid fa-money-bill-wave"></i> Payments</a>
+
+        <div class="nav-section-title">Communication</div>
+        <a href="messages.html" class="sidebar-link"><i class="fa-solid fa-comments"></i> Messages</a>
+        <a href="reviews.html" class="sidebar-link"><i class="fa-solid fa-star"></i> Reviews</a>
+        <a href="notifications.html" class="sidebar-link"><i class="fa-solid fa-bell"></i> Notifications</a>
+        <a href="profile.html" class="sidebar-link"><i class="fa-solid fa-user-tie"></i> Profile</a>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="user-avatar"><i class="fa-solid fa-house-user"></i></div>
+        <div class="user-info">
+          <div class="user-name" id="sidebar-user-name">Landlord</div>
+          <div class="user-role-badge">Property Owner</div>
+        </div>
+        <button class="logout-btn" onclick="Auth.logout()"><i class="fa-solid fa-right-from-bracket"></i></button>
+      </div>
+    </aside>
+
+    <div class="main-wrapper">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+          <h2 class="page-title">Booking Applications</h2>
+        </div>
+      </header>
+
+      <main class="dashboard-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h1 style="font-size: 1.75rem; margin-bottom: 0.25rem;">Student Booking Requests</h1>
+            <p>Review student applications, verify move-in dates, approve leases, or decline requests.</p>
+          </div>
+
+          <!-- STATUS FILTER TABS -->
+          <div style="display: flex; gap: 0.5rem; background: white; padding: 0.35rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+            <button class="btn btn-sm filter-tab active" onclick="setBookingFilter('ALL', this)">All</button>
+            <button class="btn btn-sm filter-tab" onclick="setBookingFilter('PENDING', this)">Pending Review</button>
+            <button class="btn btn-sm filter-tab" onclick="setBookingFilter('APPROVED', this)">Approved</button>
+            <button class="btn btn-sm filter-tab" onclick="setBookingFilter('DECLINED', this)">Declined</button>
+          </div>
+        </div>
+
+        <div id="booking-requests-container" style="display: flex; flex-direction: column; gap: 1.25rem;">
+          <div style="text-align: center; padding: 3rem; color: var(--text-muted);">
+            <i class="fa-solid fa-spinner fa-spin fa-2x" style="color: var(--primary);"></i>
+            <p style="margin-top: 0.5rem;">Loading booking requests...</p>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script>
+    const currentUser = Auth.requireAuth(['LANDLORD']);
+    let allBookings = [];
+    let currentFilter = 'ALL';
+
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('show');
+    }
+
+    async function loadLandlordBookings() {
+      if (!currentUser) return;
+      document.getElementById('sidebar-user-name').textContent = currentUser.full_name;
+
+      const container = document.getElementById('booking-requests-container');
+      try {
+        const res = await API.getBookings({ landlord_id: currentUser.user_id });
+        if (res.success && res.data) {
+          allBookings = res.data;
+          renderBookings();
+        } else {
+          container.innerHTML = `<div class="table-card p-4 text-center">No booking requests found.</div>`;
+        }
+      } catch (err) {
+        console.error('Error fetching bookings:', err);
+        container.innerHTML = `<div class="table-card p-4 text-center text-danger">Failed to load booking requests.</div>`;
+      }
+    }
+
+    function setBookingFilter(filter, btn) {
+      currentFilter = filter;
+      document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active', 'btn-primary'));
+      btn.classList.add('active', 'btn-primary');
+      renderBookings();
+    }
+
+    function renderBookings() {
+      const container = document.getElementById('booking-requests-container');
+      const filtered = allBookings.filter(b => {
+        if (currentFilter === 'ALL') return true;
+        return (b.status || '').toUpperCase() === currentFilter;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="table-card" style="padding: 3.5rem; text-align: center;">
+            <i class="fa-solid fa-clipboard-check fa-3x" style="color: var(--text-light); margin-bottom: 1rem;"></i>
+            <h3>No Requests in this Category</h3>
+            <p>There are no bookings matching the "${currentFilter}" filter.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map(b => {
+        const isPending = (b.status || '').toUpperCase() === 'PENDING';
+        const rent = parseFloat(b.agreed_monthly_rent || 0);
+        const total = parseFloat(b.agreed_total_amount || 0);
+
+        return `
+          <div class="table-card" style="padding: 1.75rem;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1.25rem;">
+              <div>
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.35rem;">
+                  <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-light);">APPLICATION #${b.booking_id}</span>
+                  ${App.statusBadge(b.status)}
+                </div>
+                <h3 style="font-size: 1.35rem; margin-bottom: 0.25rem;">
+                  ${App.escapeHtml(b.full_name)}
+                </h3>
+                <div style="display: flex; gap: 1.25rem; font-size: 0.875rem; color: var(--text-muted); flex-wrap: wrap;">
+                  <span><i class="fa-solid fa-envelope me-1"></i> ${App.escapeHtml(b.email)}</span>
+                  <span><i class="fa-solid fa-phone me-1"></i> ${App.escapeHtml(b.phone || 'No phone provided')}</span>
+                </div>
+              </div>
+
+              <div style="text-align: right;">
+                <div style="font-size: 1.5rem; font-weight: 800; color: var(--primary);">
+                  ${App.formatCurrency(rent)} <span style="font-size: 0.8rem; font-weight: 500; color: var(--text-muted);">/ month</span>
+                </div>
+                <div style="font-size: 0.85rem; color: var(--text-muted);">
+                  Total Agreement: <strong>${App.formatCurrency(total)}</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- PROPERTY & STAY DETAILS -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; background: var(--bg-muted); padding: 1rem 1.25rem; border-radius: var(--radius-md); margin-bottom: 1.25rem;">
+              <div>
+                <span style="font-size: 0.75rem; color: var(--text-light); text-transform: uppercase; font-weight: 700; display: block;">Boarding House</span>
+                <strong style="font-size: 0.95rem; color: var(--text-main);">${App.escapeHtml(b.house_name)}</strong>
+              </div>
+              <div>
+                <span style="font-size: 0.75rem; color: var(--text-light); text-transform: uppercase; font-weight: 700; display: block;">Assigned Room</span>
+                <strong style="font-size: 0.95rem; color: var(--text-main);">${App.escapeHtml(b.room_number)} (${App.escapeHtml(b.room_type || 'Solo')})</strong>
+              </div>
+              <div>
+                <span style="font-size: 0.75rem; color: var(--text-light); text-transform: uppercase; font-weight: 700; display: block;">Move-in Date</span>
+                <strong style="font-size: 0.95rem; color: var(--text-main);"><i class="fa-solid fa-calendar me-1"></i> ${App.formatDate(b.move_in_date)}</strong>
+              </div>
+              <div>
+                <span style="font-size: 0.75rem; color: var(--text-light); text-transform: uppercase; font-weight: 700; display: block;">Stay Duration</span>
+                <strong style="font-size: 0.95rem; color: var(--text-main);">${b.duration_months} Months</strong>
+              </div>
+            </div>
+
+            <!-- STUDENT NOTE -->
+            ${b.message_to_landlord ? `
+              <div style="font-size: 0.875rem; color: var(--text-main); background: white; border: 1px solid var(--border-color); padding: 0.85rem 1.1rem; border-radius: var(--radius-sm); margin-bottom: 1.25rem;">
+                <span style="font-weight: 700; color: var(--primary);">Student's Note:</span> "${App.escapeHtml(b.message_to_landlord)}"
+              </div>
+            ` : ''}
+
+            <!-- ACTION BUTTONS -->
+            <div style="display: flex; justify-content: flex-end; gap: 0.75rem; align-items: center; border-top: 1px solid var(--border-subtle); padding-top: 1rem;">
+              ${isPending ? `
+                <button class="btn btn-sm btn-outline-danger" onclick="updateStatus(${b.booking_id}, 'DECLINED')">
+                  <i class="fa-solid fa-xmark"></i> Decline
+                </button>
+                <button class="btn btn-sm btn-primary" onclick="updateStatus(${b.booking_id}, 'APPROVED')">
+                  <i class="fa-solid fa-check"></i> Approve Application
+                </button>
+              ` : `
+                <span style="font-size: 0.85rem; color: var(--text-light); margin-right: auto;">Application status: <strong>${b.status}</strong></span>
+              `}
+
+              <a href="messages.html?partner_id=${b.user_id}" class="btn btn-sm btn-outline-primary">
+                <i class="fa-solid fa-comment-dots"></i> Message Student
+              </a>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function updateStatus(bookingId, newStatus) {
+      const verb = newStatus === 'APPROVED' ? 'approve' : 'decline';
+      if (!confirm(`Are you sure you want to ${verb} this booking request?`)) return;
+
+      try {
+        const res = await API.updateBookingStatus(bookingId, newStatus);
+        if (res.success) {
+          App.toast(`Booking ${newStatus.toLowerCase()} successfully! Notification sent to student.`, 'success');
+          // Refresh data immediately as required
+          await loadLandlordBookings();
+        } else {
+          App.toast(res.message || 'Failed to update booking status.', 'error');
+        }
+      } catch (err) {
+        console.error('Error updating booking status:', err);
+        App.toast('Error updating booking status.', 'error');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadLandlordBookings);
+  </script>
+</body>
+</html>

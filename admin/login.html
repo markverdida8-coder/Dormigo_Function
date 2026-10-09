@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login - DORMIGO Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="assets/css/admin.css">
+</head>
+<body class="adm-login-page">
+
+  <div class="adm-login-card">
+    <div class="adm-login-logo">
+      <div class="adm-login-logo-icon">
+        <i class="fa-solid fa-house-lock"></i>
+      </div>
+      <div class="adm-login-logo-text">
+        DORMIGO
+        <small>Administration Portal</small>
+      </div>
+    </div>
+
+    <h1 class="adm-login-heading">Admin Sign In</h1>
+    <p class="adm-login-sub">Restricted access for authorized Dormigo system administrators only.</p>
+
+    <!-- Error Alert -->
+    <div id="login-error" style="display: none; background: #FEE2E2; color: #DC2626; border: 1px solid #FECACA; padding: 0.75rem 1rem; border-radius: 10px; font-size: 0.875rem; margin-bottom: 1.25rem; align-items: center; gap: 0.5rem;">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <span id="login-error-text">Invalid email or password.</span>
+    </div>
+
+    <form id="admin-login-form" autocomplete="off">
+      <div class="adm-form-group">
+        <label class="adm-form-label" for="admin-email">Administrator Email</label>
+        <div style="position: relative;">
+          <input 
+            type="email" 
+            id="admin-email" 
+            class="adm-form-control" 
+            placeholder="admin@dormigo.com" 
+            required 
+            style="padding-left: 2.6rem;">
+          <i class="fa-solid fa-envelope" style="position: absolute; left: 0.95rem; top: 50%; transform: translateY(-50%); color: var(--adm-text-light); font-size: 0.95rem;"></i>
+        </div>
+      </div>
+
+      <div class="adm-form-group">
+        <label class="adm-form-label" for="admin-password">Password</label>
+        <div class="adm-password-wrap">
+          <input 
+            type="password" 
+            id="admin-password" 
+            class="adm-form-control" 
+            placeholder="Enter admin password" 
+            required 
+            style="padding-left: 2.6rem;">
+          <i class="fa-solid fa-lock" style="position: absolute; left: 0.95rem; top: 50%; transform: translateY(-50%); color: var(--adm-text-light); font-size: 0.95rem;"></i>
+          <button type="button" class="adm-pw-toggle" id="toggle-pw" title="Show/Hide Password">
+            <i class="fa-solid fa-eye" id="toggle-pw-icon"></i>
+          </button>
+        </div>
+      </div>
+
+      <button type="submit" class="adm-btn adm-btn-primary adm-btn-block adm-btn-lg" id="btn-submit" style="margin-top: 1.5rem;">
+        <span id="btn-submit-text"><i class="fa-solid fa-right-to-bracket me-1"></i> Sign In to Portal</span>
+        <span id="btn-submit-spinner" style="display: none;"><i class="fa-solid fa-spinner fa-spin me-1"></i> Authenticating...</span>
+      </button>
+    </form>
+
+    <div class="adm-login-footer">
+      <p style="margin: 0; color: var(--adm-text-muted); font-size: 0.8rem;">
+        <i class="fa-solid fa-shield-halved" style="color: var(--adm-primary); margin-right: 4px;"></i>
+        Protected by Dormigo Server Session Security
+      </p>
+    </div>
+  </div>
+
+  <script src="assets/js/admin-api.js"></script>
+  <script src="assets/js/admin-auth.js"></script>
+  <script src="assets/js/admin-app.js"></script>
+  <script>
+    // Redirect if already logged in as admin
+    document.addEventListener('DOMContentLoaded', async () => {
+      await AdminAuth.redirectIfLoggedIn();
+
+      // Password toggle
+      const pwInput = document.getElementById('admin-password');
+      const toggleBtn = document.getElementById('toggle-pw');
+      const toggleIcon = document.getElementById('toggle-pw-icon');
+
+      toggleBtn.addEventListener('click', () => {
+        const isPassword = pwInput.type === 'password';
+        pwInput.type = isPassword ? 'text' : 'password';
+        toggleIcon.className = isPassword ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye';
+      });
+
+      // Handle login submit
+      const form = document.getElementById('admin-login-form');
+      const errorDiv = document.getElementById('login-error');
+      const errorText = document.getElementById('login-error-text');
+      const btnSubmit = document.getElementById('btn-submit');
+      const btnText = document.getElementById('btn-submit-text');
+      const btnSpinner = document.getElementById('btn-submit-spinner');
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        errorDiv.style.display = 'none';
+
+        const email = document.getElementById('admin-email').value.trim();
+        const password = document.getElementById('admin-password').value;
+
+        if (!email || !password) return;
+
+        btnSubmit.disabled = true;
+        btnText.style.display = 'none';
+        btnSpinner.style.display = 'inline-block';
+
+        try {
+          const res = await AdminAuth.login(email, password);
+
+          if (res.success && res.user) {
+            // Confirm admin role
+            if (res.user.user_type && res.user.user_type.toUpperCase() === 'ADMIN') {
+              window.location.href = 'dashboard.html';
+              return;
+            } else {
+              errorText.textContent = 'Access restricted: Only Administrators are permitted to enter this portal.';
+              errorDiv.style.display = 'flex';
+              await AdminAPI.adminLogout();
+            }
+          } else {
+            errorText.textContent = res.message || 'Invalid email or password.';
+            errorDiv.style.display = 'flex';
+          }
+        } catch (err) {
+          console.error('Login error:', err);
+          errorText.textContent = err.message || 'Network error occurred. Please try again.';
+          errorDiv.style.display = 'flex';
+        } finally {
+          btnSubmit.disabled = false;
+          btnText.style.display = 'inline-block';
+          btnSpinner.style.display = 'none';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

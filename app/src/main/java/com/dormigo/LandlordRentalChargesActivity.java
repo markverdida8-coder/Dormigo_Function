@@ -134,7 +134,7 @@ public class LandlordRentalChargesActivity extends AppCompatActivity {
 
     private void loadRooms() {
         if (houseId <= 0) return;
-        String url = "http://10.209.52.109/Dormigo_Backend/api/rooms.php?house_id=" + houseId;
+        String url = "http://172.20.10.3/Dormigo_Backend/api/rooms.php?house_id=" + houseId;
         Request request = new Request.Builder().url(url).get().build();
         new OkHttpClient().newCall(request).enqueue(new Callback() {
             @Override public void onFailure(@NonNull Call call, @NonNull IOException e) {}
@@ -153,7 +153,7 @@ public class LandlordRentalChargesActivity extends AppCompatActivity {
     private void loadCharges() {
         if (houseId <= 0) return;
         loadRooms();
-        String url = "http://10.209.52.109/Dormigo_Backend/api/property_charges.php?house_id=" + houseId;
+        String url = "http://172.20.10.3/Dormigo_Backend/api/property_charges.php?house_id=" + houseId;
         Request request = new Request.Builder().url(url).get().build();
         new OkHttpClient().newCall(request).enqueue(new Callback() {
             @Override
@@ -895,7 +895,7 @@ public class LandlordRentalChargesActivity extends AppCompatActivity {
     private void sendPostCharge(JSONObject payload) {
         RequestBody body = RequestBody.create(payload.toString(), MediaType.get("application/json; charset=utf-8"));
         Request request = new Request.Builder()
-                .url("http://10.209.52.109/Dormigo_Backend/api/property_charges.php")
+                .url("http://172.20.10.3/Dormigo_Backend/api/property_charges.php")
                 .post(body)
                 .build();
 
@@ -921,7 +921,7 @@ public class LandlordRentalChargesActivity extends AppCompatActivity {
 
             RequestBody body = RequestBody.create(payload.toString(), MediaType.get("application/json; charset=utf-8"));
             Request request = new Request.Builder()
-                    .url("http://10.209.52.109/Dormigo_Backend/api/property_charges.php")
+                    .url("http://172.20.10.3/Dormigo_Backend/api/property_charges.php")
                     .delete(body)
                     .build();
 

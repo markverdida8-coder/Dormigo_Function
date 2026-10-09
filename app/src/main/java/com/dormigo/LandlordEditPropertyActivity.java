@@ -486,7 +486,7 @@ public class LandlordEditPropertyActivity
                                         for (int p = 0; p < photosArr.length(); p++) {
                                             String pPath = photosArr.optString(p, "");
                                             if (!pPath.isEmpty()) {
-                                                String fullUrl = pPath.startsWith("http") ? pPath : "http://10.209.52.109/Dormigo_Backend/" + pPath;
+                                                String fullUrl = pPath.startsWith("http") ? pPath : "http://172.20.10.3/Dormigo_Backend/" + pPath;
                                                 photoUris.add(Uri.parse(fullUrl));
                                             }
                                         }
@@ -1504,7 +1504,7 @@ public class LandlordEditPropertyActivity
 
             RequestBody body = RequestBody.create(json.toString(), MediaType.get("application/json; charset=utf-8"));
             Request request = new Request.Builder()
-                    .url("http://10.209.52.109/Dormigo_Backend/api/boarding_houses.php")
+                    .url("http://172.20.10.3/Dormigo_Backend/api/boarding_houses.php")
                     .delete(body)
                     .build();
 

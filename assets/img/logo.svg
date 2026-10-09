@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="40" height="40" fill="none">
+  <rect width="40" height="40" rx="10" fill="#1B5E4C"/>
+  <!-- House Roof -->
+  <path d="M20 9L9 18H12V30H28V18H31L20 9Z" fill="white"/>
+  <!-- Door -->
+  <path d="M17 22H23V30H17V22Z" fill="#1B5E4C"/>
+  <!-- Student Graduation Cap Accent inside roof -->
+  <polygon points="20,13 14,16 20,19 26,16" fill="#10B981"/>
+  <circle cx="26" cy="18" r="1" fill="#10B981"/>
+</svg>

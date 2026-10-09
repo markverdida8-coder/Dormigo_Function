@@ -1,6 +1,0 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/nav_landlord_home" android:icon="@drawable/ic_home" android:title="Home" />
-    <item android:id="@+id/nav_landlord_add_house" android:icon="@drawable/ic_add" android:title="@string/add_house" />
-    <item android:id="@+id/nav_landlord_chats" android:icon="@drawable/ic_nav_chat" android:title="Chats" />
-    <item android:id="@+id/nav_landlord_profile" android:icon="@drawable/ic_nav_person" android:title="Profile" />
-</menu>

@@ -6,7 +6,7 @@ $method = $_SERVER['REQUEST_METHOD'];
 if ($method === 'GET') {
     if (isset($_GET['user_id'])) {
         $userId = (int)$_GET['user_id'];
-        $stmt = $pdo->prepare("SELECT user_id, full_name, email, phone, user_type, profile_image FROM users WHERE user_id = :user_id");
+        $stmt = $pdo->prepare("SELECT user_id, full_name, email, phone, user_type, profile_image, created_at FROM users WHERE user_id = :user_id");
         $stmt->execute(['user_id' => $userId]);
         $user = $stmt->fetch();
         if ($user) {
@@ -15,7 +15,15 @@ if ($method === 'GET') {
             echo json_encode(["success" => false, "message" => "User not found."]);
         }
     } else {
-        $stmt = $pdo->query("SELECT user_id, full_name, email, phone, user_type, profile_image FROM users ORDER BY user_id DESC");
+        $sql = "SELECT user_id, full_name, email, phone, user_type, profile_image, created_at FROM users";
+        $params = [];
+        if (isset($_GET['user_type'])) {
+            $sql .= " WHERE user_type = :user_type::user_type_enum";
+            $params['user_type'] = strtoupper(trim($_GET['user_type']));
+        }
+        $sql .= " ORDER BY user_id DESC";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
         $users = $stmt->fetchAll();
         echo json_encode(["success" => true, "data" => $users]);
     }
@@ -40,6 +48,14 @@ if ($method === 'GET') {
     if (isset($data['phone'])) {
         $fields[] = "phone = :phone";
         $params['phone'] = trim($data['phone']);
+    }
+    if (isset($data['profile_image'])) {
+        $fields[] = "profile_image = :profile_image";
+        $params['profile_image'] = trim($data['profile_image']);
+    }
+    if (isset($data['password']) && !empty(trim($data['password']))) {
+        $fields[] = "password = :password";
+        $params['password'] = trim($data['password']); // Can be plain or hashed, consistent with login.php
     }
 
     if (empty($fields)) {

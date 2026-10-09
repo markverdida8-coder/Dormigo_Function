@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Boarding House - DORMIGO</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+  <style>
+    .form-card {
+      background: white;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-color);
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+    .form-section-header {
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .room-row-card {
+      background: var(--bg-muted);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+      position: relative;
+    }
+    .remove-room-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: none;
+      border: none;
+      color: var(--accent-red);
+      cursor: pointer;
+      font-size: 1.1rem;
+    }
+    .amenities-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 0.75rem;
+    }
+    .amenity-checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      background: var(--bg-muted);
+      padding: 0.6rem 0.85rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle);
+      transition: var(--transition);
+    }
+    .amenity-checkbox-label:hover {
+      border-color: var(--primary);
+      background: white;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="dashboard-layout">
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="../index.html" class="sidebar-brand">
+          <img src="../assets/img/logo.svg" alt="Dormigo" width="34" height="34">
+          <span>DORMIGO</span>
+        </a>
+        <button class="sidebar-close" onclick="toggleSidebar()">&times;</button>
+      </div>
+
+      <div class="sidebar-content">
+        <div class="nav-section-title">Main Portal</div>
+        <a href="dashboard.html" class="sidebar-link"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+        <a href="properties.html" class="sidebar-link active"><i class="fa-solid fa-building"></i> Properties</a>
+        <a href="rooms.html" class="sidebar-link"><i class="fa-solid fa-door-closed"></i> Rooms</a>
+
+        <div class="nav-section-title">Operations</div>
+        <a href="bookings.html" class="sidebar-link"><i class="fa-solid fa-clipboard-list"></i> Booking Requests</a>
+        <a href="tenants.html" class="sidebar-link"><i class="fa-solid fa-users"></i> Tenants</a>
+        <a href="payments.html" class="sidebar-link"><i class="fa-solid fa-money-bill-wave"></i> Payments</a>
+
+        <div class="nav-section-title">Communication</div>
+        <a href="messages.html" class="sidebar-link"><i class="fa-solid fa-comments"></i> Messages</a>
+        <a href="reviews.html" class="sidebar-link"><i class="fa-solid fa-star"></i> Reviews</a>
+        <a href="notifications.html" class="sidebar-link"><i class="fa-solid fa-bell"></i> Notifications</a>
+        <a href="profile.html" class="sidebar-link"><i class="fa-solid fa-user-tie"></i> Profile</a>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="user-avatar"><i class="fa-solid fa-house-user"></i></div>
+        <div class="user-info">
+          <div class="user-name" id="sidebar-user-name">Landlord</div>
+          <div class="user-role-badge">Property Owner</div>
+        </div>
+        <button class="logout-btn" onclick="Auth.logout()"><i class="fa-solid fa-right-from-bracket"></i></button>
+      </div>
+    </aside>
+
+    <div class="main-wrapper">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+          <h2 class="page-title">Add Boarding House</h2>
+        </div>
+        <div class="topbar-right">
+          <a href="properties.html" class="btn btn-sm btn-secondary">
+            <i class="fa-solid fa-arrow-left"></i> Back to Properties
+          </a>
+        </div>
+      </header>
+
+      <main class="dashboard-content" style="max-width: 900px; margin: 0 auto;">
+        <div style="margin-bottom: 2rem;">
+          <h1 style="font-size: 1.75rem; margin-bottom: 0.25rem;">List a New Boarding House</h1>
+          <p>Provide accurate details, student house rules, amenities, and available room inventory.</p>
+        </div>
+
+        <form id="add-property-form" onsubmit="handlePublishProperty(event)">
+          
+          <!-- 1. GENERAL INFORMATION -->
+          <div class="form-card">
+            <div class="form-section-header">
+              <h3 style="font-size: 1.2rem; color: var(--text-main);">
+                <i class="fa-solid fa-circle-info me-2" style="color: var(--primary);"></i> 1. Property Details
+              </h3>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="prop-name">Boarding House Name *</label>
+              <input type="text" id="prop-name" class="form-control" placeholder="e.g. Casa Amiga Boarding House" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="prop-address">Complete Address *</label>
+              <input type="text" id="prop-address" class="form-control" placeholder="Street, Barangay, City, landmarks near university..." required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="prop-description">Property Description *</label>
+              <textarea id="prop-description" class="form-control" rows="3" placeholder="Describe the ambiance, proximity to universities, security features, quiet environment for studying..." required></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="prop-rules">House Rules & Curfew *</label>
+              <textarea id="prop-rules" class="form-control" rows="3" placeholder="e.g. 1. Curfew at 10:00 PM&#10;2. Visitors allowed until 8:00 PM in common areas&#10;3. No smoking or pets" required></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="prop-status">Initial Status *</label>
+              <select id="prop-status" class="form-select" required>
+                <option value="ACTIVE" selected>ACTIVE (Visible to students immediately)</option>
+                <option value="INACTIVE">INACTIVE (Hidden / Under prep)</option>
+                <option value="PENDING">PENDING (Awaiting admin review)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- 2. PHOTOS -->
+          <div class="form-card">
+            <div class="form-section-header">
+              <h3 style="font-size: 1.2rem; color: var(--text-main);">
+                <i class="fa-solid fa-camera me-2" style="color: var(--primary);"></i> 2. Property Photos
+              </h3>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="prop-photos">Upload Photo Files</label>
+              <input type="file" id="prop-photos" class="form-control" accept="image/*" multiple>
+              <span style="font-size: 0.75rem; color: var(--text-muted);">Upload one or more photos of the facade, bedrooms, and common areas.</span>
+            </div>
+
+            <div class="form-group" style="margin-top: 1rem;">
+              <label class="form-label" for="prop-photo-url">Or Image URL (optional)</label>
+              <input type="url" id="prop-photo-url" class="form-control" placeholder="https://images.unsplash.com/...">
+            </div>
+          </div>
+
+          <!-- 3. AMENITIES -->
+          <div class="form-card">
+            <div class="form-section-header">
+              <h3 style="font-size: 1.2rem; color: var(--text-main);">
+                <i class="fa-solid fa-list-check me-2" style="color: var(--primary);"></i> 3. Student Amenities
+              </h3>
+            </div>
+
+            <div class="amenities-grid" id="amenities-checklist">
+              <span style="color: var(--text-muted); font-size: 0.85rem;">Loading amenities from database...</span>
+            </div>
+          </div>
+
+          <!-- 4. ROOMS -->
+          <div class="form-card">
+            <div class="form-section-header" style="display: flex; justify-content: space-between; align-items: center;">
+              <h3 style="font-size: 1.2rem; color: var(--text-main); margin: 0;">
+                <i class="fa-solid fa-door-open me-2" style="color: var(--primary);"></i> 4. Room Inventory
+              </h3>
+              <button type="button" class="btn btn-sm btn-outline-primary" onclick="addRoomRow()">
+                <i class="fa-solid fa-plus"></i> + Add Another Room
+              </button>
+            </div>
+
+            <div id="rooms-rows-container">
+              <!-- Default Room 1 row -->
+            </div>
+
+            <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="addRoomRow()">
+              <i class="fa-solid fa-plus"></i> + Add Another Room
+            </button>
+          </div>
+
+          <!-- SUBMIT ACTION -->
+          <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-bottom: 4rem;">
+            <a href="properties.html" class="btn btn-secondary btn-lg">Cancel</a>
+            <button type="submit" class="btn btn-primary btn-lg" id="btn-publish-property">
+              <i class="fa-solid fa-cloud-arrow-up"></i> Publish Property
+            </button>
+          </div>
+
+        </form>
+      </main>
+    </div>
+  </div>
+
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script>
+    const currentUser = Auth.requireAuth(['LANDLORD']);
+    let roomRowCount = 0;
+
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('show');
+    }
+
+    async function initAddProperty() {
+      if (!currentUser) return;
+      document.getElementById('sidebar-user-name').textContent = currentUser.full_name;
+
+      await loadAmenitiesChecklist();
+      // Add first room row
+      addRoomRow('Room 101', 'Solo room', 1, 2500, 'AVAILABLE');
+    }
+
+    async function loadAmenitiesChecklist() {
+      const container = document.getElementById('amenities-checklist');
+      try {
+        const res = await API.getAmenities();
+        if (res.success && res.data) {
+          container.innerHTML = res.data.map(a => `
+            <label class="amenity-checkbox-label">
+              <input type="checkbox" name="amenity_id" value="${a.amenity_id}">
+              <span>${App.escapeHtml(a.amenity_name)}</span>
+            </label>
+          `).join('');
+        }
+      } catch (err) {
+        console.error('Error fetching amenities:', err);
+      }
+    }
+
+    function addRoomRow(num = '', type = 'Solo room', cap = 1, rent = '', status = 'AVAILABLE') {
+      roomRowCount++;
+      const id = roomRowCount;
+      const container = document.getElementById('rooms-rows-container');
+
+      const div = document.createElement('div');
+      div.className = 'room-row-card';
+      div.id = `room-row-${id}`;
+      div.innerHTML = `
+        ${id > 1 ? `<button type="button" class="remove-room-btn" onclick="removeRoomRow(${id})"><i class="fa-solid fa-circle-xmark"></i></button>` : ''}
+        <div style="font-weight: 700; color: var(--text-main); margin-bottom: 0.75rem; font-size: 0.95rem;">
+          Room #${id}
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem;">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">Room Number *</label>
+            <input type="text" class="form-control room-num" value="${num || 'Room ' + id}" placeholder="e.g. Room 101" required>
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">Room Type *</label>
+            <select class="form-select room-type">
+              <option value="Solo room" ${type === 'Solo room' ? 'selected' : ''}>Solo room</option>
+              <option value="Shared room" ${type === 'Shared room' ? 'selected' : ''}>Shared room</option>
+              <option value="Bedspace" ${type === 'Bedspace' ? 'selected' : ''}>Bedspace</option>
+              <option value="Studio" ${type === 'Studio' ? 'selected' : ''}>Studio</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">Capacity (Pax) *</label>
+            <input type="number" class="form-control room-cap" value="${cap}" min="1" max="10" required>
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">Monthly Rent (₱) *</label>
+            <input type="number" class="form-control room-rent" value="${rent}" placeholder="2500" min="500" step="100" required>
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">Status *</label>
+            <select class="form-select room-status">
+              <option value="AVAILABLE" selected>AVAILABLE</option>
+              <option value="OCCUPIED">OCCUPIED</option>
+              <option value="MAINTENANCE">MAINTENANCE</option>
+              <option value="INACTIVE">INACTIVE</option>
+            </select>
+          </div>
+        </div>
+      `;
+      container.appendChild(div);
+    }
+
+    function removeRoomRow(id) {
+      const el = document.getElementById(`room-row-${id}`);
+      if (el) el.remove();
+    }
+
+    async function handlePublishProperty(e) {
+      e.preventDefault();
+
+      const name = document.getElementById('prop-name').value.trim();
+      const address = document.getElementById('prop-address').value.trim();
+      const desc = document.getElementById('prop-description').value.trim();
+      const rules = document.getElementById('prop-rules').value.trim();
+      const status = document.getElementById('prop-status').value;
+      const photoUrl = document.getElementById('prop-photo-url').value.trim();
+
+      // Collect amenities
+      const amenityIds = Array.from(document.querySelectorAll('input[name="amenity_id"]:checked'))
+        .map(cb => parseInt(cb.value));
+
+      // Collect rooms
+      const roomRows = document.querySelectorAll('.room-row-card');
+      const rooms = [];
+      roomRows.forEach(row => {
+        rooms.push({
+          room_number: row.querySelector('.room-num').value.trim(),
+          room_type: row.querySelector('.room-type').value,
+          capacity: parseInt(row.querySelector('.room-cap').value) || 1,
+          monthly_rent: parseFloat(row.querySelector('.room-rent').value) || 0,
+          status: row.querySelector('.room-status').value
+        });
+      });
+
+      if (rooms.length === 0) {
+        App.toast('Please add at least one room to this boarding house.', 'warning');
+        return;
+      }
+
+      const btn = document.getElementById('btn-publish-property');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Publishing...';
+
+      try {
+        const payload = {
+          landlord_id: currentUser.user_id,
+          house_name: name,
+          address: address,
+          description: desc,
+          house_rules: rules,
+          status: status,
+          amenity_ids: amenityIds,
+          rooms: rooms,
+          photo_urls: photoUrl ? [photoUrl] : []
+        };
+
+        const fileInput = document.getElementById('prop-photos');
+        const files = (fileInput.files && fileInput.files.length > 0) ? fileInput.files : null;
+
+        const res = await API.createBoardingHouse(payload, files);
+        if (res.success) {
+          App.toast('Boarding house published successfully!', 'success');
+          setTimeout(() => {
+            window.location.href = 'properties.html';
+          }, 1200);
+        } else {
+          App.toast(res.message || 'Failed to publish property.', 'error');
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Publish Property';
+        }
+      } catch (err) {
+        console.error('Error publishing property:', err);
+        App.toast('Failed to save boarding house.', 'error');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Publish Property';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', initAddProperty);
+  </script>
+</body>
+</html>

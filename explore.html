@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Explore Boarding Houses - DORMIGO</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    .explore-layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 2rem;
+      align-items: start;
+      margin: 2.5rem 0 4rem;
+    }
+    .filter-card {
+      background: white;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-color);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-sm);
+      position: sticky;
+      top: 90px;
+    }
+    .filter-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .filter-group {
+      margin-bottom: 1.25rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .filter-group:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+    .filter-label {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .amenities-checkbox-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      max-height: 180px;
+      overflow-y: auto;
+    }
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .checkbox-item input {
+      accent-color: var(--primary);
+    }
+    @media (max-width: 900px) {
+      .explore-layout {
+        grid-template-columns: 1fr;
+      }
+      .filter-card {
+        position: static;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVIGATION -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="nav-brand">
+        <img src="assets/img/logo.svg" alt="Dormigo Logo" width="36" height="36">
+        <span>DORMIGO</span>
+      </a>
+
+      <ul class="nav-menu" id="nav-menu">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="explore.html" class="nav-link active">Explore</a></li>
+        <li><a href="about.html" class="nav-link">About</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <div id="nav-auth-container">
+          <a href="login.html" class="btn btn-outline-primary btn-sm">Log In</a>
+          <a href="register.html" class="btn btn-primary btn-sm">Register</a>
+        </div>
+        <button class="nav-toggle" id="nav-toggle">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- PAGE HEADER -->
+  <div style="background: white; border-bottom: 1px solid var(--border-color); padding: 2.5rem 0;">
+    <div class="container">
+      <h1 style="font-size: 2.25rem; margin-bottom: 0.5rem;">Explore Student Boarding Houses</h1>
+      <p style="color: var(--text-muted); font-size: 1.05rem;">
+        Find active student dormitories, solo rooms, and bedspaces near your university in Cebu and nearby campus hubs.
+      </p>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="explore-layout">
+
+      <!-- FILTERS SIDEBAR -->
+      <aside class="filter-card">
+        <div class="filter-title">
+          <span><i class="fa-solid fa-sliders me-1"></i> Filters</span>
+          <button type="button" class="btn btn-sm" style="color: var(--primary); background: none; padding: 0;" onclick="resetFilters()">Reset</button>
+        </div>
+
+        <form id="filters-form" onsubmit="event.preventDefault(); applyFilters();">
+          <!-- KEYWORD -->
+          <div class="filter-group">
+            <label class="filter-label" for="filter-keyword">Search Keyword</label>
+            <input type="text" id="filter-keyword" class="form-control" placeholder="House name or street...">
+          </div>
+
+          <!-- LOCATION -->
+          <div class="filter-group">
+            <label class="filter-label" for="filter-location">Location / Area</label>
+            <input type="text" id="filter-location" class="form-control" placeholder="e.g. Sambag, Pelaez, Guadalupe">
+          </div>
+
+          <!-- PRICE RANGE -->
+          <div class="filter-group">
+            <label class="filter-label">Monthly Rent (₱)</label>
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+              <input type="number" id="filter-min-rent" class="form-control" placeholder="Min" min="0" step="100">
+              <span style="color: var(--text-light);">-</span>
+              <input type="number" id="filter-max-rent" class="form-control" placeholder="Max" min="0" step="100">
+            </div>
+          </div>
+
+          <!-- ROOM TYPE -->
+          <div class="filter-group">
+            <label class="filter-label" for="filter-room-type">Room Type</label>
+            <select id="filter-room-type" class="form-select">
+              <option value="">All Types</option>
+              <option value="Solo">Solo Room</option>
+              <option value="Shared">Shared Room</option>
+              <option value="Bedspace">Bedspace</option>
+              <option value="Studio">Studio</option>
+            </select>
+          </div>
+
+          <!-- AVAILABILITY -->
+          <div class="filter-group">
+            <label class="filter-label" for="filter-availability">Availability</label>
+            <select id="filter-availability" class="form-select">
+              <option value="">Any</option>
+              <option value="available_only" selected>Has Available Rooms</option>
+            </select>
+          </div>
+
+          <!-- AMENITIES -->
+          <div class="filter-group">
+            <label class="filter-label">Amenities</label>
+            <div class="amenities-checkbox-list" id="filter-amenities-container">
+              <!-- Rendered from master amenities -->
+              <span style="font-size: 0.8rem; color: var(--text-light);">Loading amenities...</span>
+            </div>
+          </div>
+
+          <button type="button" class="btn btn-primary btn-block" onclick="applyFilters()">
+            <i class="fa-solid fa-filter"></i> Apply Filters
+          </button>
+        </form>
+      </aside>
+
+      <!-- RESULTS -->
+      <main>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <span style="font-weight: 700; color: var(--text-main); font-size: 1.1rem;" id="results-count">Loading results...</span>
+            <span style="color: var(--text-muted); font-size: 0.9rem;">(Active Boarding Houses Only)</span>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <label for="sort-select" style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">Sort By:</label>
+            <select id="sort-select" class="form-select" style="width: auto; padding: 0.4rem 0.8rem; font-size: 0.85rem;" onchange="applyFilters()">
+              <option value="recommended">Recommended</option>
+              <option value="price_asc">Price: Low to High</option>
+              <option value="price_desc">Price: High to Low</option>
+              <option value="rating_desc">Highest Rated</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="properties-grid" id="explore-properties-container">
+          <div style="grid-column: 1/-1; text-align: center; padding: 3rem;">
+            <i class="fa-solid fa-circle-notch fa-spin fa-2x" style="color: var(--primary);"></i>
+            <p style="margin-top: 1rem;">Loading student boarding houses...</p>
+          </div>
+        </div>
+      </main>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand">
+            <img src="assets/img/logo.svg" alt="Dormigo" width="32" height="32">
+            <span>DORMIGO</span>
+          </div>
+          <p class="footer-desc">
+            The student-first boarding house community. Safe rooms, clear rules, and direct landlord connections.
+          </p>
+        </div>
+        <div>
+          <h4 class="footer-heading">Explore</h4>
+          <ul class="footer-links">
+            <li><a href="explore.html" class="footer-link">All Boarding Houses</a></li>
+            <li><a href="about.html" class="footer-link">About Us</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="footer-heading">Portals</h4>
+          <ul class="footer-links">
+            <li><a href="login.html" class="footer-link">Student Login</a></li>
+            <li><a href="login.html?role=landlord" class="footer-link">Landlord Login</a></li>
+            <li><a href="login.html?role=admin" class="footer-link">Admin Portal</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="footer-heading">Support</h4>
+          <ul class="footer-links">
+            <li><span class="footer-link">support@dormigo.com</span></li>
+            <li><span class="footer-link">+63 912 345 6789</span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div>&copy; 2026 DORMIGO System.</div>
+        <div>Boarding House Finder & Management System</div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    App.renderNavAuth();
+
+    let allHouses = [];
+    let masterAmenities = [];
+
+    // Parse URL params
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialSearch = urlParams.get('search') || '';
+    if (initialSearch) {
+      document.getElementById('filter-keyword').value = initialSearch;
+    }
+
+    async function initExplore() {
+      await loadAmenities();
+      await fetchHouses();
+    }
+
+    async function loadAmenities() {
+      try {
+        const res = await API.getAmenities();
+        if (res.success && res.data) {
+          masterAmenities = res.data;
+          const container = document.getElementById('filter-amenities-container');
+          container.innerHTML = masterAmenities.map(a => `
+            <label class="checkbox-item">
+              <input type="checkbox" name="amenity" value="${a.amenity_id}" onchange="applyFilters()">
+              <span>${App.escapeHtml(a.amenity_name)}</span>
+            </label>
+          `).join('');
+        }
+      } catch (err) {
+        console.error('Error loading amenities:', err);
+      }
+    }
+
+    async function fetchHouses() {
+      const container = document.getElementById('explore-properties-container');
+      try {
+        // Enforce: Only display ACTIVE boarding houses to students
+        const res = await API.getBoardingHouses({ status: 'ACTIVE' });
+        if (res.success && res.data) {
+          allHouses = res.data;
+          applyFilters();
+        } else {
+          container.innerHTML = `<p class="text-center p-4">No active properties available.</p>`;
+          document.getElementById('results-count').textContent = '0 Boarding Houses Found';
+        }
+      } catch (err) {
+        console.error('Failed to load houses:', err);
+        container.innerHTML = `<div class="p-4 text-center text-danger">Failed to connect to database.</div>`;
+      }
+    }
+
+    function applyFilters() {
+      const keyword = (document.getElementById('filter-keyword').value || '').toLowerCase().trim();
+      const location = (document.getElementById('filter-location').value || '').toLowerCase().trim();
+      const minRent = parseFloat(document.getElementById('filter-min-rent').value) || 0;
+      const maxRent = parseFloat(document.getElementById('filter-max-rent').value) || Infinity;
+      const roomType = (document.getElementById('filter-room-type').value || '').toLowerCase();
+      const availability = document.getElementById('filter-availability').value;
+      const sort = document.getElementById('sort-select').value;
+
+      const checkedAmenities = Array.from(document.querySelectorAll('input[name="amenity"]:checked'))
+        .map(cb => parseInt(cb.value));
+
+      let filtered = allHouses.filter(house => {
+        // Keyword filter (name, description, address)
+        if (keyword) {
+          const matchName = (house.house_name || '').toLowerCase().includes(keyword);
+          const matchAddr = (house.address || '').toLowerCase().includes(keyword);
+          const matchDesc = (house.description || '').toLowerCase().includes(keyword);
+          if (!matchName && !matchAddr && !matchDesc) return false;
+        }
+
+        // Location filter
+        if (location) {
+          const matchAddr = (house.address || '').toLowerCase().includes(location);
+          if (!matchAddr) return false;
+        }
+
+        // Price filter
+        const startingRent = parseFloat(house.starting_rent || house.min_rent || 0);
+        if (startingRent < minRent || startingRent > maxRent) return false;
+
+        // Availability filter
+        if (availability === 'available_only') {
+          if ((house.available_rooms || 0) <= 0) return false;
+        }
+
+        // Amenities filter
+        if (checkedAmenities.length > 0) {
+          const houseAmenityIds = (house.amenities || []).map(a => a.amenity_id);
+          const hasAll = checkedAmenities.every(id => houseAmenityIds.includes(id));
+          if (!hasAll) return false;
+        }
+
+        return true;
+      });
+
+      // Sorting
+      if (sort === 'price_asc') {
+        filtered.sort((a, b) => parseFloat(a.starting_rent || a.min_rent || 0) - parseFloat(b.starting_rent || b.min_rent || 0));
+      } else if (sort === 'price_desc') {
+        filtered.sort((a, b) => parseFloat(b.starting_rent || b.min_rent || 0) - parseFloat(a.starting_rent || a.min_rent || 0));
+      } else if (sort === 'rating_desc') {
+        filtered.sort((a, b) => parseFloat(b.avg_rating || 0) - parseFloat(a.avg_rating || 0));
+      }
+
+      renderHouses(filtered);
+    }
+
+    function renderHouses(houses) {
+      const container = document.getElementById('explore-properties-container');
+      const countEl = document.getElementById('results-count');
+      countEl.textContent = `${houses.length} Boarding House${houses.length === 1 ? '' : 's'} Found`;
+
+      if (houses.length === 0) {
+        container.innerHTML = `
+          <div style="grid-column: 1/-1; text-align: center; padding: 4rem; background: white; border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
+            <i class="fa-solid fa-house-circle-xmark fa-3x" style="color: var(--text-light); margin-bottom: 1rem;"></i>
+            <h3>No Boarding Houses Found</h3>
+            <p>Try adjusting your search criteria, price range, or amenities filter.</p>
+            <button class="btn btn-outline-primary btn-sm mt-3" onclick="resetFilters()">Reset Filters</button>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = houses.map(house => {
+        const photo = (house.photo_paths && house.photo_paths.length > 0) ? house.photo_paths[0] : null;
+        const photoUrl = App.resolvePhotoUrl(photo);
+        const startingRent = parseFloat(house.starting_rent || house.min_rent || 0);
+
+        const amenitiesHtml = (house.amenities || []).slice(0, 3).map(a => 
+          `<span class="amenity-chip"><i class="fa-solid fa-check"></i> ${App.escapeHtml(a.amenity_name)}</span>`
+        ).join('');
+
+        return `
+          <div class="property-card">
+            <div class="property-img-wrap">
+              <img src="${photoUrl}" alt="${App.escapeHtml(house.house_name)}" class="property-img" loading="lazy">
+              <div class="property-price-badge">
+                Starts at ${App.formatCurrency(startingRent)}/mo
+              </div>
+              <div class="property-status-badge">
+                ${App.statusBadge(house.status)}
+              </div>
+            </div>
+
+            <div class="property-body">
+              <h3 class="property-title">${App.escapeHtml(house.house_name)}</h3>
+              <div class="property-address">
+                <i class="fa-solid fa-location-dot"></i>
+                <span>${App.escapeHtml(house.address)}</span>
+              </div>
+
+              <div class="property-stats">
+                <div class="property-stat-item">
+                  <i class="fa-solid fa-door-open"></i>
+                  <span><strong>${house.available_rooms || 0}</strong> / ${house.total_rooms || 0} Available</span>
+                </div>
+                <div class="property-rating">
+                  <i class="fa-solid fa-star"></i>
+                  <span>${house.avg_rating > 0 ? parseFloat(house.avg_rating).toFixed(1) : '5.0'}</span>
+                  <span style="color: var(--text-light); font-size: 0.75rem;">(${house.reviews_count || 1})</span>
+                </div>
+              </div>
+
+              <div class="property-amenities">
+                ${amenitiesHtml || '<span class="amenity-chip">Essential Amenities</span>'}
+              </div>
+
+              <div class="property-footer">
+                <span style="font-size: 0.85rem; color: var(--text-muted);">
+                  <i class="fa-solid fa-user-tie me-1"></i> ${App.escapeHtml(house.landlord_name || 'Landlord')}
+                </span>
+                <a href="house-details.html?id=${house.house_id}" class="btn btn-primary btn-sm">
+                  View Details <i class="fa-solid fa-chevron-right"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function resetFilters() {
+      document.getElementById('filter-keyword').value = '';
+      document.getElementById('filter-location').value = '';
+      document.getElementById('filter-min-rent').value = '';
+      document.getElementById('filter-max-rent').value = '';
+      document.getElementById('filter-room-type').value = '';
+      document.getElementById('filter-availability').value = '';
+      document.querySelectorAll('input[name="amenity"]').forEach(cb => cb.checked = false);
+      document.getElementById('sort-select').value = 'recommended';
+      applyFilters();
+    }
+
+    document.addEventListener('DOMContentLoaded', initExplore);
+  </script>
+</body>
+</html>

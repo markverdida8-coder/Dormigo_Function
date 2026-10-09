@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Landlord Profile - DORMIGO</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+</head>
+<body>
+
+  <div class="dashboard-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="../index.html" class="sidebar-brand">
+          <img src="../assets/img/logo.svg" alt="Dormigo" width="34" height="34">
+          <span>DORMIGO</span>
+        </a>
+        <button class="sidebar-close" onclick="toggleSidebar()">&times;</button>
+      </div>
+
+      <div class="sidebar-content">
+        <div class="nav-section-title">Main Portal</div>
+        <a href="dashboard.html" class="sidebar-link"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+        <a href="properties.html" class="sidebar-link"><i class="fa-solid fa-building"></i> Properties</a>
+        <a href="rooms.html" class="sidebar-link"><i class="fa-solid fa-door-closed"></i> Rooms</a>
+
+        <div class="nav-section-title">Operations</div>
+        <a href="bookings.html" class="sidebar-link"><i class="fa-solid fa-clipboard-list"></i> Booking Requests</a>
+        <a href="tenants.html" class="sidebar-link"><i class="fa-solid fa-users"></i> Tenants</a>
+        <a href="payments.html" class="sidebar-link"><i class="fa-solid fa-money-bill-wave"></i> Payments</a>
+
+        <div class="nav-section-title">Communication</div>
+        <a href="messages.html" class="sidebar-link"><i class="fa-solid fa-comments"></i> Messages</a>
+        <a href="reviews.html" class="sidebar-link"><i class="fa-solid fa-star"></i> Reviews</a>
+        <a href="notifications.html" class="sidebar-link"><i class="fa-solid fa-bell"></i> Notifications</a>
+        <a href="profile.html" class="sidebar-link active"><i class="fa-solid fa-user-tie"></i> Profile</a>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="user-avatar"><i class="fa-solid fa-house-user"></i></div>
+        <div class="user-info">
+          <div class="user-name" id="sidebar-user-name">Landlord</div>
+          <div class="user-role-badge">Property Owner</div>
+        </div>
+        <button class="logout-btn" onclick="Auth.logout()"><i class="fa-solid fa-right-from-bracket"></i></button>
+      </div>
+    </aside>
+
+    <div class="main-wrapper">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+          <h2 class="page-title">Landlord Account Profile</h2>
+        </div>
+      </header>
+
+      <main class="dashboard-content">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem;">
+          
+          <!-- OVERVIEW CARD -->
+          <div class="table-card" style="padding: 2rem; text-align: center;">
+            <div class="user-avatar" style="width: 90px; height: 90px; margin: 0 auto 1.25rem; font-size: 2.5rem; border: 4px solid var(--primary-soft);">
+              <i class="fa-solid fa-user-tie"></i>
+            </div>
+
+            <h2 style="font-size: 1.5rem; margin-bottom: 0.25rem;" id="profile-full-name">Loading...</h2>
+            <div style="margin-bottom: 1.25rem;">
+              <span class="badge badge-success"><i class="fa-solid fa-house-user"></i> Landlord</span>
+              <span id="landlord-verif-badge" class="badge badge-warning ms-1">Unverified</span>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 0.75rem; text-align: left; background: var(--bg-muted); padding: 1.25rem; border-radius: var(--radius-md); margin-bottom: 1.5rem; font-size: 0.925rem;">
+              <div>
+                <span style="font-size: 0.75rem; color: var(--text-light); text-transform: uppercase; font-weight: 700; display: block;">Registered Email</span>
+                <strong id="profile-email">--</strong>
+              </div>
+              <div>
+                <span style="font-size: 0.75rem; color: var(--text-light); text-transform: uppercase; font-weight: 700; display: block;">Contact Phone</span>
+                <strong id="profile-phone">--</strong>
+              </div>
+              <div>
+                <span style="font-size: 0.75rem; color: var(--text-light); text-transform: uppercase; font-weight: 700; display: block;">Role</span>
+                <strong>LANDLORD</strong>
+              </div>
+            </div>
+
+            <button class="btn btn-danger btn-block" onclick="Auth.logout()">
+              <i class="fa-solid fa-right-from-bracket"></i> Logout
+            </button>
+          </div>
+
+          <!-- EDIT PROFILE & VERIFICATION -->
+          <div style="display: flex; flex-direction: column; gap: 2rem;">
+            
+            <div class="table-card" style="padding: 1.75rem;">
+              <h3 style="font-size: 1.2rem; margin-bottom: 1.25rem;">
+                <i class="fa-solid fa-pen-to-square me-2" style="color: var(--primary);"></i> Edit Profile Details
+              </h3>
+              <form id="edit-landlord-form" onsubmit="handleProfileUpdate(event)">
+                <div class="form-group">
+                  <label class="form-label" for="edit-fullname">Full Name</label>
+                  <input type="text" id="edit-fullname" class="form-control" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="edit-email">Email Address</label>
+                  <input type="email" id="edit-email" class="form-control" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="edit-phone">Contact Phone</label>
+                  <input type="tel" id="edit-phone" class="form-control" placeholder="+63 912 345 6789">
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="edit-password">New Password (leave blank to keep current)</label>
+                  <input type="password" id="edit-password" class="form-control" placeholder="Optional new password">
+                </div>
+                <button type="submit" class="btn btn-primary" id="btn-save-landlord">
+                  <i class="fa-solid fa-floppy-disk"></i> Save Profile
+                </button>
+              </form>
+            </div>
+
+            <!-- LANDLORD VERIFICATION -->
+            <div class="table-card" style="padding: 1.75rem;">
+              <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem;">
+                <i class="fa-solid fa-certificate me-2" style="color: var(--primary);"></i> Landlord Credential Verification
+              </h3>
+              <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+                Submit property ownership proof, barangay clearance, or business permit for verified status.
+              </p>
+
+              <div id="landlord-verif-panel" style="margin-bottom: 1.25rem;"></div>
+
+              <form id="landlord-verif-form" onsubmit="submitLandlordVerification(event)">
+                <div class="form-group">
+                  <label class="form-label" for="landlord-verif-file">Upload Ownership / Permit Document</label>
+                  <input type="file" id="landlord-verif-file" class="form-control" accept="image/*,.pdf" required>
+                </div>
+                <button type="submit" class="btn btn-outline-primary" id="btn-submit-landlord-verif">
+                  <i class="fa-solid fa-upload"></i> Submit Documents
+                </button>
+              </form>
+            </div>
+
+          </div>
+
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script>
+    let currentUser = Auth.requireAuth(['LANDLORD']);
+
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('show');
+    }
+
+    async function initProfile() {
+      if (!currentUser) return;
+      document.getElementById('profile-full-name').textContent = currentUser.full_name;
+      document.getElementById('sidebar-user-name').textContent = currentUser.full_name;
+      document.getElementById('profile-email').textContent = currentUser.email;
+      document.getElementById('profile-phone').textContent = currentUser.phone || 'Not provided';
+
+      document.getElementById('edit-fullname').value = currentUser.full_name;
+      document.getElementById('edit-email').value = currentUser.email;
+      document.getElementById('edit-phone').value = currentUser.phone || '';
+
+      await loadLandlordVerification();
+    }
+
+    async function loadLandlordVerification() {
+      const panel = document.getElementById('landlord-verif-panel');
+      const badge = document.getElementById('landlord-verif-badge');
+
+      try {
+        const res = await API.getVerifications('landlord', { landlord_id: currentUser.user_id });
+        if (res.success && res.data && res.data.length > 0) {
+          const v = res.data[0];
+          const status = (v.verification_status || 'PENDING').toUpperCase();
+
+          if (status === 'VERIFIED') {
+            badge.className = 'badge badge-success ms-1';
+            badge.innerHTML = '<i class="fa-solid fa-shield-check"></i> Verified Landlord';
+            panel.innerHTML = `
+              <div style="background: var(--primary-soft); border-left: 4px solid var(--primary); padding: 1rem; border-radius: var(--radius-sm);">
+                <strong style="color: var(--primary);"><i class="fa-solid fa-shield-check"></i> Credentials Verified</strong>
+                <p style="margin: 0.25rem 0 0; font-size: 0.85rem; color: var(--text-muted);">
+                  Verified on ${App.formatDate(v.reviewed_at)}. Your boarding houses will carry the verified badge!
+                </p>
+              </div>
+            `;
+            document.getElementById('landlord-verif-form').style.display = 'none';
+          } else if (status === 'REJECTED') {
+            badge.className = 'badge badge-danger ms-1';
+            badge.innerHTML = '<i class="fa-solid fa-xmark"></i> Rejected';
+            panel.innerHTML = `
+              <div style="background: var(--accent-red-light); border-left: 4px solid var(--accent-red); padding: 1rem; border-radius: var(--radius-sm);">
+                <strong style="color: var(--accent-red);"><i class="fa-solid fa-circle-exclamation"></i> Documents Rejected</strong>
+                <p style="margin: 0.25rem 0 0; font-size: 0.85rem;">
+                  Reason: ${App.escapeHtml(v.rejection_reason || 'Please submit valid documents.')}
+                </p>
+              </div>
+            `;
+          } else {
+            badge.className = 'badge badge-warning ms-1';
+            badge.innerHTML = '<i class="fa-solid fa-clock"></i> Pending Review';
+            panel.innerHTML = `
+              <div style="background: var(--accent-amber-light); border-left: 4px solid var(--accent-amber); padding: 1rem; border-radius: var(--radius-sm);">
+                <strong style="color: var(--accent-amber);"><i class="fa-solid fa-hourglass-half"></i> Verification In Progress</strong>
+                <p style="margin: 0.25rem 0 0; font-size: 0.85rem; color: var(--text-muted);">
+                  Documents submitted on ${App.formatDate(v.submitted_at)}. An administrator will review your paperwork.
+                </p>
+              </div>
+            `;
+          }
+        } else {
+          badge.className = 'badge badge-muted ms-1';
+          badge.textContent = 'Unverified';
+          panel.innerHTML = `<p style="font-size: 0.85rem; color: var(--text-muted);">No documentation submitted yet.</p>`;
+        }
+      } catch (err) {
+        console.error('Error fetching landlord verification:', err);
+      }
+    }
+
+    async function handleProfileUpdate(e) {
+      e.preventDefault();
+      const fullName = document.getElementById('edit-fullname').value.trim();
+      const email = document.getElementById('edit-email').value.trim();
+      const phone = document.getElementById('edit-phone').value.trim();
+      const password = document.getElementById('edit-password').value;
+
+      const btn = document.getElementById('btn-save-landlord');
+      btn.disabled = true;
+
+      try {
+        const payload = {
+          user_id: currentUser.user_id,
+          full_name: fullName,
+          email: email,
+          phone: phone
+        };
+        if (password) payload.password = password;
+
+        const res = await API.updateUser(payload);
+        if (res.success) {
+          currentUser.full_name = fullName;
+          currentUser.email = email;
+          currentUser.phone = phone;
+          Auth.setUser(currentUser);
+          App.toast('Profile updated successfully!', 'success');
+          initProfile();
+        } else {
+          App.toast(res.message || 'Failed to update profile.', 'error');
+        }
+      } catch (err) {
+        console.error('Error updating profile:', err);
+        App.toast('Error saving profile.', 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    async function submitLandlordVerification(e) {
+      e.preventDefault();
+      const fileInput = document.getElementById('landlord-verif-file');
+      if (!fileInput.files || fileInput.files.length === 0) return;
+
+      const btn = document.getElementById('btn-submit-landlord-verif');
+      btn.disabled = true;
+
+      try {
+        const formData = new FormData();
+        formData.append('type', 'landlord');
+        formData.append('landlord_id', currentUser.user_id);
+        formData.append('document', fileInput.files[0]);
+
+        const res = await API.submitVerification('landlord', formData);
+        if (res.success) {
+          App.toast('Documents submitted for verification!', 'success');
+          fileInput.value = '';
+          loadLandlordVerification();
+        } else {
+          App.toast(res.message || 'Submission failed.', 'error');
+        }
+      } catch (err) {
+        console.error('Error submitting landlord verification:', err);
+        App.toast('Error submitting documents.', 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', initProfile);
+  </script>
+</body>
+</html>

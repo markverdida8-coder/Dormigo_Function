@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payments & Transaction History - DORMIGO Student</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+</head>
+<body>
+
+  <div class="dashboard-layout">
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="../index.html" class="sidebar-brand">
+          <img src="../assets/img/logo.svg" alt="Dormigo" width="34" height="34">
+          <span>DORMIGO</span>
+        </a>
+        <button class="sidebar-close" onclick="toggleSidebar()">&times;</button>
+      </div>
+
+      <div class="sidebar-content">
+        <div class="nav-section-title">Navigation</div>
+        <a href="../index.html" class="sidebar-link">
+          <i class="fa-solid fa-house"></i> Home
+        </a>
+        <a href="../explore.html" class="sidebar-link">
+          <i class="fa-solid fa-compass"></i> Explore
+        </a>
+
+        <div class="nav-section-title">Student Portal</div>
+        <a href="dashboard.html" class="sidebar-link">
+          <i class="fa-solid fa-gauge-high"></i> Dashboard
+        </a>
+        <a href="bookings.html" class="sidebar-link">
+          <i class="fa-solid fa-calendar-check"></i> My Bookings
+        </a>
+        <a href="payments.html" class="sidebar-link active">
+          <i class="fa-solid fa-credit-card"></i> Payments
+        </a>
+        <a href="messages.html" class="sidebar-link">
+          <i class="fa-solid fa-comments"></i> Messages
+        </a>
+        <a href="reviews.html" class="sidebar-link">
+          <i class="fa-solid fa-star"></i> Reviews
+        </a>
+        <a href="notifications.html" class="sidebar-link">
+          <i class="fa-solid fa-bell"></i> Notifications
+        </a>
+        <a href="profile.html" class="sidebar-link">
+          <i class="fa-solid fa-user"></i> Profile
+        </a>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="user-avatar"><i class="fa-solid fa-user"></i></div>
+        <div class="user-info">
+          <div class="user-name" id="sidebar-user-name">Student</div>
+          <div class="user-role-badge">Student Tenant</div>
+        </div>
+        <button class="logout-btn" onclick="Auth.logout()"><i class="fa-solid fa-right-from-bracket"></i></button>
+      </div>
+    </aside>
+
+    <div class="main-wrapper">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+          <h2 class="page-title">Payments & Invoices</h2>
+        </div>
+        <div class="topbar-right">
+          <a href="bookings.html" class="btn btn-sm btn-outline-primary">
+            <i class="fa-solid fa-calendar-check"></i> View Bookings
+          </a>
+        </div>
+      </header>
+
+      <main class="dashboard-content">
+        <div style="margin-bottom: 2rem;">
+          <h1 style="font-size: 1.75rem; margin-bottom: 0.25rem;">Payment Center</h1>
+          <p>Review rental payment schedules, due dates, settled transactions, and official receipts.</p>
+        </div>
+
+        <!-- PAYMENT OVERVIEW SUMMARY -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon stat-icon-green"><i class="fa-solid fa-circle-check"></i></div>
+            <div class="stat-info">
+              <div class="stat-value" id="summary-total-paid">₱0.00</div>
+              <div class="stat-label">Total Settled</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon stat-icon-amber"><i class="fa-solid fa-clock"></i></div>
+            <div class="stat-info">
+              <div class="stat-value" id="summary-pending-due">₱0.00</div>
+              <div class="stat-label">Pending Dues</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon stat-icon-blue"><i class="fa-solid fa-receipt"></i></div>
+            <div class="stat-info">
+              <div class="stat-value" id="summary-transactions-count">0</div>
+              <div class="stat-label">Total Transactions</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TRANSACTIONS TABLE -->
+        <div class="table-card">
+          <div class="table-header">
+            <h3 class="table-title"><i class="fa-solid fa-clock-rotate-left me-2" style="color: var(--primary);"></i> Transaction History</h3>
+            <div class="table-actions">
+              <select id="payment-status-filter" class="form-select" style="width: auto; padding: 0.35rem 0.75rem; font-size: 0.85rem;" onchange="renderPaymentsTable()">
+                <option value="ALL">All Statuses</option>
+                <option value="PENDING">Pending Only</option>
+                <option value="PAID">Paid Only</option>
+                <option value="CONFIRMED">Confirmed Only</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>Ref #</th>
+                  <th>Boarding House & Room</th>
+                  <th>Period</th>
+                  <th>Due Date</th>
+                  <th>Amount</th>
+                  <th>Method</th>
+                  <th>Payment Date</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="payments-table-body">
+                <tr>
+                  <td colspan="9" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
+                    <i class="fa-solid fa-spinner fa-spin fa-2x" style="color: var(--primary);"></i>
+                    <p style="margin-top: 0.5rem;">Loading transactions from database...</p>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- PAY NOW MODAL -->
+  <div class="modal-backdrop" id="pay-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-credit-card me-2" style="color: var(--primary);"></i> Settle Rent Payment</h3>
+        <button class="modal-close" onclick="closePayModal()">&times;</button>
+      </div>
+      <form id="pay-form" onsubmit="submitPayment(event)">
+        <div class="modal-body">
+          <input type="hidden" id="pay-payment-id">
+
+          <div style="background: var(--primary-soft); padding: 1.25rem; border-radius: var(--radius-md); margin-bottom: 1.25rem;">
+            <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Payment Due</div>
+            <div style="font-size: 1.75rem; font-weight: 800; color: var(--primary);" id="pay-modal-amount">₱0.00</div>
+            <div style="font-size: 0.9rem; color: var(--text-main); margin-top: 0.25rem;" id="pay-modal-details">
+              Casa Amiga - Room 101 (Period 1)
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="pay-method">Payment Method *</label>
+            <select id="pay-method" class="form-select" required>
+              <option value="GCash" selected>GCash (E-Wallet)</option>
+              <option value="Cash">Cash to Landlord</option>
+              <option value="Bank Transfer">Bank Transfer</option>
+              <option value="Maya">Maya</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="pay-ref">Transaction Reference / Receipt No. *</label>
+            <input type="text" id="pay-ref" class="form-control" placeholder="e.g. GCASH-984321-12 or Cash Receipt #" required>
+            <span style="font-size: 0.75rem; color: var(--text-muted);">Enter the confirmation code from your payment app or landlord cash acknowledgment.</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="pay-date">Payment Date *</label>
+            <input type="date" id="pay-date" class="form-control" required>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closePayModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btn-submit-pay">
+            <i class="fa-solid fa-check-circle"></i> Confirm Payment
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script>
+    const currentUser = Auth.requireAuth(['STUDENT']);
+    let paymentsData = [];
+
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('show');
+    }
+
+    async function loadPayments() {
+      if (!currentUser) return;
+      document.getElementById('sidebar-user-name').textContent = currentUser.full_name;
+
+      try {
+        const res = await API.getPayments({ user_id: currentUser.user_id });
+        if (res.success && res.data) {
+          paymentsData = res.data;
+          updateSummaries();
+          renderPaymentsTable();
+
+          // Check if booking_id was passed in URL to trigger payment modal
+          const urlParams = new URLSearchParams(window.location.search);
+          const targetBookingId = urlParams.get('booking_id');
+          if (targetBookingId) {
+            const pendingPayment = paymentsData.find(p => p.booking_id == targetBookingId && p.status === 'PENDING');
+            if (pendingPayment) {
+              openPayModal(pendingPayment.payment_id);
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching payments:', err);
+      }
+    }
+
+    function updateSummaries() {
+      let totalPaid = 0;
+      let totalPending = 0;
+
+      paymentsData.forEach(p => {
+        const amt = parseFloat(p.amount) || 0;
+        if (p.status === 'PAID' || p.status === 'CONFIRMED') {
+          totalPaid += amt;
+        } else if (p.status === 'PENDING') {
+          totalPending += amt;
+        }
+      });
+
+      document.getElementById('summary-total-paid').textContent = App.formatCurrency(totalPaid);
+      document.getElementById('summary-pending-due').textContent = App.formatCurrency(totalPending);
+      document.getElementById('summary-transactions-count').textContent = paymentsData.length;
+    }
+
+    function renderPaymentsTable() {
+      const tbody = document.getElementById('payments-table-body');
+      const filter = document.getElementById('payment-status-filter').value;
+
+      const filtered = paymentsData.filter(p => {
+        if (filter === 'ALL') return true;
+        return (p.status || '').toUpperCase() === filter;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="9" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
+              No transactions found for the selected filter.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(p => {
+        const isPending = (p.status || '').toUpperCase() === 'PENDING';
+        return `
+          <tr>
+            <td>
+              <span style="font-family: monospace; font-weight: 600; font-size: 0.85rem;">
+                ${App.escapeHtml(p.transaction_ref || `TX-${p.payment_id}`)}
+              </span>
+            </td>
+            <td>
+              <strong>${App.escapeHtml(p.house_name)}</strong>
+              <div style="font-size: 0.8rem; color: var(--text-muted);">${App.escapeHtml(p.room_number)} (${App.escapeHtml(p.room_type || 'Solo')})</div>
+            </td>
+            <td>Month ${p.payment_period}</td>
+            <td><i class="fa-solid fa-calendar me-1" style="color: var(--text-light);"></i> ${App.formatDate(p.due_date)}</td>
+            <td><strong>${App.formatCurrency(p.amount)}</strong></td>
+            <td><span class="badge badge-muted">${App.escapeHtml(p.payment_method || 'GCash')}</span></td>
+            <td>${p.payment_date ? App.formatDate(p.payment_date) : '<span style="color: var(--text-light);">&mdash;</span>'}</td>
+            <td>${App.statusBadge(p.status)}</td>
+            <td>
+              ${isPending ? `
+                <button class="btn btn-sm btn-primary" onclick="openPayModal(${p.payment_id})">
+                  <i class="fa-solid fa-wallet"></i> Pay Now
+                </button>
+              ` : `
+                <button class="btn btn-sm btn-secondary" onclick="viewReceipt(${p.payment_id})">
+                  <i class="fa-solid fa-receipt"></i> Receipt
+                </button>
+              `}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function openPayModal(paymentId) {
+      const p = paymentsData.find(item => item.payment_id === paymentId);
+      if (!p) return;
+
+      document.getElementById('pay-payment-id').value = p.payment_id;
+      document.getElementById('pay-modal-amount').textContent = App.formatCurrency(p.amount);
+      document.getElementById('pay-modal-details').textContent = `${p.house_name} - ${p.room_number} (Period ${p.payment_period})`;
+      document.getElementById('pay-date').value = new Date().toISOString().split('T')[0];
+      document.getElementById('pay-ref').value = `GCASH-${Date.now().toString().slice(-6)}`;
+      document.getElementById('pay-modal').classList.add('show');
+    }
+
+    function closePayModal() {
+      document.getElementById('pay-modal').classList.remove('show');
+    }
+
+    async function submitPayment(e) {
+      e.preventDefault();
+      const paymentId = parseInt(document.getElementById('pay-payment-id').value);
+      const method = document.getElementById('pay-method').value;
+      const ref = document.getElementById('pay-ref').value.trim();
+      const date = document.getElementById('pay-date').value;
+
+      const btn = document.getElementById('btn-submit-pay');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+
+      try {
+        const res = await API.updatePaymentStatus(paymentId, 'PAID', {
+          payment_method: method,
+          transaction_ref: ref,
+          payment_date: date
+        });
+
+        if (res.success) {
+          App.toast('Payment submitted successfully! Landlord notified.', 'success');
+          closePayModal();
+          loadPayments();
+        } else {
+          App.toast(res.message || 'Payment update failed.', 'error');
+        }
+      } catch (err) {
+        console.error('Error submitting payment:', err);
+        App.toast('Failed to record payment.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-check-circle"></i> Confirm Payment';
+      }
+    }
+
+    function viewReceipt(paymentId) {
+      const p = paymentsData.find(item => item.payment_id === paymentId);
+      if (!p) return;
+      alert(`RECEIPT FOR PAYMENT #${p.payment_id}\n\nProperty: ${p.house_name}\nRoom: ${p.room_number}\nAmount: ₱${parseFloat(p.amount).toFixed(2)}\nStatus: ${p.status}\nReference: ${p.transaction_ref || 'N/A'}\nDate: ${p.payment_date || p.due_date}`);
+    }
+
+    document.addEventListener('DOMContentLoaded', loadPayments);
+  </script>
+</body>
+</html>

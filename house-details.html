@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Boarding House Details - DORMIGO</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    .details-layout {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 2.5rem;
+      margin: 2rem 0 5rem;
+    }
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 0.75rem;
+      height: 420px;
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      margin-bottom: 2rem;
+    }
+    .gallery-main-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      cursor: pointer;
+    }
+    .gallery-thumbs {
+      display: grid;
+      grid-template-rows: 1fr 1fr;
+      gap: 0.75rem;
+      height: 100%;
+    }
+    .gallery-thumb-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      cursor: pointer;
+    }
+    .details-card {
+      background: white;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-color);
+      padding: 2rem;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 2rem;
+    }
+    .details-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .room-item-card {
+      background: #FAFCFB;
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      transition: var(--transition);
+      cursor: pointer;
+    }
+    .room-item-card:hover {
+      border-color: var(--primary-light);
+      background: white;
+      box-shadow: var(--shadow-sm);
+    }
+    .room-item-card.selected {
+      border-color: var(--primary);
+      background: var(--primary-soft);
+    }
+    .room-item-card.disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      border-color: #E2E8F0;
+      background: #F8FAFC;
+    }
+    .booking-sidebar-card {
+      position: sticky;
+      top: 90px;
+    }
+    @media (max-width: 900px) {
+      .details-layout {
+        grid-template-columns: 1fr;
+      }
+      .gallery-grid {
+        grid-template-columns: 1fr;
+        height: 280px;
+      }
+      .gallery-thumbs {
+        display: none;
+      }
+      .booking-sidebar-card {
+        position: static;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVIGATION -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="nav-brand">
+        <img src="assets/img/logo.svg" alt="Dormigo Logo" width="36" height="36">
+        <span>DORMIGO</span>
+      </a>
+
+      <ul class="nav-menu" id="nav-menu">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="explore.html" class="nav-link">Explore</a></li>
+        <li><a href="about.html" class="nav-link">About</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <div id="nav-auth-container">
+          <a href="login.html" class="btn btn-outline-primary btn-sm">Log In</a>
+          <a href="register.html" class="btn btn-primary btn-sm">Register</a>
+        </div>
+        <button class="nav-toggle" id="nav-toggle">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="container" id="details-container">
+    <div style="text-align: center; padding: 5rem 0;">
+      <i class="fa-solid fa-circle-notch fa-spin fa-3x" style="color: var(--primary);"></i>
+      <p style="margin-top: 1.5rem; font-size: 1.1rem;">Loading boarding house details...</p>
+    </div>
+  </div>
+
+  <!-- BOOKING MODAL -->
+  <div class="modal-backdrop" id="booking-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-calendar-check me-2" style="color: var(--primary);"></i> Request Room Booking</h3>
+        <button class="modal-close" onclick="closeBookingModal()">&times;</button>
+      </div>
+      <form id="booking-form" onsubmit="submitBooking(event)">
+        <div class="modal-body">
+          <div style="background: var(--primary-soft); padding: 1rem; border-radius: var(--radius-md); margin-bottom: 1.25rem;">
+            <div style="font-weight: 700; color: var(--primary); font-size: 1.05rem;" id="modal-house-name">House Name</div>
+            <div style="font-size: 0.9rem; color: var(--text-muted);" id="modal-room-info">Room 101 (Solo) - ₱2,500.00 / month</div>
+          </div>
+
+          <input type="hidden" id="booking-room-id">
+          <input type="hidden" id="booking-rent">
+
+          <div class="form-group">
+            <label class="form-label" for="booking-move-in">Move-in Date *</label>
+            <input type="date" id="booking-move-in" class="form-control" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="booking-duration">Stay Duration (Months) *</label>
+            <select id="booking-duration" class="form-select" onchange="calculateBookingTotal()" required>
+              <option value="1">1 Month</option>
+              <option value="3">3 Months (Quarter)</option>
+              <option value="5">5 Months (1 Semester)</option>
+              <option value="6" selected>6 Months (1 Semester + Break)</option>
+              <option value="10">10 Months (Academic Year)</option>
+              <option value="12">12 Months (Full Year)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="booking-message">Message to Landlord (Optional)</label>
+            <textarea id="booking-message" class="form-control" placeholder="Introduce yourself (e.g. course, year level, expected move-in time, or questions)..."></textarea>
+          </div>
+
+          <div style="background: var(--bg-muted); padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem; font-size: 0.9rem;">
+              <span>Monthly Rent:</span>
+              <strong id="modal-monthly-rent">₱0.00</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem; font-size: 0.9rem;">
+              <span>Duration:</span>
+              <span id="modal-duration-text">6 Months</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 1.05rem; font-weight: 800; color: var(--primary); padding-top: 0.4rem; border-top: 1px solid var(--border-subtle);">
+              <span>Estimated Total:</span>
+              <span id="modal-total-amount">₱0.00</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeBookingModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btn-submit-booking">
+            <i class="fa-solid fa-paper-plane"></i> Submit Booking Request
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MESSAGE LANDLORD MODAL -->
+  <div class="modal-backdrop" id="message-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-comment-dots me-2" style="color: var(--primary);"></i> Send Message to Landlord</h3>
+        <button class="modal-close" onclick="closeMessageModal()">&times;</button>
+      </div>
+      <form id="direct-msg-form" onsubmit="sendDirectMessage(event)">
+        <div class="modal-body">
+          <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem;">
+            <div class="user-avatar" style="width: 44px; height: 44px;"><i class="fa-solid fa-user"></i></div>
+            <div>
+              <div style="font-weight: 700;" id="msg-landlord-name">Landlord Name</div>
+              <div style="font-size: 0.825rem; color: var(--text-muted);" id="msg-house-name">Casa Amiga Boarding House</div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="direct-msg-text">Your Inquiry or Message *</label>
+            <textarea id="direct-msg-text" class="form-control" rows="4" placeholder="Ask about room availability, viewing schedule, curfew hours, etc..." required></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeMessageModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fa-solid fa-paper-plane"></i> Send Message
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom" style="border: none; padding: 0;">
+        <div>&copy; 2026 DORMIGO System. All rights reserved.</div>
+        <div>Boarding House Finder & Management System</div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    App.renderNavAuth();
+
+    let currentHouse = null;
+    let selectedRoom = null;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const houseId = urlParams.get('id');
+
+    if (!houseId) {
+      window.location.href = 'explore.html';
+    }
+
+    async function loadHouseDetails() {
+      const container = document.getElementById('details-container');
+      try {
+        const res = await API.getBoardingHouseById(houseId);
+        if (!res.success || !res.data) {
+          container.innerHTML = `
+            <div style="text-align: center; padding: 4rem;">
+              <i class="fa-solid fa-circle-exclamation fa-3x" style="color: var(--accent-red); margin-bottom: 1rem;"></i>
+              <h2>Boarding House Not Found</h2>
+              <p>The property you are looking for does not exist or has been removed.</p>
+              <a href="explore.html" class="btn btn-primary mt-3">Back to Explore</a>
+            </div>
+          `;
+          return;
+        }
+
+        currentHouse = res.data;
+        renderDetails(currentHouse);
+      } catch (err) {
+        console.error('Error fetching details:', err);
+        container.innerHTML = `<div class="p-4 text-center text-danger">Error loading property details.</div>`;
+      }
+    }
+
+    function renderDetails(h) {
+      const container = document.getElementById('details-container');
+      
+      const photos = (h.photo_paths && h.photo_paths.length > 0)
+        ? h.photo_paths
+        : ['https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=800&q=80'];
+
+      const mainPhoto = App.resolvePhotoUrl(photos[0]);
+      const thumb1 = App.resolvePhotoUrl(photos[1] || photos[0]);
+      const thumb2 = App.resolvePhotoUrl(photos[2] || photos[0]);
+
+      // Amenities list
+      const amenitiesHtml = (h.amenities && h.amenities.length > 0)
+        ? h.amenities.map(a => `
+            <div style="background: var(--bg-muted); padding: 0.75rem 1rem; border-radius: var(--radius-md); display: flex; align-items: center; gap: 0.6rem; font-weight: 600; font-size: 0.9rem;">
+              <i class="fa-solid fa-circle-check" style="color: var(--primary);"></i>
+              <span>${App.escapeHtml(a.amenity_name)}</span>
+            </div>
+          `).join('')
+        : '<p style="color: var(--text-muted);">Standard boarding house facilities included.</p>';
+
+      // Available Rooms
+      const roomsHtml = (h.rooms && h.rooms.length > 0)
+        ? h.rooms.map(r => {
+            const isAvail = (r.status || '').toUpperCase() === 'AVAILABLE';
+            const rent = parseFloat(r.monthly_rent || 0);
+            return `
+              <div 
+                class="room-item-card ${isAvail ? '' : 'disabled'} ${selectedRoom && selectedRoom.room_id === r.room_id ? 'selected' : ''}"
+                onclick="${isAvail ? `selectRoom(${r.room_id})` : ''}"
+                id="room-card-${r.room_id}"
+              >
+                <div>
+                  <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <span style="font-size: 1.1rem; font-weight: 700; color: var(--text-main);">${App.escapeHtml(r.room_number)}</span>
+                    <span class="badge ${isAvail ? 'badge-blue' : 'badge-muted'}">${App.escapeHtml(r.room_type)}</span>
+                    ${App.statusBadge(r.status)}
+                  </div>
+                  <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.35rem;">
+                    <i class="fa-solid fa-users me-1"></i> Capacity: ${r.capacity} pax &bull; Move-in ready
+                  </div>
+                </div>
+
+                <div style="text-align: right;">
+                  <div style="font-size: 1.25rem; font-weight: 800; color: var(--primary);">
+                    ${App.formatCurrency(rent)}
+                    <span style="font-size: 0.75rem; font-weight: 500; color: var(--text-muted);">/ mo</span>
+                  </div>
+                  ${isAvail 
+                    ? `<button type="button" class="btn btn-sm btn-outline-primary mt-1" onclick="event.stopPropagation(); openBookingModalWithRoom(${r.room_id})">Select Room</button>`
+                    : `<span style="font-size: 0.8rem; color: var(--text-light);">Unavailable</span>`
+                  }
+                </div>
+              </div>
+            `;
+          }).join('')
+        : '<p style="color: var(--text-muted); padding: 1rem;">No room data registered for this property yet.</p>';
+
+      // Student Reviews
+      const reviewsHtml = (h.reviews && h.reviews.length > 0)
+        ? h.reviews.map(rev => `
+            <div style="padding: 1.25rem 0; border-bottom: 1px solid var(--border-subtle);">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+                <div style="display: flex; align-items: center; gap: 0.6rem;">
+                  <div class="user-avatar" style="width: 34px; height: 34px; font-size: 0.85rem;"><i class="fa-solid fa-user"></i></div>
+                  <strong style="font-size: 0.95rem;">${App.escapeHtml(rev.student_name || 'Verified Student')}</strong>
+                </div>
+                <div style="color: #F59E0B; font-size: 0.85rem;">
+                  ${'<i class="fa-solid fa-star"></i>'.repeat(rev.rating)}
+                </div>
+              </div>
+              <p style="font-size: 0.925rem; color: var(--text-main); margin-bottom: 0.3rem;">${App.escapeHtml(rev.comment || 'Great student accommodation.')}</p>
+              <span style="font-size: 0.75rem; color: var(--text-light);">${App.formatDate(rev.created_at)}</span>
+            </div>
+          `).join('')
+        : '<p style="color: var(--text-muted); font-size: 0.95rem;">No reviews submitted yet. Be the first student to review!</p>';
+
+      const directionsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(h.address + ', Cebu')}`;
+
+      container.innerHTML = `
+        <!-- GALLERY -->
+        <div class="gallery-grid">
+          <img src="${mainPhoto}" alt="${App.escapeHtml(h.house_name)}" class="gallery-main-img" onclick="window.open(this.src, '_blank')">
+          <div class="gallery-thumbs">
+            <img src="${thumb1}" alt="Gallery Thumb" class="gallery-thumb-img" onclick="window.open(this.src, '_blank')">
+            <img src="${thumb2}" alt="Gallery Thumb" class="gallery-thumb-img" onclick="window.open(this.src, '_blank')">
+          </div>
+        </div>
+
+        <div class="details-layout">
+          <!-- MAIN CONTENT -->
+          <div>
+            <div class="details-card">
+              <div class="details-title-row">
+                <div>
+                  <h1 style="font-size: 2.25rem; margin-bottom: 0.5rem;">${App.escapeHtml(h.house_name)}</h1>
+                  <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--text-muted); font-size: 0.95rem;">
+                    <i class="fa-solid fa-location-dot" style="color: var(--primary);"></i>
+                    <span>${App.escapeHtml(h.address)}</span>
+                  </div>
+                </div>
+                <div style="text-align: right;">
+                  <div style="font-size: 1.85rem; font-weight: 800; color: var(--primary);">
+                    Starts at ${App.formatCurrency(h.starting_rent || h.min_rent || 0)}
+                    <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">/ mo</span>
+                  </div>
+                  <div style="display: flex; align-items: center; justify-content: flex-end; gap: 0.4rem; margin-top: 0.3rem;">
+                    <i class="fa-solid fa-star" style="color: #F59E0B;"></i>
+                    <strong>${h.avg_rating > 0 ? parseFloat(h.avg_rating).toFixed(1) : '5.0'}</strong>
+                    <span style="color: var(--text-light); font-size: 0.85rem;">(${h.reviews_count || 1} student reviews)</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ACTION BUTTONS ROW -->
+              <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 2rem;">
+                <button class="btn btn-primary" onclick="triggerBookingFromTop()">
+                  <i class="fa-solid fa-calendar-check"></i> Request Booking
+                </button>
+                <button class="btn btn-outline-primary" onclick="openMessageModal()">
+                  <i class="fa-solid fa-comment"></i> Message Landlord
+                </button>
+                <a href="${directionsUrl}" target="_blank" class="btn btn-secondary">
+                  <i class="fa-solid fa-diamond-turn-right"></i> Get Directions
+                </a>
+              </div>
+
+              <hr style="border: none; border-top: 1px solid var(--border-subtle); margin: 2rem 0;">
+
+              <!-- DESCRIPTION -->
+              <h3 style="margin-bottom: 0.75rem;"><i class="fa-solid fa-circle-info me-2" style="color: var(--primary);"></i> About this Boarding House</h3>
+              <p style="white-space: pre-line; line-height: 1.7; font-size: 1rem; color: var(--text-main); margin-bottom: 2rem;">
+                ${App.escapeHtml(h.description || 'No description provided by the landlord.')}
+              </p>
+
+              <!-- HOUSE RULES -->
+              <h3 style="margin-bottom: 0.75rem;"><i class="fa-solid fa-book-bookmark me-2" style="color: var(--primary);"></i> House Rules & Curfew</h3>
+              <div style="background: #FFFBEB; border-left: 4px solid var(--accent-amber); padding: 1.25rem; border-radius: var(--radius-sm); margin-bottom: 2rem;">
+                <p style="white-space: pre-line; color: #92400E; font-size: 0.95rem; margin: 0;">
+                  ${App.escapeHtml(h.house_rules || '1. Observe silence during study hours.\n2. Curfew at 10:00 PM.\n3. Keep common areas clean.')}
+                </p>
+              </div>
+
+              <!-- AMENITIES -->
+              <h3 style="margin-bottom: 1rem;"><i class="fa-solid fa-list-check me-2" style="color: var(--primary);"></i> Amenities Included</h3>
+              <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.75rem; margin-bottom: 2.5rem;">
+                ${amenitiesHtml}
+              </div>
+
+              <!-- AVAILABLE ROOMS -->
+              <h3 style="margin-bottom: 1rem;"><i class="fa-solid fa-door-open me-2" style="color: var(--primary);"></i> Available Rooms</h3>
+              <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">
+                Select an available room to send your booking application directly to the landlord.
+              </p>
+              <div>
+                ${roomsHtml}
+              </div>
+            </div>
+
+            <!-- REVIEWS SECTION -->
+            <div class="details-card">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+                <h3><i class="fa-solid fa-star me-2" style="color: #F59E0B;"></i> Student Reviews</h3>
+                <span class="badge badge-success">${h.reviews_count || 1} Reviews</span>
+              </div>
+              ${reviewsHtml}
+            </div>
+          </div>
+
+          <!-- SIDEBAR -->
+          <aside>
+            <div class="details-card booking-sidebar-card">
+              <h4 style="margin-bottom: 1rem;">Landlord Information</h4>
+              <div style="display: flex; align-items: center; gap: 0.85rem; margin-bottom: 1.25rem;">
+                <div class="user-avatar" style="width: 50px; height: 50px; font-size: 1.25rem;">
+                  <i class="fa-solid fa-user-shield"></i>
+                </div>
+                <div>
+                  <strong style="font-size: 1.05rem; display: block;">${App.escapeHtml(h.landlord_name || 'Landlord')}</strong>
+                  <span class="badge badge-success"><i class="fa-solid fa-shield-check"></i> Registered Landlord</span>
+                </div>
+              </div>
+
+              <div style="display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 1.5rem; font-size: 0.9rem; color: var(--text-muted);">
+                <div><i class="fa-solid fa-phone me-2" style="color: var(--primary);"></i> ${App.escapeHtml(h.landlord_phone || 'Contact via message')}</div>
+                <div><i class="fa-solid fa-envelope me-2" style="color: var(--primary);"></i> ${App.escapeHtml(h.landlord_email || 'Protected')}</div>
+              </div>
+
+              <button class="btn btn-primary btn-block mb-2" onclick="triggerBookingFromTop()">
+                <i class="fa-solid fa-calendar-check"></i> Request Booking
+              </button>
+              <button class="btn btn-outline-primary btn-block mb-3" onclick="openMessageModal()">
+                <i class="fa-solid fa-comment"></i> Message Landlord
+              </button>
+
+              <div style="border-top: 1px solid var(--border-subtle); padding-top: 1rem; font-size: 0.825rem; color: var(--text-light); text-align: center;">
+                <i class="fa-solid fa-lock me-1"></i> Student bookings are protected and reviewed prior to acceptance.
+              </div>
+            </div>
+          </aside>
+        </div>
+      `;
+    }
+
+    function selectRoom(roomId) {
+      if (!currentHouse || !currentHouse.rooms) return;
+      const room = currentHouse.rooms.find(r => r.room_id === roomId);
+      if (!room || room.status !== 'AVAILABLE') return;
+
+      selectedRoom = room;
+
+      // Update UI selection
+      document.querySelectorAll('.room-item-card').forEach(el => el.classList.remove('selected'));
+      const activeCard = document.getElementById(`room-card-${roomId}`);
+      if (activeCard) activeCard.classList.add('selected');
+
+      openBookingModalWithRoom(roomId);
+    }
+
+    function triggerBookingFromTop() {
+      // Find first available room
+      if (!currentHouse || !currentHouse.rooms) return;
+      const firstAvail = currentHouse.rooms.find(r => r.status === 'AVAILABLE');
+      if (firstAvail) {
+        openBookingModalWithRoom(firstAvail.room_id);
+      } else {
+        App.toast('All rooms in this boarding house are currently occupied.', 'warning');
+      }
+    }
+
+    function openBookingModalWithRoom(roomId) {
+      const user = Auth.getUser();
+      if (!user) {
+        App.toast('Please log in with a student account to request a room.', 'warning');
+        setTimeout(() => {
+          window.location.href = `login.html?redirect=${encodeURIComponent(window.location.href)}`;
+        }, 1200);
+        return;
+      }
+
+      if (user.user_type !== 'STUDENT') {
+        App.toast('Only students can submit booking requests.', 'error');
+        return;
+      }
+
+      const room = currentHouse.rooms.find(r => r.room_id === roomId);
+      if (!room) return;
+
+      selectedRoom = room;
+      document.getElementById('modal-house-name').textContent = currentHouse.house_name;
+      document.getElementById('modal-room-info').textContent = `${room.room_number} (${room.room_type}) - ${App.formatCurrency(room.monthly_rent)} / month`;
+      document.getElementById('booking-room-id').value = room.room_id;
+      document.getElementById('booking-rent').value = room.monthly_rent;
+
+      // Set min date to today
+      const today = new Date().toISOString().split('T')[0];
+      const moveInInput = document.getElementById('booking-move-in');
+      moveInInput.min = today;
+      if (!moveInInput.value) moveInInput.value = today;
+
+      calculateBookingTotal();
+      document.getElementById('booking-modal').classList.add('show');
+    }
+
+    function closeBookingModal() {
+      document.getElementById('booking-modal').classList.remove('show');
+    }
+
+    function calculateBookingTotal() {
+      const rent = parseFloat(document.getElementById('booking-rent').value) || 0;
+      const duration = parseInt(document.getElementById('booking-duration').value) || 1;
+      const total = rent * duration;
+
+      document.getElementById('modal-monthly-rent').textContent = App.formatCurrency(rent);
+      document.getElementById('modal-duration-text').textContent = `${duration} Month${duration > 1 ? 's' : ''}`;
+      document.getElementById('modal-total-amount').textContent = App.formatCurrency(total);
+    }
+
+    async function submitBooking(e) {
+      e.preventDefault();
+      const user = Auth.getUser();
+      if (!user) return;
+
+      const roomId = parseInt(document.getElementById('booking-room-id').value);
+      const moveInDate = document.getElementById('booking-move-in').value;
+      const duration = parseInt(document.getElementById('booking-duration').value);
+      const rent = parseFloat(document.getElementById('booking-rent').value);
+      const message = document.getElementById('booking-message').value.trim();
+      const total = rent * duration;
+
+      const submitBtn = document.getElementById('btn-submit-booking');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...';
+
+      try {
+        const payload = {
+          user_id: user.user_id,
+          room_id: roomId,
+          move_in_date: moveInDate,
+          duration_months: duration,
+          agreed_monthly_rent: rent,
+          agreed_total_amount: total,
+          message_to_landlord: message,
+          status: 'PENDING'
+        };
+
+        const res = await API.createBooking(payload);
+        if (res.success) {
+          App.toast('Booking request submitted! The landlord will review your application.', 'success');
+          closeBookingModal();
+          setTimeout(() => {
+            window.location.href = 'student/bookings.html';
+          }, 1500);
+        } else {
+          App.toast(res.message || 'Failed to submit booking.', 'error');
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Submit Booking Request';
+        }
+      } catch (err) {
+        console.error('Booking submission error:', err);
+        App.toast('Error submitting booking.', 'error');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Submit Booking Request';
+      }
+    }
+
+    function openMessageModal() {
+      const user = Auth.getUser();
+      if (!user) {
+        App.toast('Please log in to message the landlord.', 'warning');
+        setTimeout(() => {
+          window.location.href = `login.html?redirect=${encodeURIComponent(window.location.href)}`;
+        }, 1200);
+        return;
+      }
+
+      if (!currentHouse) return;
+      document.getElementById('msg-landlord-name').textContent = currentHouse.landlord_name || 'Landlord';
+      document.getElementById('msg-house-name').textContent = currentHouse.house_name;
+      document.getElementById('message-modal').classList.add('show');
+    }
+
+    function closeMessageModal() {
+      document.getElementById('message-modal').classList.remove('show');
+    }
+
+    async function sendDirectMessage(e) {
+      e.preventDefault();
+      const user = Auth.getUser();
+      if (!user || !currentHouse) return;
+
+      const text = document.getElementById('direct-msg-text').value.trim();
+      if (!text) return;
+
+      try {
+        const res = await API.sendMessage(user.user_id, currentHouse.landlord_id, text, currentHouse.house_id);
+        if (res.success) {
+          App.toast('Message sent to landlord!', 'success');
+          closeMessageModal();
+          document.getElementById('direct-msg-text').value = '';
+          setTimeout(() => {
+            if (user.user_type === 'STUDENT') {
+              window.location.href = 'student/messages.html';
+            } else if (user.user_type === 'LANDLORD') {
+              window.location.href = 'landlord/messages.html';
+            }
+          }, 1000);
+        } else {
+          App.toast(res.message || 'Failed to send message.', 'error');
+        }
+      } catch (err) {
+        console.error('Error sending message:', err);
+        App.toast('Error sending message.', 'error');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadHouseDetails);
+  </script>
+</body>
+</html>

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Profile - DORMIGO</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+</head>
+<body>
+
+  <div class="dashboard-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="../index.html" class="sidebar-brand">
+          <img src="../assets/img/logo.svg" alt="Dormigo" width="34" height="34">
+          <span>DORMIGO</span>
+        </a>
+        <button class="sidebar-close" onclick="toggleSidebar()">&times;</button>
+      </div>
+
+      <div class="sidebar-content">
+        <div class="nav-section-title">Navigation</div>
+        <a href="../index.html" class="sidebar-link"><i class="fa-solid fa-house"></i> Home</a>
+        <a href="../explore.html" class="sidebar-link"><i class="fa-solid fa-compass"></i> Explore</a>
+
+        <div class="nav-section-title">Student Portal</div>
+        <a href="dashboard.html" class="sidebar-link"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+        <a href="bookings.html" class="sidebar-link"><i class="fa-solid fa-calendar-check"></i> My Bookings</a>
+        <a href="payments.html" class="sidebar-link"><i class="fa-solid fa-credit-card"></i> Payments</a>
+        <a href="messages.html" class="sidebar-link"><i class="fa-solid fa-comments"></i> Messages</a>
+        <a href="reviews.html" class="sidebar-link"><i class="fa-solid fa-star"></i> Reviews</a>
+        <a href="notifications.html" class="sidebar-link"><i class="fa-solid fa-bell"></i> Notifications</a>
+        <a href="profile.html" class="sidebar-link active"><i class="fa-solid fa-user"></i> Profile</a>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="user-avatar"><i class="fa-solid fa-user"></i></div>
+        <div class="user-info">
+          <div class="user-name" id="sidebar-user-name">Student</div>
+          <div class="user-role-badge">Student Tenant</div>
+        </div>
+        <button class="logout-btn" onclick="Auth.logout()"><i class="fa-solid fa-right-from-bracket"></i></button>
+      </div>
+    </aside>
+
+    <div class="main-wrapper">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+          <h2 class="page-title">Account Profile</h2>
+        </div>
+      </header>
+
+      <main class="dashboard-content">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem;">
+          
+          <!-- PROFILE OVERVIEW CARD -->
+          <div class="table-card" style="padding: 2rem; text-align: center;">
+            <div class="user-avatar" style="width: 90px; height: 90px; margin: 0 auto 1.25rem; font-size: 2.5rem; border: 4px solid var(--primary-soft);" id="profile-picture-container">
+              <i class="fa-solid fa-user-graduate"></i>
+            </div>
+
+            <h2 style="font-size: 1.5rem; margin-bottom: 0.25rem;" id="profile-full-name">Loading...</h2>
+            <div style="margin-bottom: 1rem;">
+              <span class="badge badge-success"><i class="fa-solid fa-graduation-cap"></i> Student Tenant</span>
+              <span id="verif-status-badge" class="badge badge-warning ms-1">Unverified</span>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 0.75rem; text-align: left; background: var(--bg-muted); padding: 1.25rem; border-radius: var(--radius-md); margin-bottom: 1.5rem; font-size: 0.925rem;">
+              <div>
+                <span style="font-size: 0.75rem; color: var(--text-light); text-transform: uppercase; font-weight: 700; display: block;">Email</span>
+                <strong id="profile-email">--</strong>
+              </div>
+              <div>
+                <span style="font-size: 0.75rem; color: var(--text-light); text-transform: uppercase; font-weight: 700; display: block;">Phone Number</span>
+                <strong id="profile-phone">--</strong>
+              </div>
+              <div>
+                <span style="font-size: 0.75rem; color: var(--text-light); text-transform: uppercase; font-weight: 700; display: block;">Account Role</span>
+                <strong>STUDENT</strong>
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 0.5rem; flex-direction: column;">
+              <a href="reviews.html" class="btn btn-outline-primary btn-sm">
+                <i class="fa-solid fa-star"></i> My Reviews
+              </a>
+              <button class="btn btn-danger btn-sm" onclick="Auth.logout()">
+                <i class="fa-solid fa-right-from-bracket"></i> Logout
+              </button>
+            </div>
+          </div>
+
+          <!-- EDIT PROFILE & VERIFICATION SECTION -->
+          <div style="display: flex; flex-direction: column; gap: 2rem;">
+            
+            <!-- EDIT FORM -->
+            <div class="table-card" style="padding: 1.75rem;">
+              <h3 style="font-size: 1.2rem; margin-bottom: 1.25rem;"><i class="fa-solid fa-user-pen me-2" style="color: var(--primary);"></i> Edit Profile Details</h3>
+              <form id="edit-profile-form" onsubmit="handleProfileUpdate(event)">
+                <div class="form-group">
+                  <label class="form-label" for="edit-fullname">Full Name</label>
+                  <input type="text" id="edit-fullname" class="form-control" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="edit-email">Email Address</label>
+                  <input type="email" id="edit-email" class="form-control" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="edit-phone">Contact Phone</label>
+                  <input type="tel" id="edit-phone" class="form-control" placeholder="+63 912 345 6789">
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="edit-password">New Password (leave blank to keep current)</label>
+                  <input type="password" id="edit-password" class="form-control" placeholder="Optional new password">
+                </div>
+                <button type="submit" class="btn btn-primary" id="btn-save-profile">
+                  <i class="fa-solid fa-floppy-disk"></i> Save Profile Changes
+                </button>
+              </form>
+            </div>
+
+            <!-- STUDENT VERIFICATION -->
+            <div class="table-card" style="padding: 1.75rem;">
+              <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem;"><i class="fa-solid fa-id-card-clip me-2" style="color: var(--primary);"></i> Student ID Verification</h3>
+              <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+                Verified students get fast-track booking approvals and trusted tenant badges for landlords.
+              </p>
+
+              <div id="verification-status-panel" style="margin-bottom: 1.25rem;">
+                <!-- Status badge or rejection note rendered dynamically -->
+              </div>
+
+              <form id="verification-form" onsubmit="submitStudentIdVerification(event)">
+                <div class="form-group">
+                  <label class="form-label" for="verif-file">Upload Student ID Photo</label>
+                  <input type="file" id="verif-file" class="form-control" accept="image/*,.pdf" required>
+                  <span style="font-size: 0.75rem; color: var(--text-light);">Accepted formats: JPG, PNG, PDF with clear university name and student number.</span>
+                </div>
+                <button type="submit" class="btn btn-outline-primary" id="btn-submit-verif">
+                  <i class="fa-solid fa-upload"></i> Submit for Verification
+                </button>
+              </form>
+            </div>
+
+          </div>
+
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script>
+    let currentUser = Auth.requireAuth(['STUDENT']);
+
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('show');
+    }
+
+    async function initProfile() {
+      if (!currentUser) return;
+
+      document.getElementById('profile-full-name').textContent = currentUser.full_name;
+      document.getElementById('sidebar-user-name').textContent = currentUser.full_name;
+      document.getElementById('profile-email').textContent = currentUser.email;
+      document.getElementById('profile-phone').textContent = currentUser.phone || 'Not provided';
+
+      document.getElementById('edit-fullname').value = currentUser.full_name;
+      document.getElementById('edit-email').value = currentUser.email;
+      document.getElementById('edit-phone').value = currentUser.phone || '';
+
+      await loadStudentVerificationStatus();
+    }
+
+    async function loadStudentVerificationStatus() {
+      const panel = document.getElementById('verification-status-panel');
+      const badge = document.getElementById('verif-status-badge');
+
+      try {
+        const res = await API.getVerifications('student', { user_id: currentUser.user_id });
+        if (res.success && res.data && res.data.length > 0) {
+          const v = res.data[0];
+          const status = (v.verification_status || 'PENDING').toUpperCase();
+
+          if (status === 'VERIFIED') {
+            badge.className = 'badge badge-success ms-1';
+            badge.innerHTML = '<i class="fa-solid fa-check"></i> Verified Student';
+            panel.innerHTML = `
+              <div style="background: var(--primary-soft); border-left: 4px solid var(--primary); padding: 1rem; border-radius: var(--radius-sm);">
+                <strong style="color: var(--primary);"><i class="fa-solid fa-shield-check"></i> Your Student ID is Verified!</strong>
+                <p style="margin: 0.25rem 0 0; font-size: 0.85rem; color: var(--text-muted);">
+                  Verified on ${App.formatDate(v.reviewed_at)}. Landlords will see your verified status badge.
+                </p>
+              </div>
+            `;
+            document.getElementById('verification-form').style.display = 'none';
+          } else if (status === 'REJECTED') {
+            badge.className = 'badge badge-danger ms-1';
+            badge.innerHTML = '<i class="fa-solid fa-xmark"></i> Rejected';
+            panel.innerHTML = `
+              <div style="background: var(--accent-red-light); border-left: 4px solid var(--accent-red); padding: 1rem; border-radius: var(--radius-sm);">
+                <strong style="color: var(--accent-red);"><i class="fa-solid fa-circle-exclamation"></i> Verification Rejected</strong>
+                <p style="margin: 0.25rem 0 0; font-size: 0.85rem; color: var(--text-main);">
+                  Reason: ${App.escapeHtml(v.rejection_reason || 'Document could not be verified.')}
+                </p>
+                <span style="font-size: 0.75rem; color: var(--text-muted);">You can re-upload a clear copy below.</span>
+              </div>
+            `;
+          } else {
+            badge.className = 'badge badge-warning ms-1';
+            badge.innerHTML = '<i class="fa-solid fa-clock"></i> Verification Pending';
+            panel.innerHTML = `
+              <div style="background: var(--accent-amber-light); border-left: 4px solid var(--accent-amber); padding: 1rem; border-radius: var(--radius-sm);">
+                <strong style="color: var(--accent-amber);"><i class="fa-solid fa-hourglass-half"></i> Verification Pending Review</strong>
+                <p style="margin: 0.25rem 0 0; font-size: 0.85rem; color: var(--text-muted);">
+                  Submitted on ${App.formatDate(v.submitted_at)}. An administrator will review your ID shortly.
+                </p>
+              </div>
+            `;
+          }
+        } else {
+          badge.className = 'badge badge-muted ms-1';
+          badge.textContent = 'Unverified';
+          panel.innerHTML = `<p style="font-size: 0.85rem; color: var(--text-muted);">No student ID submitted yet.</p>`;
+        }
+      } catch (err) {
+        console.error('Error fetching verification status:', err);
+      }
+    }
+
+    async function handleProfileUpdate(e) {
+      e.preventDefault();
+      const fullName = document.getElementById('edit-fullname').value.trim();
+      const email = document.getElementById('edit-email').value.trim();
+      const phone = document.getElementById('edit-phone').value.trim();
+      const password = document.getElementById('edit-password').value;
+
+      const btn = document.getElementById('btn-save-profile');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+
+      try {
+        const payload = {
+          user_id: currentUser.user_id,
+          full_name: fullName,
+          email: email,
+          phone: phone
+        };
+        if (password) payload.password = password;
+
+        const res = await API.updateUser(payload);
+        if (res.success) {
+          currentUser.full_name = fullName;
+          currentUser.email = email;
+          currentUser.phone = phone;
+          Auth.setUser(currentUser);
+          App.toast('Profile updated successfully!', 'success');
+          initProfile();
+        } else {
+          App.toast(res.message || 'Failed to update profile.', 'error');
+        }
+      } catch (err) {
+        console.error('Error updating profile:', err);
+        App.toast('Error saving changes.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save Profile Changes';
+      }
+    }
+
+    async function submitStudentIdVerification(e) {
+      e.preventDefault();
+      const fileInput = document.getElementById('verif-file');
+      if (!fileInput.files || fileInput.files.length === 0) {
+        App.toast('Please choose a file to upload.', 'warning');
+        return;
+      }
+
+      const btn = document.getElementById('btn-submit-verif');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...';
+
+      try {
+        const formData = new FormData();
+        formData.append('type', 'student');
+        formData.append('user_id', currentUser.user_id);
+        formData.append('document', fileInput.files[0]);
+
+        const res = await API.submitVerification('student', formData);
+        if (res.success) {
+          App.toast('Student ID submitted for verification!', 'success');
+          fileInput.value = '';
+          loadStudentVerificationStatus();
+        } else {
+          App.toast(res.message || 'Verification submission failed.', 'error');
+        }
+      } catch (err) {
+        console.error('Error submitting verification:', err);
+        App.toast('Error submitting verification.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-upload"></i> Submit for Verification';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', initProfile);
+  </script>
+</body>
+</html>

@@ -575,7 +575,7 @@ public class PaymentActivity extends AppCompatActivity {
 
         final String fullUrl;
         if (houseGcashQrCode != null && !houseGcashQrCode.trim().isEmpty() && !"null".equalsIgnoreCase(houseGcashQrCode.trim())) {
-            fullUrl = houseGcashQrCode.startsWith("http") ? houseGcashQrCode : "http://10.209.52.109/Dormigo_Backend/" + houseGcashQrCode;
+            fullUrl = houseGcashQrCode.startsWith("http") ? houseGcashQrCode : "http://172.20.10.3/Dormigo_Backend/" + houseGcashQrCode;
         } else {
             fullUrl = "";
         }

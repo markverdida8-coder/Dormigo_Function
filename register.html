@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register - DORMIGO</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body style="background-color: var(--bg-page);">
+
+  <!-- NAVBAR -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="nav-brand">
+        <img src="assets/img/logo.svg" alt="Dormigo Logo" width="36" height="36">
+        <span>DORMIGO</span>
+      </a>
+
+      <div class="nav-actions">
+        <span style="font-size: 0.9rem; color: var(--text-muted);">Already have an account?</span>
+        <a href="login.html" class="btn btn-outline-primary btn-sm">Log In</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="auth-wrapper">
+    <div class="auth-card" style="max-width: 520px;">
+      <div class="auth-header">
+        <div class="auth-logo">
+          <img src="assets/img/logo.svg" alt="Dormigo" width="40" height="40">
+          <span>DORMIGO</span>
+        </div>
+        <h2 style="font-size: 1.5rem; margin-bottom: 0.35rem;">Create Your Account</h2>
+        <p>Join the student accommodation network</p>
+      </div>
+
+      <!-- ROLE SELECTOR -->
+      <div class="auth-tabs" id="reg-role-tabs">
+        <div class="auth-tab active" data-role="STUDENT" onclick="setRegRole('STUDENT')">
+          <i class="fa-solid fa-graduation-cap me-1"></i> I'm a Student
+        </div>
+        <div class="auth-tab" data-role="LANDLORD" onclick="setRegRole('LANDLORD')">
+          <i class="fa-solid fa-house-chimney-user me-1"></i> I'm a Landlord
+        </div>
+      </div>
+
+      <form id="register-form" onsubmit="handleRegister(event)">
+        <input type="hidden" id="reg-user-type" value="STUDENT">
+
+        <div class="form-group">
+          <label class="form-label" for="reg-fullname">Full Name *</label>
+          <input 
+            type="text" 
+            id="reg-fullname" 
+            class="form-control" 
+            placeholder="e.g. Maria Santos" 
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="reg-email">Email Address *</label>
+          <input 
+            type="email" 
+            id="reg-email" 
+            class="form-control" 
+            placeholder="student@university.edu.ph" 
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="reg-phone">Phone Number</label>
+          <input 
+            type="tel" 
+            id="reg-phone" 
+            class="form-control" 
+            placeholder="+63 912 345 6789"
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="reg-password">Password *</label>
+          <input 
+            type="password" 
+            id="reg-password" 
+            class="form-control" 
+            placeholder="At least 6 characters" 
+            minlength="6"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="reg-confirm-password">Confirm Password *</label>
+          <input 
+            type="password" 
+            id="reg-confirm-password" 
+            class="form-control" 
+            placeholder="Confirm your password" 
+            minlength="6"
+            required
+          >
+        </div>
+
+        <div style="margin: 1.25rem 0; font-size: 0.85rem; color: var(--text-muted);">
+          By registering, you agree to Dormigo's Terms of Service and Privacy Policy for student housing.
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block btn-lg" id="btn-register">
+          <i class="fa-solid fa-user-plus"></i> Complete Registration
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    Auth.redirectIfLoggedIn();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const roleParam = urlParams.get('role');
+    if (roleParam && roleParam.toUpperCase() === 'LANDLORD') {
+      setRegRole('LANDLORD');
+    }
+
+    function setRegRole(role) {
+      document.getElementById('reg-user-type').value = role;
+      document.querySelectorAll('#reg-role-tabs .auth-tab').forEach(tab => {
+        if (tab.dataset.role === role) {
+          tab.classList.add('active');
+        } else {
+          tab.classList.remove('active');
+        }
+      });
+    }
+
+    async function handleRegister(e) {
+      e.preventDefault();
+      const fullName = document.getElementById('reg-fullname').value.trim();
+      const email = document.getElementById('reg-email').value.trim();
+      const phone = document.getElementById('reg-phone').value.trim();
+      const password = document.getElementById('reg-password').value;
+      const confirmPassword = document.getElementById('reg-confirm-password').value;
+      const userType = document.getElementById('reg-user-type').value;
+
+      if (password !== confirmPassword) {
+        App.toast('Passwords do not match.', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('btn-register');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Registering...';
+
+      try {
+        const payload = {
+          full_name: fullName,
+          email: email,
+          phone: phone,
+          password: password,
+          user_type: userType
+        };
+
+        const res = await API.register(payload);
+        if (res.success && res.user) {
+          Auth.setUser(res.user);
+          App.toast('Account registered successfully! Redirecting...', 'success');
+          setTimeout(() => {
+            window.location.href = Auth.getDashboardUrl(res.user.user_type);
+          }, 1000);
+        } else {
+          App.toast(res.message || 'Registration failed.', 'error');
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Complete Registration';
+        }
+      } catch (err) {
+        console.error('Registration error:', err);
+        App.toast('Failed to register account.', 'error');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Complete Registration';
+      }
+    }
+  </script>
+</body>
+</html>

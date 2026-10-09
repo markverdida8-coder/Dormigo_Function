@@ -293,7 +293,7 @@ public class LandlordTransactionHistoryActivity extends AppCompatActivity implem
         if (layoutProofContainer != null && dialogProofImage != null) {
             if (proofImage != null && !proofImage.trim().isEmpty() && !"null".equalsIgnoreCase(proofImage.trim())) {
                 layoutProofContainer.setVisibility(View.VISIBLE);
-                String fullUrl = proofImage.startsWith("http") ? proofImage : "http://10.209.52.109/Dormigo_Backend/" + proofImage;
+                String fullUrl = proofImage.startsWith("http") ? proofImage : "http://172.20.10.3/Dormigo_Backend/" + proofImage;
                 Glide.with(this)
                         .load(fullUrl)
                         .placeholder(R.drawable.bg_image_placeholder)

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notifications - DORMIGO Student</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+</head>
+<body>
+
+  <div class="dashboard-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="../index.html" class="sidebar-brand">
+          <img src="../assets/img/logo.svg" alt="Dormigo" width="34" height="34">
+          <span>DORMIGO</span>
+        </a>
+        <button class="sidebar-close" onclick="toggleSidebar()">&times;</button>
+      </div>
+
+      <div class="sidebar-content">
+        <div class="nav-section-title">Navigation</div>
+        <a href="../index.html" class="sidebar-link"><i class="fa-solid fa-house"></i> Home</a>
+        <a href="../explore.html" class="sidebar-link"><i class="fa-solid fa-compass"></i> Explore</a>
+
+        <div class="nav-section-title">Student Portal</div>
+        <a href="dashboard.html" class="sidebar-link"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+        <a href="bookings.html" class="sidebar-link"><i class="fa-solid fa-calendar-check"></i> My Bookings</a>
+        <a href="payments.html" class="sidebar-link"><i class="fa-solid fa-credit-card"></i> Payments</a>
+        <a href="messages.html" class="sidebar-link"><i class="fa-solid fa-comments"></i> Messages</a>
+        <a href="reviews.html" class="sidebar-link"><i class="fa-solid fa-star"></i> Reviews</a>
+        <a href="notifications.html" class="sidebar-link active"><i class="fa-solid fa-bell"></i> Notifications</a>
+        <a href="profile.html" class="sidebar-link"><i class="fa-solid fa-user"></i> Profile</a>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="user-avatar"><i class="fa-solid fa-user"></i></div>
+        <div class="user-info">
+          <div class="user-name" id="sidebar-user-name">Student</div>
+          <div class="user-role-badge">Student Tenant</div>
+        </div>
+        <button class="logout-btn" onclick="Auth.logout()"><i class="fa-solid fa-right-from-bracket"></i></button>
+      </div>
+    </aside>
+
+    <div class="main-wrapper">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+          <h2 class="page-title">Notifications</h2>
+        </div>
+        <div class="topbar-right">
+          <button class="btn btn-sm btn-outline-primary" onclick="markAllRead()">
+            <i class="fa-solid fa-check-double"></i> Mark All as Read
+          </button>
+        </div>
+      </header>
+
+      <main class="dashboard-content">
+        <div style="margin-bottom: 2rem;">
+          <h1 style="font-size: 1.75rem; margin-bottom: 0.25rem;">Notification Center</h1>
+          <p>Real-time updates regarding your booking requests, payments, and admin verifications.</p>
+        </div>
+
+        <div class="table-card" style="padding: 1.5rem;">
+          <div id="notifications-list" style="display: flex; flex-direction: column; gap: 0.85rem;">
+            <div style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
+              <i class="fa-solid fa-spinner fa-spin fa-2x" style="color: var(--primary);"></i>
+              <p style="margin-top: 0.5rem;">Loading notifications...</p>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script>
+    const currentUser = Auth.requireAuth(['STUDENT']);
+
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('show');
+    }
+
+    async function loadNotifications() {
+      if (!currentUser) return;
+      document.getElementById('sidebar-user-name').textContent = currentUser.full_name;
+
+      const container = document.getElementById('notifications-list');
+      try {
+        const res = await API.getNotifications(currentUser.user_id);
+        if (res.success && res.data) {
+          const list = res.data;
+          if (list.length === 0) {
+            container.innerHTML = `
+              <div style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                <i class="fa-regular fa-bell fa-3x" style="color: var(--text-light); margin-bottom: 1rem;"></i>
+                <h4>No notifications</h4>
+                <p>You're all caught up!</p>
+              </div>
+            `;
+            return;
+          }
+
+          container.innerHTML = list.map(n => {
+            let icon = 'fa-bell';
+            let iconColor = 'var(--primary)';
+            if (n.type === 'REQUEST') { icon = 'fa-calendar-check'; iconColor = 'var(--accent-blue)'; }
+            if (n.type === 'PAYMENT') { icon = 'fa-wallet'; iconColor = '#10B981'; }
+            if (n.type === 'MESSAGE') { icon = 'fa-comment'; iconColor = '#8B5CF6'; }
+
+            return `
+              <div style="display: flex; gap: 1rem; align-items: flex-start; padding: 1.25rem; border-radius: var(--radius-md); background: ${n.is_read ? 'white' : 'var(--primary-soft)'}; border: 1px solid var(--border-color); transition: var(--transition);">
+                <div style="width: 44px; height: 44px; border-radius: var(--radius-sm); background: white; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; color: ${iconColor}; flex-shrink: 0;">
+                  <i class="fa-solid ${icon}"></i>
+                </div>
+                <div style="flex: 1; min-width: 0;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem; flex-wrap: wrap; gap: 0.5rem;">
+                    <strong style="font-size: 1rem; color: var(--text-main);">${App.escapeHtml(n.title)}</strong>
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                      <span style="font-size: 0.75rem; color: var(--text-light);">${App.formatDateTime(n.created_at)}</span>
+                      ${!n.is_read ? `
+                        <button class="btn btn-sm" style="font-size: 0.75rem; padding: 0.15rem 0.5rem; background: white;" onclick="markSingleRead(${n.notification_id})">
+                          Mark Read
+                        </button>
+                      ` : ''}
+                    </div>
+                  </div>
+                  <p style="margin: 0; font-size: 0.925rem; color: var(--text-muted); line-height: 1.5;">${App.escapeHtml(n.message)}</p>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+      } catch (err) {
+        console.error('Error fetching notifications:', err);
+      }
+    }
+
+    async function markSingleRead(notifId) {
+      try {
+        await API.markNotificationRead(notifId);
+        loadNotifications();
+      } catch (err) {
+        console.error('Error marking read:', err);
+      }
+    }
+
+    async function markAllRead() {
+      try {
+        await API.markAllNotificationsRead(currentUser.user_id);
+        App.toast('All notifications marked as read.', 'success');
+        loadNotifications();
+      } catch (err) {
+        console.error('Error marking all read:', err);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadNotifications);
+  </script>
+</body>
+</html>

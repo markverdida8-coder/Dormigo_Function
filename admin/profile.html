@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Profile - DORMIGO Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="assets/css/admin.css">
+</head>
+<body>
+
+  <div class="adm-layout" id="adm-layout-body">
+    <div>
+      <!-- Page Header -->
+      <div class="adm-page-header">
+        <div>
+          <h1>Administrator Profile</h1>
+          <p>Manage your system administrator credentials, security access, and personal account details.</p>
+        </div>
+      </div>
+
+      <!-- PROFILE BANNER CARD -->
+      <div class="adm-card" style="padding: 2rem; background: linear-gradient(135deg, #0F2C23 0%, #1B5E4C 100%); color: white; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1.5rem; margin-bottom: 2rem;">
+        <div style="display: flex; align-items: center; gap: 1.5rem;">
+          <div class="adm-profile-avatar-large" id="profile-avatar">?</div>
+          <div>
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.25rem;">
+              <h2 style="color: white; font-size: 1.65rem; margin: 0;" id="profile-name">Administrator</h2>
+              <span class="adm-badge adm-badge-warning" style="background: rgba(254,243,199,0.25); color: #FEF3C7; border: 1px solid rgba(254,243,199,0.4);">
+                <i class="fa-solid fa-shield-halved"></i> SYSTEM ADMIN
+              </span>
+            </div>
+            <p style="color: rgba(255,255,255,0.85); font-size: 0.95rem; margin: 0;" id="profile-email">admin@dormigo.com</p>
+          </div>
+        </div>
+
+        <div>
+          <button class="adm-btn adm-btn-danger" onclick="confirmLogout()">
+            <i class="fa-solid fa-right-from-bracket"></i> Sign Out
+          </button>
+        </div>
+      </div>
+
+      <!-- TWO-COLUMN LAYOUT: EDIT PROFILE & CHANGE PASSWORD -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 2rem;">
+        
+        <!-- EDIT PROFILE DETAILS -->
+        <div class="adm-card">
+          <div class="adm-card-header">
+            <div class="adm-card-title">
+              <i class="fa-solid fa-user-pen"></i> Profile Information
+            </div>
+          </div>
+          <div class="adm-card-body">
+            <form id="edit-profile-form">
+              <div class="adm-form-group">
+                <label class="adm-form-label" for="edit-name">Full Name</label>
+                <input type="text" id="edit-name" class="adm-form-control" placeholder="Administrator Name" required>
+              </div>
+
+              <div class="adm-form-group">
+                <label class="adm-form-label" for="edit-email">Email Address</label>
+                <input type="email" id="edit-email" class="adm-form-control" disabled style="background: var(--adm-bg-muted); cursor: not-allowed;" title="Email cannot be altered">
+                <div class="adm-form-hint">Email address is fixed as the primary system identifier.</div>
+              </div>
+
+              <div class="adm-form-group">
+                <label class="adm-form-label" for="edit-phone">Contact Phone</label>
+                <input type="text" id="edit-phone" class="adm-form-control" placeholder="09123456789">
+              </div>
+
+              <div class="adm-form-group">
+                <label class="adm-form-label" for="edit-image">Profile Image URL</label>
+                <input type="text" id="edit-image" class="adm-form-control" placeholder="https://example.com/photo.jpg">
+                <div class="adm-form-hint">Enter an image URL to customize your administrator avatar.</div>
+              </div>
+
+              <button type="submit" class="adm-btn adm-btn-primary" id="btn-save-profile">
+                <i class="fa-solid fa-floppy-disk me-1"></i> Save Changes
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- CHANGE PASSWORD -->
+        <div class="adm-card">
+          <div class="adm-card-header">
+            <div class="adm-card-title">
+              <i class="fa-solid fa-key"></i> Security & Password
+            </div>
+          </div>
+          <div class="adm-card-body">
+            <form id="change-password-form">
+              <div class="adm-form-group">
+                <label class="adm-form-label" for="new-password">New Admin Password</label>
+                <input type="password" id="new-password" class="adm-form-control" placeholder="Minimum 6 characters" minlength="6" required>
+              </div>
+
+              <div class="adm-form-group">
+                <label class="adm-form-label" for="confirm-password">Confirm New Password</label>
+                <input type="password" id="confirm-password" class="adm-form-control" placeholder="Re-enter new password" minlength="6" required>
+              </div>
+
+              <div style="background: var(--adm-bg-muted); padding: 1rem; border-radius: var(--adm-radius-md); font-size: 0.825rem; color: var(--adm-text-muted); margin-bottom: 1.25rem;">
+                <i class="fa-solid fa-lock" style="color: var(--adm-primary); margin-right: 4px;"></i>
+                Passwords are securely updated on the server and verified via prepared SQL statements.
+              </div>
+
+              <button type="submit" class="adm-btn adm-btn-primary" id="btn-save-password">
+                <i class="fa-solid fa-shield me-1"></i> Update Password
+              </button>
+            </form>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <script src="assets/js/admin-api.js"></script>
+  <script src="assets/js/admin-auth.js"></script>
+  <script src="assets/js/admin-app.js"></script>
+  <script src="assets/js/admin-layout.js"></script>
+  <script>
+    let currentAdminUser = null;
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      currentAdminUser = await AdminLayout.init('profile', 'Admin Profile');
+      if (!currentAdminUser) return;
+
+      populateProfile(currentAdminUser);
+      setupFormListeners();
+    });
+
+    function populateProfile(u) {
+      document.getElementById('profile-name').textContent = u.full_name || 'Administrator';
+      document.getElementById('profile-email').textContent = u.email || 'admin@dormigo.com';
+
+      document.getElementById('edit-name').value = u.full_name || '';
+      document.getElementById('edit-email').value = u.email || '';
+      document.getElementById('edit-phone').value = u.phone || '';
+      document.getElementById('edit-image').value = u.profile_image || '';
+
+      const avatarEl = document.getElementById('profile-avatar');
+      if (u.profile_image) {
+        avatarEl.innerHTML = `<img src="${AdminApp.resolvePhotoUrl(u.profile_image)}" alt="" style="width:100%; height:100%; object-fit:cover;">`;
+      } else {
+        avatarEl.textContent = AdminApp.avatarInitials(u.full_name);
+      }
+    }
+
+    function setupFormListeners() {
+      // Profile form
+      document.getElementById('edit-profile-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('btn-save-profile');
+        btn.disabled = true;
+
+        const payload = {
+          full_name: document.getElementById('edit-name').value.trim(),
+          phone: document.getElementById('edit-phone').value.trim(),
+          profile_image: document.getElementById('edit-image').value.trim()
+        };
+
+        try {
+          const res = await AdminAPI.updateAdminProfile(payload);
+          if (res.success) {
+            AdminApp.toast('Admin profile updated successfully!', 'success');
+            // Update local state
+            currentAdminUser.full_name = payload.full_name;
+            currentAdminUser.phone = payload.phone;
+            currentAdminUser.profile_image = payload.profile_image;
+            AdminAuth.setUser(currentAdminUser);
+            populateProfile(currentAdminUser);
+            AdminApp.renderSidebarUser(currentAdminUser);
+          } else {
+            AdminApp.toast(res.message || 'Profile update failed.', 'error');
+          }
+        } catch (err) {
+          AdminApp.toast('Network error updating profile.', 'error');
+        } finally {
+          btn.disabled = false;
+        }
+      });
+
+      // Password form
+      document.getElementById('change-password-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const newPw = document.getElementById('new-password').value;
+        const confirmPw = document.getElementById('confirm-password').value;
+
+        if (newPw !== confirmPw) {
+          AdminApp.toast('Passwords do not match. Please re-enter.', 'warning');
+          return;
+        }
+
+        const btn = document.getElementById('btn-save-password');
+        btn.disabled = true;
+
+        try {
+          const res = await AdminAPI.updateAdminProfile({ new_password: newPw });
+          if (res.success) {
+            AdminApp.toast('Password changed successfully!', 'success');
+            document.getElementById('new-password').value = '';
+            document.getElementById('confirm-password').value = '';
+          } else {
+            AdminApp.toast(res.message || 'Password update failed.', 'error');
+          }
+        } catch (err) {
+          AdminApp.toast('Network error changing password.', 'error');
+        } finally {
+          btn.disabled = false;
+        }
+      });
+    }
+
+    function confirmLogout() {
+      AdminApp.confirm(
+        'Are you sure you want to log out of the Dormigo Admin Portal?',
+        () => AdminAuth.logout(),
+        { title: 'Confirm Logout', confirmText: 'Log Out', danger: true }
+      );
+    }
+  </script>
+</body>
+</html>

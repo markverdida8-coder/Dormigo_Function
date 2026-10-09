@@ -177,7 +177,7 @@ public class AdminVerificationActivity extends AppCompatActivity {
     }
 
     private void loadVerificationsData() {
-        String url = "http://10.209.52.109/Dormigo_Backend/api/get_admin_dashboard_stats.php";
+        String url = "http://172.20.10.3/Dormigo_Backend/api/get_admin_dashboard_stats.php";
         Request request = new Request.Builder().url(url).get().build();
         new OkHttpClient().newCall(request).enqueue(new Callback() {
             @Override
@@ -433,7 +433,7 @@ public class AdminVerificationActivity extends AppCompatActivity {
 
             RequestBody body = RequestBody.create(json.toString(), MediaType.get("application/json; charset=utf-8"));
             Request request = new Request.Builder()
-                    .url("http://10.209.52.109/Dormigo_Backend/api/" + endpoint)
+                    .url("http://172.20.10.3/Dormigo_Backend/api/" + endpoint)
                     .post(body)
                     .build();
 
@@ -488,7 +488,7 @@ public class AdminVerificationActivity extends AppCompatActivity {
 
             RequestBody body = RequestBody.create(json.toString(), MediaType.get("application/json; charset=utf-8"));
             Request request = new Request.Builder()
-                    .url("http://10.209.52.109/Dormigo_Backend/api/" + endpoint)
+                    .url("http://172.20.10.3/Dormigo_Backend/api/" + endpoint)
                     .post(body)
                     .build();
 

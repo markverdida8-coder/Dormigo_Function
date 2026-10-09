@@ -92,7 +92,7 @@ public class LandlordReviewsActivity extends AppCompatActivity {
             return;
         }
 
-        String url = "http://10.209.52.109/Dormigo_Backend/api/reviews.php?house_id=" + houseId;
+        String url = "http://172.20.10.3/Dormigo_Backend/api/reviews.php?house_id=" + houseId;
         Request request = new Request.Builder().url(url).get().build();
         new OkHttpClient().newCall(request).enqueue(new Callback() {
             @Override
