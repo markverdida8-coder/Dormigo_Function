@@ -15,3 +15,5 @@ app/build/
 local.properties
 
 /app/build/
+php_backend/logs/
+php_backend/api/mail_config.local.php

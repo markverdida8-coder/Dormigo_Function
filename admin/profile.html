@@ -9,6 +9,46 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="assets/css/admin.css">
+  <style>
+    .otp-modal-input {
+      font-size: 1.75rem !important;
+      font-weight: 800 !important;
+      letter-spacing: 0.5rem !important;
+      text-align: center !important;
+      font-family: 'Courier New', Courier, monospace !important;
+      padding: 0.75rem 1rem !important;
+      border: 2px solid var(--adm-border) !important;
+      border-radius: var(--adm-radius-md) !important;
+    }
+    .otp-modal-input:focus {
+      border-color: var(--adm-primary) !important;
+      box-shadow: 0 0 0 4px var(--adm-primary-soft) !important;
+    }
+    .debug-badge {
+      background: #FEF3C7;
+      color: #92400E;
+      border: 1px dashed #F59E0B;
+      padding: 0.6rem 0.85rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .pw-meter {
+      height: 4px;
+      border-radius: 2px;
+      background: #E2E8F0;
+      margin-top: 6px;
+      overflow: hidden;
+    }
+    .pw-meter-bar {
+      height: 100%;
+      width: 0%;
+      transition: width 0.3s ease, background-color 0.3s ease;
+    }
+  </style>
 </head>
 <body>
 
@@ -85,32 +125,61 @@
           </div>
         </div>
 
-        <!-- CHANGE PASSWORD -->
+        <!-- CHANGE PASSWORD (PROTECTED WITH EMAIL OTP) -->
         <div class="adm-card">
           <div class="adm-card-header">
             <div class="adm-card-title">
-              <i class="fa-solid fa-key"></i> Security & Password
+              <i class="fa-solid fa-shield-halved"></i> Security & Password
             </div>
+            <span class="adm-badge adm-badge-success" style="font-size: 0.75rem;">
+              <i class="fa-solid fa-envelope-shield"></i> OTP Protected
+            </span>
           </div>
           <div class="adm-card-body">
             <form id="change-password-form">
+              <!-- Current Password -->
               <div class="adm-form-group">
-                <label class="adm-form-label" for="new-password">New Admin Password</label>
-                <input type="password" id="new-password" class="adm-form-control" placeholder="Minimum 6 characters" minlength="6" required>
+                <label class="adm-form-label" for="current-password">Current Admin Password *</label>
+                <div class="adm-password-wrap">
+                  <input type="password" id="current-password" class="adm-form-control" placeholder="Enter your current password" required>
+                  <button type="button" class="adm-pw-toggle" onclick="togglePasswordVisibility('current-password', this)">
+                    <i class="fa-solid fa-eye"></i>
+                  </button>
+                </div>
               </div>
 
+              <!-- New Password -->
               <div class="adm-form-group">
-                <label class="adm-form-label" for="confirm-password">Confirm New Password</label>
-                <input type="password" id="confirm-password" class="adm-form-control" placeholder="Re-enter new password" minlength="6" required>
+                <label class="adm-form-label" for="new-password">New Admin Password *</label>
+                <div class="adm-password-wrap">
+                  <input type="password" id="new-password" class="adm-form-control" placeholder="Minimum 8 characters" minlength="8" required oninput="checkPasswordStrength(this.value)">
+                  <button type="button" class="adm-pw-toggle" onclick="togglePasswordVisibility('new-password', this)">
+                    <i class="fa-solid fa-eye"></i>
+                  </button>
+                </div>
+                <div class="pw-meter"><div id="pw-meter-bar" class="pw-meter-bar"></div></div>
+                <div id="pw-hint" class="adm-form-hint" style="margin-top: 4px;">Use at least 8 characters with letters and numbers.</div>
+              </div>
+
+              <!-- Confirm New Password -->
+              <div class="adm-form-group">
+                <label class="adm-form-label" for="confirm-password">Confirm New Password *</label>
+                <div class="adm-password-wrap">
+                  <input type="password" id="confirm-password" class="adm-form-control" placeholder="Re-enter new password" minlength="8" required>
+                  <button type="button" class="adm-pw-toggle" onclick="togglePasswordVisibility('confirm-password', this)">
+                    <i class="fa-solid fa-eye"></i>
+                  </button>
+                </div>
               </div>
 
               <div style="background: var(--adm-bg-muted); padding: 1rem; border-radius: var(--adm-radius-md); font-size: 0.825rem; color: var(--adm-text-muted); margin-bottom: 1.25rem;">
-                <i class="fa-solid fa-lock" style="color: var(--adm-primary); margin-right: 4px;"></i>
-                Passwords are securely updated on the server and verified via prepared SQL statements.
+                <i class="fa-solid fa-circle-info" style="color: var(--adm-primary); margin-right: 4px;"></i>
+                To prevent unauthorized changes, an authorization code will be emailed to your address to confirm this request.
               </div>
 
-              <button type="submit" class="adm-btn adm-btn-primary" id="btn-save-password">
-                <i class="fa-solid fa-shield me-1"></i> Update Password
+              <button type="submit" class="adm-btn adm-btn-primary" id="btn-request-password-change">
+                <span id="btn-pw-text"><i class="fa-solid fa-key me-1"></i> Verify & Change Password</span>
+                <span id="btn-pw-spinner" style="display: none;"><i class="fa-solid fa-spinner fa-spin me-1"></i> Generating Code...</span>
               </button>
             </form>
           </div>
@@ -121,12 +190,73 @@
     </div>
   </div>
 
+  <!-- ════════════════════════════════════════════════════════════════════════ -->
+  <!-- SECURITY CONFIRMATION MODAL: PASSWORD CHANGE OTP -->
+  <!-- ════════════════════════════════════════════════════════════════════════ -->
+  <div class="adm-modal-overlay" id="passwordOtpModal" style="display: none;">
+    <div class="adm-modal" style="max-width: 480px;">
+      <div class="adm-modal-header">
+        <div>
+          <h3 class="adm-modal-title"><i class="fa-solid fa-envelope-shield me-1" style="color: var(--adm-primary);"></i> Confirm Password Change</h3>
+          <div class="adm-modal-subtitle">Two-Factor Security Authorization</div>
+        </div>
+        <button class="adm-modal-close" onclick="closePasswordOtpModal()">&times;</button>
+      </div>
+
+      <div class="adm-modal-body">
+        <p style="font-size: 0.9rem; color: var(--adm-text-main); margin-bottom: 0.5rem;">
+          An authorization code has been dispatched to:
+        </p>
+        <div style="font-weight: 700; color: var(--adm-primary); font-size: 1rem; margin-bottom: 1.25rem;" id="modal-otp-email">
+          admin@dormigo.com
+        </div>
+
+        <!-- Local dev debug banner (when SMTP not active) -->
+        <div id="modal-debug-box" class="debug-badge" style="display: none;">
+          <span><i class="fa-solid fa-bug me-1"></i> Dev Code: <strong id="modal-debug-val">------</strong></span>
+          <button type="button" id="btn-modal-autofill" class="adm-btn adm-btn-outline adm-btn-sm" style="padding: 0.15rem 0.5rem; font-size: 0.75rem;">Fill</button>
+        </div>
+
+        <div class="adm-form-group">
+          <label class="adm-form-label" style="text-align: center; display: block;" for="modal-otp-input">Enter 6-Digit Authorization Code</label>
+          <input 
+            type="text" 
+            id="modal-otp-input" 
+            class="adm-form-control otp-modal-input" 
+            placeholder="000000" 
+            maxlength="6" 
+            inputmode="numeric" 
+            required>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.6rem; font-size: 0.8rem; color: var(--adm-text-muted);">
+            <span>Expires in: <strong id="modal-otp-timer">05:00</strong></span>
+            <button type="button" id="btn-modal-resend" style="background: none; border: none; color: var(--adm-primary); font-weight: 600; cursor: pointer; text-decoration: underline;" disabled>Resend Code</button>
+          </div>
+        </div>
+
+        <div style="background: #FEF3C7; border-left: 4px solid #F59E0B; padding: 0.75rem 1rem; border-radius: 4px; font-size: 0.8rem; color: #92400E;">
+          <i class="fa-solid fa-triangle-exclamation me-1"></i>
+          Once confirmed, your old password will be deactivated immediately.
+        </div>
+      </div>
+
+      <div class="adm-modal-footer">
+        <button type="button" class="adm-btn adm-btn-secondary" onclick="closePasswordOtpModal()">Cancel</button>
+        <button type="button" class="adm-btn adm-btn-success" id="btn-confirm-password-otp">
+          <span id="btn-confirm-text"><i class="fa-solid fa-check me-1"></i> Authorize & Update</span>
+          <span id="btn-confirm-spinner" style="display: none;"><i class="fa-solid fa-spinner fa-spin me-1"></i> Updating...</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script src="assets/js/admin-api.js"></script>
   <script src="assets/js/admin-auth.js"></script>
   <script src="assets/js/admin-app.js"></script>
   <script src="assets/js/admin-layout.js"></script>
   <script>
     let currentAdminUser = null;
+    let modalTimer = null;
+    let modalResendTimer = null;
 
     window.addEventListener('DOMContentLoaded', async () => {
       currentAdminUser = await AdminLayout.init('profile', 'Admin Profile');
@@ -147,14 +277,54 @@
 
       const avatarEl = document.getElementById('profile-avatar');
       if (u.profile_image) {
-        avatarEl.innerHTML = `<img src="${AdminApp.resolvePhotoUrl(u.profile_image)}" alt="" style="width:100%; height:100%; object-fit:cover;">`;
+        avatarEl.innerHTML = `<img src="${AdminApp.resolvePhotoUrl(u.profile_image)}" alt="" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
       } else {
         avatarEl.textContent = AdminApp.avatarInitials(u.full_name);
       }
     }
 
+    function togglePasswordVisibility(inputId, btn) {
+      const input = document.getElementById(inputId);
+      const icon = btn.querySelector('i');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'fa-solid fa-eye-slash';
+      } else {
+        input.type = 'password';
+        icon.className = 'fa-solid fa-eye';
+      }
+    }
+
+    function checkPasswordStrength(pw) {
+      const bar = document.getElementById('pw-meter-bar');
+      const hint = document.getElementById('pw-hint');
+
+      let score = 0;
+      if (pw.length >= 8) score++;
+      if (/[A-Z]/.test(pw)) score++;
+      if (/[0-9]/.test(pw)) score++;
+      if (/[^A-Za-z0-9]/.test(pw)) score++;
+
+      if (score === 0) {
+        bar.style.width = '0%';
+        hint.textContent = 'Use at least 8 characters with letters and numbers.';
+      } else if (score <= 2) {
+        bar.style.width = '35%';
+        bar.style.backgroundColor = '#EF4444';
+        hint.textContent = 'Weak password. Add uppercase letters or numbers.';
+      } else if (score === 3) {
+        bar.style.width = '70%';
+        bar.style.backgroundColor = '#F59E0B';
+        hint.textContent = 'Moderate strength. Add a special character to make it strong.';
+      } else {
+        bar.style.width = '100%';
+        bar.style.backgroundColor = '#10B981';
+        hint.textContent = 'Strong password.';
+      }
+    }
+
     function setupFormListeners() {
-      // Profile form
+      // 1. Edit Profile Information Form
       document.getElementById('edit-profile-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn = document.getElementById('btn-save-profile');
@@ -170,7 +340,6 @@
           const res = await AdminAPI.updateAdminProfile(payload);
           if (res.success) {
             AdminApp.toast('Admin profile updated successfully!', 'success');
-            // Update local state
             currentAdminUser.full_name = payload.full_name;
             currentAdminUser.phone = payload.phone;
             currentAdminUser.profile_image = payload.profile_image;
@@ -187,35 +356,189 @@
         }
       });
 
-      // Password form
-      document.getElementById('change-password-form').addEventListener('submit', async (e) => {
+      // 2. Change Password Form (Triggers Email OTP)
+      const pwForm = document.getElementById('change-password-form');
+      const btnRequestPw = document.getElementById('btn-request-password-change');
+      const btnPwText = document.getElementById('btn-pw-text');
+      const btnPwSpin = document.getElementById('btn-pw-spinner');
+
+      pwForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const newPw = document.getElementById('new-password').value;
+
+        const currentPw = document.getElementById('current-password').value;
+        const newPw     = document.getElementById('new-password').value;
         const confirmPw = document.getElementById('confirm-password').value;
 
         if (newPw !== confirmPw) {
-          AdminApp.toast('Passwords do not match. Please re-enter.', 'warning');
+          AdminApp.toast('New passwords do not match. Please re-enter.', 'warning');
           return;
         }
 
-        const btn = document.getElementById('btn-save-password');
-        btn.disabled = true;
+        if (newPw.length < 8) {
+          AdminApp.toast('New password must be at least 8 characters.', 'warning');
+          return;
+        }
+
+        if (currentPw === newPw) {
+          AdminApp.toast('New password cannot be the same as the current password.', 'warning');
+          return;
+        }
+
+        btnRequestPw.disabled = true;
+        btnPwText.style.display = 'none';
+        btnPwSpin.style.display = 'inline-block';
 
         try {
-          const res = await AdminAPI.updateAdminProfile({ new_password: newPw });
-          if (res.success) {
-            AdminApp.toast('Password changed successfully!', 'success');
-            document.getElementById('new-password').value = '';
-            document.getElementById('confirm-password').value = '';
+          const res = await AdminAPI.requestPasswordOtp(currentPw, newPw);
+
+          if (res.success && res.requires_otp) {
+            openPasswordOtpModal(res);
           } else {
-            AdminApp.toast(res.message || 'Password update failed.', 'error');
+            AdminApp.toast(res.message || 'Verification request failed.', 'error');
           }
         } catch (err) {
-          AdminApp.toast('Network error changing password.', 'error');
+          AdminApp.toast(err.message || 'Error processing request.', 'error');
         } finally {
-          btn.disabled = false;
+          btnRequestPw.disabled = false;
+          btnPwText.style.display = 'inline-block';
+          btnPwSpin.style.display = 'none';
         }
       });
+
+      // 3. Confirm Password OTP Button
+      const btnConfirmOtp = document.getElementById('btn-confirm-password-otp');
+      const btnConfText = document.getElementById('btn-confirm-text');
+      const btnConfSpin = document.getElementById('btn-confirm-spinner');
+      const modalOtpInput = document.getElementById('modal-otp-input');
+
+      btnConfirmOtp.addEventListener('click', async () => {
+        const code = modalOtpInput.value.trim();
+        if (code.length !== 6) {
+          AdminApp.toast('Please enter the 6-digit authorization code.', 'warning');
+          return;
+        }
+
+        btnConfirmOtp.disabled = true;
+        btnConfText.style.display = 'none';
+        btnConfSpin.style.display = 'inline-block';
+
+        try {
+          const res = await AdminAPI.confirmPasswordChange(code);
+          if (res.success) {
+            closePasswordOtpModal();
+            AdminApp.toast('Password updated successfully with security confirmation!', 'success');
+            document.getElementById('current-password').value = '';
+            document.getElementById('new-password').value = '';
+            document.getElementById('confirm-password').value = '';
+            document.getElementById('pw-meter-bar').style.width = '0%';
+          } else {
+            AdminApp.toast(res.message || 'Authorization failed.', 'error');
+          }
+        } catch (err) {
+          AdminApp.toast(err.message || 'Error confirming password change.', 'error');
+        } finally {
+          btnConfirmOtp.disabled = false;
+          btnConfText.style.display = 'inline-block';
+          btnConfSpin.style.display = 'none';
+        }
+      });
+
+      // Format modal OTP input
+      modalOtpInput.addEventListener('input', () => {
+        modalOtpInput.value = modalOtpInput.value.replace(/\D/g, '').slice(0, 6);
+      });
+    }
+
+    function openPasswordOtpModal(data) {
+      document.getElementById('modal-otp-email').textContent = data.email_masked || currentAdminUser.email;
+      const modal = document.getElementById('passwordOtpModal');
+      const debugBox = document.getElementById('modal-debug-box');
+      const debugVal = document.getElementById('modal-debug-val');
+      const input = document.getElementById('modal-otp-input');
+
+      if (data.debug_code) {
+        debugVal.textContent = data.debug_code;
+        debugBox.style.display = 'flex';
+        document.getElementById('btn-modal-autofill').onclick = () => {
+          input.value = data.debug_code;
+          input.focus();
+        };
+      } else {
+        debugBox.style.display = 'none';
+      }
+
+      input.value = '';
+      modal.style.display = 'flex';
+      input.focus();
+
+      startModalTimer(300);
+      startModalResendCooldown(45);
+    }
+
+    function closePasswordOtpModal() {
+      document.getElementById('passwordOtpModal').style.display = 'none';
+      if (modalTimer) clearInterval(modalTimer);
+      if (modalResendTimer) clearInterval(modalResendTimer);
+    }
+
+    function startModalTimer(seconds = 300) {
+      if (modalTimer) clearInterval(modalTimer);
+      const timerEl = document.getElementById('modal-otp-timer');
+      let rem = seconds;
+
+      function tick() {
+        const m = String(Math.floor(rem / 60)).padStart(2, '0');
+        const s = String(rem % 60).padStart(2, '0');
+        timerEl.textContent = `${m}:${s}`;
+        if (rem <= 0) {
+          clearInterval(modalTimer);
+          timerEl.textContent = 'EXPIRED';
+        }
+        rem--;
+      }
+      tick();
+      modalTimer = setInterval(tick, 1000);
+    }
+
+    function startModalResendCooldown(seconds = 45) {
+      if (modalResendTimer) clearInterval(modalResendTimer);
+      const btn = document.getElementById('btn-modal-resend');
+      btn.disabled = true;
+      let sec = seconds;
+
+      function tick() {
+        if (sec > 0) {
+          btn.textContent = `Resend Code (${sec}s)`;
+          sec--;
+        } else {
+          clearInterval(modalResendTimer);
+          btn.disabled = false;
+          btn.textContent = 'Resend Code';
+          btn.onclick = async () => {
+            btn.disabled = true;
+            try {
+              const res = await AdminAPI.resendOtp('PASSWORD_CHANGE');
+              if (res.success) {
+                AdminApp.toast('New authorization code sent.', 'info');
+                if (res.debug_code) {
+                  document.getElementById('modal-debug-val').textContent = res.debug_code;
+                  document.getElementById('modal-debug-box').style.display = 'flex';
+                }
+                startModalTimer(300);
+                startModalResendCooldown(45);
+              } else {
+                AdminApp.toast(res.message || 'Could not resend.', 'error');
+                btn.disabled = false;
+              }
+            } catch (err) {
+              AdminApp.toast(err.message, 'error');
+              btn.disabled = false;
+            }
+          };
+        }
+      }
+      tick();
+      modalResendTimer = setInterval(tick, 1000);
     }
 
     function confirmLogout() {

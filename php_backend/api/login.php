@@ -7,7 +7,7 @@ if (!isset($data['email']) || !isset($data['password'])) {
     echo json_encode(["success" => false, "message" => "Email and password are required."]);
     exit();
 }
-
+    
 $email = trim($data['email']);
 $password = trim($data['password']);
 

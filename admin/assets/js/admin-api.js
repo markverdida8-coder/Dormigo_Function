@@ -65,11 +65,42 @@ const AdminAPI = (() => {
     BASE_URL,
     getBasePath,
 
-    // ── Authentication ─────────────────────────────────────────────────────────
+    // ── Authentication & Two-Factor OTP ─────────────────────────────────────────
     adminLogin: async (email, password) => {
-      return request('admin_auth.php', {
+      return request('admin_auth.php?action=login', {
         method: 'POST',
         body: JSON.stringify({ email, password })
+      });
+    },
+
+    verifyLoginOtp: async (otpCode) => {
+      return request('admin_auth.php?action=verify_login_otp', {
+        method: 'POST',
+        body: JSON.stringify({ otp_code: otpCode })
+      });
+    },
+
+    resendOtp: async (purpose = 'LOGIN_2FA') => {
+      return request('admin_auth.php?action=resend_otp', {
+        method: 'POST',
+        body: JSON.stringify({ purpose })
+      });
+    },
+
+    requestPasswordOtp: async (currentPassword, newPassword) => {
+      return request('admin_auth.php?action=request_password_otp', {
+        method: 'POST',
+        body: JSON.stringify({ 
+          current_password: currentPassword, 
+          new_password: newPassword 
+        })
+      });
+    },
+
+    confirmPasswordChange: async (otpCode) => {
+      return request('admin_auth.php?action=confirm_password_change', {
+        method: 'POST',
+        body: JSON.stringify({ otp_code: otpCode })
       });
     },
 
