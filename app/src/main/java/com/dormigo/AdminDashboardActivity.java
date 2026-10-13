@@ -130,7 +130,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
     }
 
     private void loadDashboardStats() {
-        String url = "http://10.32.189.109/Dormigo_Backend/api/get_admin_dashboard_stats.php";
+        String url = "http://10.193.202.109/Dormigo_Backend/api/get_admin_dashboard_stats.php";
         Request request = new Request.Builder().url(url).get().build();
         new OkHttpClient().newCall(request).enqueue(new Callback() {
             @Override
