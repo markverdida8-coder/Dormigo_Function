@@ -83,7 +83,10 @@ public class EditProfileActivity extends AppCompatActivity {
         String name = prefs.getString("fullName", "User");
         String email = prefs.getString("email", "");
         String phone = prefs.getString("phone", "");
-        String school = prefs.getString("school", "Southwestern University Phinma");
+        String school = prefs.getString("school", "");
+        if ("Not specified".equalsIgnoreCase(school)) {
+            school = "";
+        }
 
         if (inputFullName != null) inputFullName.setText(name);
         if (inputContactNumber != null) inputContactNumber.setText(phone);
@@ -107,7 +110,8 @@ public class EditProfileActivity extends AppCompatActivity {
         String newName = inputFullName != null ? inputFullName.getText().toString().trim() : "";
         String newPhone = inputContactNumber != null ? inputContactNumber.getText().toString().trim() : "";
         String newEmail = inputEmail != null ? inputEmail.getText().toString().trim() : "";
-        String newSchool = inputSchool != null ? inputSchool.getText().toString().trim() : "";
+        String rawSchool = inputSchool != null ? inputSchool.getText().toString().trim() : "";
+        final String newSchool = "Not specified".equalsIgnoreCase(rawSchool) ? "" : rawSchool;
 
         if (newName.isEmpty() || newEmail.isEmpty()) {
             Toast.makeText(this, "Name and Email cannot be empty.", Toast.LENGTH_SHORT).show();

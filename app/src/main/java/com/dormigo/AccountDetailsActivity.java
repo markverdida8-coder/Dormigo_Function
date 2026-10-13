@@ -153,7 +153,7 @@ public class AccountDetailsActivity extends AppCompatActivity {
         String name = prefs.getString("fullName", "User");
         String email = prefs.getString("email", "");
         String phone = prefs.getString("phone", "");
-        String school = prefs.getString("school", "Southwestern University Phinma");
+        String school = prefs.getString("school", "Not specified");
         int userId = prefs.getInt("userId", -1);
 
         displayInfo(name, email, phone, school);
@@ -198,13 +198,13 @@ public class AccountDetailsActivity extends AppCompatActivity {
             accountFullName.setText(name);
         }
         if (accountContactNumber != null) {
-            accountContactNumber.setText(phone.isEmpty() ? "None" : phone);
+            accountContactNumber.setText(phone == null || phone.trim().isEmpty() ? "Not specified" : phone);
         }
         if (accountEmail != null) {
-            accountEmail.setText(email.isEmpty() ? "None" : email);
+            accountEmail.setText(email == null || email.trim().isEmpty() ? "Not specified" : email);
         }
         if (accountSchool != null) {
-            accountSchool.setText(school.isEmpty() ? "None" : school);
+            accountSchool.setText(school == null || school.trim().isEmpty() ? "Not specified" : school);
         }
     }
 
