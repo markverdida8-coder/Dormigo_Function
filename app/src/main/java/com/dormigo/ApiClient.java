@@ -36,7 +36,7 @@ public class ApiClient {
     // Phone and PC must be connected to the same Wi-Fi/network.
 
     private static final String BASE_URL =
-            "http://10.32.189.109/Dormigo_Backend_Test/api/";
+            "http://10.32.189.109/Dormigo_Backend/api/";
 
 
     private static final MediaType JSON =

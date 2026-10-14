@@ -703,7 +703,7 @@ public class HomeActivity extends AppCompatActivity {
 
                             String pPath = getFirstPhotoPath(h);
                             if (img1 != null && !pPath.isEmpty()) {
-                                String imgUrl = "http://10.32.189.109/Dormigo_Backend/" + pPath;
+                                String imgUrl = "http://10.193.202.109/Dormigo_Backend/" + pPath;
                                 Glide.with(this)
                                         .load(imgUrl)
                                         .placeholder(R.drawable.bg_image_placeholder)
@@ -747,7 +747,7 @@ public class HomeActivity extends AppCompatActivity {
 
                             String pPath = getFirstPhotoPath(h);
                             if (img2 != null && !pPath.isEmpty()) {
-                                String imgUrl = "http://10.32.189.109/Dormigo_Backend/" + pPath;
+                                String imgUrl = "http://10.193.202.109/Dormigo_Backend/" + pPath;
                                 Glide.with(this)
                                         .load(imgUrl)
                                         .placeholder(R.drawable.bg_image_placeholder)
@@ -791,7 +791,7 @@ public class HomeActivity extends AppCompatActivity {
 
                             String pPath = getFirstPhotoPath(h);
                             if (img3 != null && !pPath.isEmpty()) {
-                                String imgUrl = "http://10.32.189.109/Dormigo_Backend/" + pPath;
+                                String imgUrl = "http://10.193.202.109/Dormigo_Backend/" + pPath;
                                 Glide.with(this)
                                         .load(imgUrl)
                                         .placeholder(R.drawable.bg_image_placeholder)
@@ -835,7 +835,7 @@ public class HomeActivity extends AppCompatActivity {
 
                             String pPath = getFirstPhotoPath(h);
                             if (img4 != null && !pPath.isEmpty()) {
-                                String imgUrl = "http://10.32.189.109/Dormigo_Backend/" + pPath;
+                                String imgUrl = "http://10.193.202.109/Dormigo_Backend/" + pPath;
                                 Glide.with(this)
                                         .load(imgUrl)
                                         .placeholder(R.drawable.bg_image_placeholder)
