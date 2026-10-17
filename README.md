@@ -2,6 +2,22 @@
 
 Dormigo is a boarding-house discovery and management system. This repository contains an Android application, a PHP/PostgreSQL API, a public web site, and web portals for administrators, landlords, and students.
 
+## Project Contributors
+
+The Dormigo project repository includes contributions from the following group members:
+
+| Group Member | GitHub Account |
+|---|---|
+| John Villegas Cabansag | [Ryudev23](https://github.com/Ryudev23) |
+| Mark Levi Canales | [markverdida8-coder](https://github.com/markverdida8-coder) |
+| Mark Levi Canales | [mavecanalesswu-cpu](https://github.com/mavecanalesswu-cpu) |
+
+**Note:** Mark Levi Canales uses two GitHub accounts for contributions to the Dormigo repository. Therefore, the three contributor accounts represent two group members.
+
+### Commit Documentation
+
+The repository maintains Git commit history to track changes made during development. Future commits will use descriptive messages that clearly explain the implemented features, bug fixes, or documentation updates.
+
 ## Components
 
 | Component | Location | Purpose |
