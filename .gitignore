@@ -38,3 +38,7 @@ uploads/
 
 # Outdated destructive database reset script
 dormigo_database.sql
+
+# Local development artifacts and scratch tests
+.artifacts/
+/tests/
