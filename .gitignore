@@ -42,3 +42,6 @@ dormigo_database.sql
 # Local development artifacts and scratch tests
 .artifacts/
 /tests/
+
+# Allow safe configuration templates
+!php_backend/.env.example

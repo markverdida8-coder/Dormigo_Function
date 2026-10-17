@@ -1,66 +1,100 @@
 # Dormigo
 
-Dormigo is a boarding-house discovery and management system. This repository contains an Android application, a PHP/PostgreSQL API, a public web site, and web portals for administrators, landlords, and students.
+Dormigo is a boarding-house discovery and management system. This repository contains an Android application, separate PHP backends for Android and web portals, a public web site, and web portals for administrators, landlords, and students.
 
 ## Project Contributors
 
-The Dormigo project repository includes contributions from the following group members:
-
 | Group Member | GitHub Account |
-|---|---|
+| --- | --- |
 | John Villegas Cabansag | [Ryudev23](https://github.com/Ryudev23) |
 | Mark Levi Canales | [markverdida8-coder](https://github.com/markverdida8-coder) |
 | Mark Levi Canales | [mavecanalesswu-cpu](https://github.com/mavecanalesswu-cpu) |
 
-**Note:** Mark Levi Canales uses two GitHub accounts for contributions to the Dormigo repository. Therefore, the three contributor accounts represent two group members.
+Mark Levi Canales uses two GitHub accounts for contributions to this repository.
 
-### Commit Documentation
-
-The repository maintains Git commit history to track changes made during development. Future commits will use descriptive messages that clearly explain the implemented features, bug fixes, or documentation updates.
-
-## Components
+## Repository Components
 
 | Component | Location | Purpose |
 | --- | --- | --- |
-| Android application | `app/` | Native Java Android application for students, landlords, and administrators. |
-| Public web site | Root `*.html` and `assets/` | Public browsing, login, registration, and property details. |
-| Admin portal | `admin/` | Administration, verification, reporting, payments, and subscriptions. |
-| Landlord portal | `landlord/` | Property, room, booking, tenant, payment, and profile management. |
-| Student portal | `student/` | Bookings, messages, notifications, payments, reviews, and profile management. |
-| PHP API | `php_backend/api/` | Session-aware REST-style endpoints used by the web portals. |
-| PostgreSQL schema | `dormigo_database.sql` | Development schema and sample seed data. |
+| Android application | `app/` | Native Android application. |
+| Android PHP backend | `android_backend/api/` | PHP API currently used by the Android application deployment. |
+| Android PHP dependencies | `android_backend/composer.json` | Composer dependency definition for the Android backend. |
+| Web PHP backend | `php_backend/api/` | PHP API used by the web portals. |
+| Web database template | `php_backend/.env.example` | Example PostgreSQL environment variables only. |
+| Admin web portal | `admin/` | Web administration portal. |
+| Landlord web portal | `landlord/` | Web portal for landlords. |
+| Student web portal | `student/` | Web portal for students. |
+| Public web assets | `assets/` | Public website JavaScript, CSS, and images. |
+| Gradle wrapper | `gradle/` | Gradle wrapper files and version catalog. |
 
 ## Repository Layout
 
 ```text
 .
-|- app/                         Android app module
-|- gradle/                      Gradle wrapper and version catalog
+|- app/                         Android application module
+|- android_backend/
+|  |- api/                      PHP backend for Android
+|  |- composer.json             PHP dependency definition
+|  `- composer.lock             Locked PHP dependency versions
+|- php_backend/
+|  |- api/                      PHP backend for web portals
+|  `- .env.example              PostgreSQL configuration template
 |- admin/                       Admin web portal
 |- landlord/                    Landlord web portal
 |- student/                     Student web portal
-|- assets/                      Shared public-site assets
-|- php_backend/
-|  |- api/                      PHP endpoints and helpers
-|  `- .env.example              Safe database environment reference
-|- dormigo_database.sql         PostgreSQL schema and development seed data
+|- assets/                      Public website assets
+|- gradle/                      Gradle wrapper files and version catalog
 `- gradlew / gradlew.bat        Gradle wrapper commands
 ```
 
+## Database Initialization Status
+
+The local development file named `dormigo_database.sql` is intentionally excluded from GitHub. It contains destructive `DROP` statements and sample data, so it is not safe as a shared installation script.
+
+A complete, safe PostgreSQL database initialization script is not yet provided. Do not assume that cloning this repository is sufficient to create a working database, and do not run local SQL reset scripts against databases containing real data.
+
 ## Prerequisites
 
-- Android Studio with an Android SDK that supports `compileSdk 37`.
-- JDK 11.
+- Android Studio with Android SDK Platform 37. The Android module uses `compileSdk 37` and `targetSdk 37`.
+- JDK 17 or newer for Gradle 9.6 and Android Gradle Plugin 9.4.1. The Android source is configured with Java 11 source and target compatibility.
 - PHP with the PDO PostgreSQL extension enabled.
 - PostgreSQL.
-- Apache or another PHP-capable web server. XAMPP on Windows is supported by the current deployment paths.
+- Apache or XAMPP for serving the PHP and web portal directories.
+- Composer when working with `android_backend/`; its `composer.json` currently declares PHPMailer.
 
-## Database Configuration
+## Clone And Build Android
 
-The PHP API reads all database connection settings from environment variables. It does not load `.env` files automatically.
+Clone the repository:
 
-1. Use `php_backend/.env.example` as a reference only. Do not copy real values into a tracked file.
-2. Set these variables in your web-server or container environment:
+```bash
+git clone <repository-url>
+cd Dormigo_GitHub_Cleanup
+```
+
+Open the cloned repository root in Android Studio, allow Gradle to sync, select an Android device or emulator, and run the `app` configuration.
+
+To build a debug APK from the command line on Windows:
+
+```powershell
+.\gradlew.bat assembleDebug
+```
+
+The debug APK is generated under `app/build/outputs/apk/debug/`.
+
+## PHP Backends And Deployment
+
+The repository contains separate PHP backend directories:
+
+- `android_backend/api/` contains Android-oriented endpoints and its Composer configuration is in `android_backend/composer.json`.
+- `php_backend/api/` contains endpoints used by the web portals and has `php_backend/.env.example` for database configuration guidance.
+
+These backends are separate code paths. They are not documented as fully integrated or interchangeable deployments. Before deployment, configure the intended server document root, PHP dependencies, database environment, upload directories, and endpoint URLs for the selected backend.
+
+## PostgreSQL Environment Configuration
+
+`php_backend/.env.example` is a template only. The web backend connection code in `php_backend/api/db.php` reads the variables from the server environment; PHP does not automatically load `.env` files.
+
+Configure these environment variables in Apache or the server environment instead of committing credentials:
 
 ```text
 DORMIGO_DB_HOST
@@ -70,66 +104,35 @@ DORMIGO_DB_USER
 DORMIGO_DB_PASSWORD
 ```
 
-For Apache, define the variables in the applicable virtual-host or Apache configuration using `SetEnv`, then restart Apache. For local PHP CLI commands, define them in the shell environment before invoking PHP.
-
-Example Apache configuration:
+For Apache, set the variables in the relevant virtual-host or Apache configuration, then restart Apache. Example names only:
 
 ```apache
-SetEnv DORMIGO_DB_HOST "localhost"
+SetEnv DORMIGO_DB_HOST "database-host"
 SetEnv DORMIGO_DB_PORT "5432"
-SetEnv DORMIGO_DB_NAME "dormigo"
-SetEnv DORMIGO_DB_USER "postgres"
-SetEnv DORMIGO_DB_PASSWORD "use-a-local-secret"
+SetEnv DORMIGO_DB_NAME "database-name"
+SetEnv DORMIGO_DB_USER "database-user"
+SetEnv DORMIGO_DB_PASSWORD "set-this-in-the-server-environment"
 ```
 
-The API returns a generic error when configuration or connection fails and writes technical details only to the server error log.
+For PHP CLI work, export the same variables in the shell session before invoking PHP. Keep real values out of tracked files and Git history.
 
-### Database Schema
+## API URL Configuration
 
-`dormigo_database.sql` contains `DROP TABLE` statements and development sample data. Do not run it against a production database or a database containing live user, booking, payment, or verification data.
+The Android API base URL requires environment-specific configuration. Review `app/src/main/java/com/dormigo/ApiClient.java` before running the Android application.
 
-The schema currently needs reconciliation with the newer admin, verification, and subscription endpoints before a fresh installation can support every feature. See [Known Limitations](#known-limitations).
+Some Android activities and web assets still contain legacy deployment URLs. API URLs are not fully centralized, so changing one base URL may not update every request path. Review and configure the required URLs for the target environment before deployment.
 
-## Local Web Setup
+## Security And Git Hygiene
 
-1. Serve this directory through Apache/PHP, preserving the current directory structure.
-2. Configure the database environment variables above.
-3. Ensure the PHP process can create and write its runtime upload and log directories. These directories must remain untracked.
-4. Open the appropriate portal in the browser. With an XAMPP document root, an example base URL is `http://localhost/Dormigo_Function-WEB-ADMIN/`.
-
-| Portal | Example URL |
-| --- | --- |
-| Public site | `http://localhost/Dormigo_Function-WEB-ADMIN/` |
-| Admin | `http://localhost/Dormigo_Function-WEB-ADMIN/admin/` |
-| Landlord | `http://localhost/Dormigo_Function-WEB-ADMIN/landlord/` |
-| Student | `http://localhost/Dormigo_Function-WEB-ADMIN/student/` |
-
-## Android Setup
-
-1. Open this repository root in Android Studio.
-2. Allow Gradle to sync dependencies.
-3. Configure the API base URLs for your environment before running the app. The main value is in `app/src/main/java/com/dormigo/ApiClient.java`; additional activities also contain legacy deployment URLs.
-4. Connect a device or start an emulator, then run the `app` configuration.
-
-Build a debug APK from the command line:
-
-```powershell
-.\gradlew.bat assembleDebug
-```
-
-The generated APK is placed under `app/build/outputs/apk/debug/` and is intentionally ignored by Git.
-
-## Security and Git Hygiene
-
-- Never commit real database passwords, SMTP credentials, OTP logs, Android signing keys, or user-uploaded files.
-- Keep `php_backend/api/mail_config.local.php` local only. It is ignored by Git.
-- Keep local database values in the host environment, not in source files.
-- Rotate a credential immediately if it has been shared or committed.
-- Review `dormigo_database.sql` sample accounts before sharing the repository publicly.
+- Never commit database passwords, SMTP credentials, OTP logs, signing keys, or uploaded user files.
+- Keep local `.env` files and server-specific configuration outside version control.
+- Do not commit database reset scripts containing destructive statements or sample accounts.
+- Rotate a credential immediately if it has been committed or shared.
 
 ## Known Limitations
 
-- Several Android, PHP, and web-portal paths still reference a separate `Dormigo_Backend` deployment and a development LAN address. Centralize these values before production deployment.
-- The supplied SQL schema does not yet create every table, enum value, or column used by the admin, verification, notification, and subscription API endpoints.
-- The Android test directories currently contain only stock template tests; application behavior is not yet covered by meaningful automated tests.
+- A complete, safe database initialization and migration path is not yet included in GitHub.
+- The Android and web PHP backends are separate and are not yet documented as a fully integrated deployment.
+- Android and web endpoint URLs still require deployment-specific configuration; legacy URLs remain in some files.
+- The repository does not yet include comprehensive automated application tests.
 - The project has no license, contribution guide, or security-policy document yet.
