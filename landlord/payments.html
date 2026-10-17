@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payments - DORMIGO Landlord</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+</head>
+<body>
+
+  <div class="dashboard-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="../index.html" class="sidebar-brand">
+          <img src="../assets/img/logo.svg" alt="Dormigo" width="34" height="34">
+          <span>DORMIGO</span>
+        </a>
+        <button class="sidebar-close" onclick="toggleSidebar()">&times;</button>
+      </div>
+
+      <div class="sidebar-content">
+        <div class="nav-section-title">Main Portal</div>
+        <a href="dashboard.html" class="sidebar-link"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+        <a href="properties.html" class="sidebar-link"><i class="fa-solid fa-building"></i> Properties</a>
+        <a href="rooms.html" class="sidebar-link"><i class="fa-solid fa-door-closed"></i> Rooms</a>
+
+        <div class="nav-section-title">Operations</div>
+        <a href="bookings.html" class="sidebar-link"><i class="fa-solid fa-clipboard-list"></i> Booking Requests</a>
+        <a href="tenants.html" class="sidebar-link"><i class="fa-solid fa-users"></i> Tenants</a>
+        <a href="payments.html" class="sidebar-link active"><i class="fa-solid fa-money-bill-wave"></i> Payments</a>
+
+        <div class="nav-section-title">Communication</div>
+        <a href="messages.html" class="sidebar-link"><i class="fa-solid fa-comments"></i> Messages</a>
+        <a href="reviews.html" class="sidebar-link"><i class="fa-solid fa-star"></i> Reviews</a>
+        <a href="notifications.html" class="sidebar-link"><i class="fa-solid fa-bell"></i> Notifications</a>
+        <a href="profile.html" class="sidebar-link"><i class="fa-solid fa-user-tie"></i> Profile</a>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="user-avatar"><i class="fa-solid fa-house-user"></i></div>
+        <div class="user-info">
+          <div class="user-name" id="sidebar-user-name">Landlord</div>
+          <div class="user-role-badge">Property Owner</div>
+        </div>
+        <button class="logout-btn" onclick="Auth.logout()"><i class="fa-solid fa-right-from-bracket"></i></button>
+      </div>
+    </aside>
+
+    <div class="main-wrapper">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+          <h2 class="page-title">Rent Transactions</h2>
+        </div>
+      </header>
+
+      <main class="dashboard-content">
+        <div style="margin-bottom: 2rem;">
+          <h1 style="font-size: 1.75rem; margin-bottom: 0.25rem;">Payment & Ledger Management</h1>
+          <p>Track student rent collections, review submitted references, and confirm settlements.</p>
+        </div>
+
+        <!-- REVENUE STATS -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon stat-icon-green"><i class="fa-solid fa-peso-sign"></i></div>
+            <div class="stat-info">
+              <div class="stat-value" id="landlord-total-collected">₱0.00</div>
+              <div class="stat-label">Total Collected</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon stat-icon-amber"><i class="fa-solid fa-hourglass-half"></i></div>
+            <div class="stat-info">
+              <div class="stat-value" id="landlord-pending-collections">₱0.00</div>
+              <div class="stat-label">Pending / Unpaid</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon stat-icon-blue"><i class="fa-solid fa-receipt"></i></div>
+            <div class="stat-info">
+              <div class="stat-value" id="landlord-total-invoices">0</div>
+              <div class="stat-label">Total Transactions</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TRANSACTIONS TABLE WITH FILTERS -->
+        <div class="table-card">
+          <div class="table-header">
+            <h3 class="table-title"><i class="fa-solid fa-wallet me-2" style="color: var(--primary);"></i> Transaction Ledger</h3>
+            <div class="table-actions" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+              <!-- Property Filter -->
+              <select id="filter-property" class="form-select" style="width: auto; font-size: 0.85rem;" onchange="renderPaymentsTable()">
+                <option value="ALL">All Properties</option>
+              </select>
+
+              <!-- Tenant Filter -->
+              <input type="text" id="filter-tenant" class="form-control" style="width: 140px; font-size: 0.85rem;" placeholder="Tenant name..." oninput="renderPaymentsTable()">
+
+              <!-- Status Filter -->
+              <select id="filter-status" class="form-select" style="width: auto; font-size: 0.85rem;" onchange="renderPaymentsTable()">
+                <option value="ALL">All Statuses</option>
+                <option value="PENDING">Pending Only</option>
+                <option value="PAID">Paid Only</option>
+                <option value="CONFIRMED">Confirmed Only</option>
+              </select>
+
+              <!-- Date Filter -->
+              <input type="date" id="filter-date" class="form-control" style="width: auto; font-size: 0.85rem;" onchange="renderPaymentsTable()">
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>Ref #</th>
+                  <th>Student / Tenant</th>
+                  <th>Boarding House</th>
+                  <th>Room</th>
+                  <th>Amount</th>
+                  <th>Method</th>
+                  <th>Payment Date</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="payments-table-body">
+                <tr>
+                  <td colspan="9" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
+                    <i class="fa-solid fa-spinner fa-spin fa-2x" style="color: var(--primary);"></i>
+                    <p style="margin-top: 0.5rem;">Loading transactions from database...</p>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script>
+    const currentUser = Auth.requireAuth(['LANDLORD']);
+    let paymentsList = [];
+    let propertiesList = [];
+
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('show');
+    }
+
+    async function initPayments() {
+      if (!currentUser) return;
+      document.getElementById('sidebar-user-name').textContent = currentUser.full_name;
+
+      await loadPropertiesForFilter();
+      await loadPayments();
+    }
+
+    async function loadPropertiesForFilter() {
+      try {
+        const res = await API.getBoardingHouses({ landlord_id: currentUser.user_id });
+        if (res.success && res.data) {
+          propertiesList = res.data;
+          const select = document.getElementById('filter-property');
+          select.innerHTML = '<option value="ALL">All Properties</option>' + 
+            propertiesList.map(h => `<option value="${h.house_id}">${App.escapeHtml(h.house_name)}</option>`).join('');
+        }
+      } catch (err) {
+        console.error('Error loading properties for filter:', err);
+      }
+    }
+
+    async function loadPayments() {
+      try {
+        const res = await API.getPayments({ landlord_id: currentUser.user_id });
+        if (res.success && res.data) {
+          paymentsList = res.data;
+          updateStats();
+          renderPaymentsTable();
+        }
+      } catch (err) {
+        console.error('Error fetching payments:', err);
+      }
+    }
+
+    function updateStats() {
+      let collected = 0;
+      let pending = 0;
+
+      paymentsList.forEach(p => {
+        const val = parseFloat(p.amount) || 0;
+        if (p.status === 'PAID' || p.status === 'CONFIRMED') {
+          collected += val;
+        } else if (p.status === 'PENDING') {
+          pending += val;
+        }
+      });
+
+      document.getElementById('landlord-total-collected').textContent = App.formatCurrency(collected);
+      document.getElementById('landlord-pending-collections').textContent = App.formatCurrency(pending);
+      document.getElementById('landlord-total-invoices').textContent = paymentsList.length;
+    }
+
+    function renderPaymentsTable() {
+      const tbody = document.getElementById('payments-table-body');
+      const propFilter = document.getElementById('filter-property').value;
+      const tenantSearch = (document.getElementById('filter-tenant').value || '').toLowerCase().trim();
+      const statusFilter = document.getElementById('filter-status').value;
+      const dateFilter = document.getElementById('filter-date').value;
+
+      const filtered = paymentsList.filter(p => {
+        if (propFilter !== 'ALL' && p.house_id != propFilter) return false;
+        if (tenantSearch && !(p.tenant_name || '').toLowerCase().includes(tenantSearch)) return false;
+        if (statusFilter !== 'ALL' && (p.status || '').toUpperCase() !== statusFilter) return false;
+        if (dateFilter && p.due_date !== dateFilter && p.payment_date !== dateFilter) return false;
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="9" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
+              No transactions match the selected filters.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(p => {
+        const isPending = (p.status || '').toUpperCase() === 'PENDING';
+        const isPaid = (p.status || '').toUpperCase() === 'PAID';
+
+        return `
+          <tr>
+            <td>
+              <span style="font-family: monospace; font-weight: 700; font-size: 0.85rem;">
+                ${App.escapeHtml(p.transaction_ref || `INV-${p.payment_id}`)}
+              </span>
+            </td>
+            <td>
+              <strong>${App.escapeHtml(p.tenant_name)}</strong>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">${App.escapeHtml(p.tenant_phone || p.tenant_email || '')}</div>
+            </td>
+            <td>${App.escapeHtml(p.house_name)}</td>
+            <td><span class="badge badge-blue">${App.escapeHtml(p.room_number)}</span></td>
+            <td><strong style="color: var(--primary); font-size: 1rem;">${App.formatCurrency(p.amount)}</strong></td>
+            <td><span class="badge badge-muted">${App.escapeHtml(p.payment_method || 'GCash')}</span></td>
+            <td>${p.payment_date ? App.formatDate(p.payment_date) : `<span style="color: var(--text-light);">Due ${App.formatDate(p.due_date)}</span>`}</td>
+            <td>${App.statusBadge(p.status)}</td>
+            <td>
+              <div style="display: flex; gap: 0.4rem;">
+                ${isPaid ? `
+                  <button class="btn btn-sm btn-success" onclick="verifyPayment(${p.payment_id}, 'CONFIRMED')" title="Confirm Receipt">
+                    <i class="fa-solid fa-check"></i> Confirm
+                  </button>
+                ` : ''}
+                ${isPending ? `
+                  <button class="btn btn-sm btn-primary" onclick="verifyPayment(${p.payment_id}, 'PAID')" title="Mark as Paid">
+                    <i class="fa-solid fa-money-check"></i> Mark Paid
+                  </button>
+                ` : ''}
+                <a href="messages.html?partner_id=${p.student_id}" class="btn btn-sm btn-outline-primary" title="Message Tenant">
+                  <i class="fa-solid fa-comment"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function verifyPayment(paymentId, status) {
+      if (!confirm(`Confirm updating payment #${paymentId} status to "${status}"?`)) return;
+
+      try {
+        const res = await API.updatePaymentStatus(paymentId, status, {
+          payment_date: new Date().toISOString().split('T')[0]
+        });
+        if (res.success) {
+          App.toast(`Payment marked as ${status}! Tenant notified.`, 'success');
+          loadPayments();
+        } else {
+          App.toast(res.message || 'Payment status update failed.', 'error');
+        }
+      } catch (err) {
+        console.error('Error updating payment:', err);
+        App.toast('Error updating payment status.', 'error');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', initPayments);
+  </script>
+</body>
+</html>

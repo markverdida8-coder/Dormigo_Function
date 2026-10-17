@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Properties - DORMIGO Landlord</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+</head>
+<body>
+
+  <div class="dashboard-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="../index.html" class="sidebar-brand">
+          <img src="../assets/img/logo.svg" alt="Dormigo" width="34" height="34">
+          <span>DORMIGO</span>
+        </a>
+        <button class="sidebar-close" onclick="toggleSidebar()">&times;</button>
+      </div>
+
+      <div class="sidebar-content">
+        <div class="nav-section-title">Main Portal</div>
+        <a href="dashboard.html" class="sidebar-link"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+        <a href="properties.html" class="sidebar-link active"><i class="fa-solid fa-building"></i> Properties</a>
+        <a href="rooms.html" class="sidebar-link"><i class="fa-solid fa-door-closed"></i> Rooms</a>
+
+        <div class="nav-section-title">Operations</div>
+        <a href="bookings.html" class="sidebar-link"><i class="fa-solid fa-clipboard-list"></i> Booking Requests</a>
+        <a href="tenants.html" class="sidebar-link"><i class="fa-solid fa-users"></i> Tenants</a>
+        <a href="payments.html" class="sidebar-link"><i class="fa-solid fa-money-bill-wave"></i> Payments</a>
+
+        <div class="nav-section-title">Communication</div>
+        <a href="messages.html" class="sidebar-link"><i class="fa-solid fa-comments"></i> Messages</a>
+        <a href="reviews.html" class="sidebar-link"><i class="fa-solid fa-star"></i> Reviews</a>
+        <a href="notifications.html" class="sidebar-link"><i class="fa-solid fa-bell"></i> Notifications</a>
+        <a href="profile.html" class="sidebar-link"><i class="fa-solid fa-user-tie"></i> Profile</a>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="user-avatar"><i class="fa-solid fa-house-user"></i></div>
+        <div class="user-info">
+          <div class="user-name" id="sidebar-user-name">Landlord</div>
+          <div class="user-role-badge">Property Owner</div>
+        </div>
+        <button class="logout-btn" onclick="Auth.logout()"><i class="fa-solid fa-right-from-bracket"></i></button>
+      </div>
+    </aside>
+
+    <div class="main-wrapper">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+          <h2 class="page-title">Property Management</h2>
+        </div>
+        <div class="topbar-right">
+          <a href="add-property.html" class="btn btn-sm btn-primary">
+            <i class="fa-solid fa-plus"></i> List New Boarding House
+          </a>
+        </div>
+      </header>
+
+      <main class="dashboard-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h1 style="font-size: 1.75rem; margin-bottom: 0.25rem;">My Boarding Houses</h1>
+            <p>Manage your properties, rooms, amenities, and visibility status.</p>
+          </div>
+          <a href="add-property.html" class="btn btn-primary">
+            <i class="fa-solid fa-house-medical"></i> + Add Boarding House
+          </a>
+        </div>
+
+        <div class="properties-grid" id="landlord-properties-grid">
+          <div style="grid-column: 1/-1; text-align: center; padding: 3rem;">
+            <i class="fa-solid fa-spinner fa-spin fa-2x" style="color: var(--primary);"></i>
+            <p style="margin-top: 0.5rem;">Loading your properties...</p>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script>
+    const currentUser = Auth.requireAuth(['LANDLORD']);
+
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('show');
+    }
+
+    async function loadLandlordProperties() {
+      if (!currentUser) return;
+      document.getElementById('sidebar-user-name').textContent = currentUser.full_name;
+
+      const grid = document.getElementById('landlord-properties-grid');
+      try {
+        const res = await API.getBoardingHouses({ landlord_id: currentUser.user_id });
+        if (res.success && res.data) {
+          const houses = res.data;
+          if (houses.length === 0) {
+            grid.innerHTML = `
+              <div style="grid-column: 1/-1; text-align: center; padding: 4rem; background: white; border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
+                <i class="fa-solid fa-house-chimney-medical fa-3x" style="color: var(--text-light); margin-bottom: 1rem;"></i>
+                <h3>No Properties Listed Yet</h3>
+                <p style="margin-bottom: 1.5rem;">Start listing your boarding house to connect with university students.</p>
+                <a href="add-property.html" class="btn btn-primary">List Your First Property</a>
+              </div>
+            `;
+            return;
+          }
+
+          grid.innerHTML = houses.map(h => {
+            const photo = (h.photo_paths && h.photo_paths.length > 0) ? h.photo_paths[0] : null;
+            const photoUrl = App.resolvePhotoUrl(photo);
+
+            return `
+              <div class="property-card">
+                <div class="property-img-wrap">
+                  <img src="${photoUrl}" alt="${App.escapeHtml(h.house_name)}" class="property-img" loading="lazy">
+                  <div class="property-price-badge">
+                    Starts at ${App.formatCurrency(h.starting_rent || h.min_rent)}/mo
+                  </div>
+                  <div class="property-status-badge">
+                    ${App.statusBadge(h.status)}
+                  </div>
+                </div>
+
+                <div class="property-body">
+                  <h3 class="property-title">${App.escapeHtml(h.house_name)}</h3>
+                  <div class="property-address">
+                    <i class="fa-solid fa-location-dot"></i>
+                    <span>${App.escapeHtml(h.address)}</span>
+                  </div>
+
+                  <!-- ROOM STATS METRICS -->
+                  <div class="property-stats">
+                    <div class="property-stat-item">
+                      <i class="fa-solid fa-door-closed"></i>
+                      <span><strong>${h.total_rooms || 0}</strong> Total Rooms</span>
+                    </div>
+                    <div class="property-stat-item">
+                      <i class="fa-solid fa-door-open" style="color: #10B981;"></i>
+                      <span><strong>${h.available_rooms || 0}</strong> Avail</span>
+                    </div>
+                    <div class="property-stat-item">
+                      <i class="fa-solid fa-user-check" style="color: var(--accent-amber);"></i>
+                      <span><strong>${h.occupied_rooms || 0}</strong> Occupied</span>
+                    </div>
+                  </div>
+
+                  <!-- ACTIONS -->
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: auto; padding-top: 1rem;">
+                    <a href="../house-details.html?id=${h.house_id}" class="btn btn-sm btn-secondary" target="_blank">
+                      <i class="fa-solid fa-eye"></i> View
+                    </a>
+                    <a href="edit-property.html?id=${h.house_id}" class="btn btn-sm btn-outline-primary">
+                      <i class="fa-solid fa-pen-to-square"></i> Edit
+                    </a>
+                    <a href="rooms.html?house_id=${h.house_id}" class="btn btn-sm btn-primary">
+                      <i class="fa-solid fa-bed"></i> Manage Rooms
+                    </a>
+                    <button class="btn btn-sm btn-danger" onclick="deleteProperty(${h.house_id}, '${App.escapeHtml(h.house_name)}')">
+                      <i class="fa-solid fa-trash"></i> Delete
+                    </button>
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+      } catch (err) {
+        console.error('Error fetching landlord properties:', err);
+        grid.innerHTML = `<div class="p-4 text-center text-danger">Failed to load properties.</div>`;
+      }
+    }
+
+    async function deleteProperty(houseId, name) {
+      if (!confirm(`Are you sure you want to delete "${name}"? This will also remove associated rooms.`)) return;
+
+      try {
+        const res = await API.deleteBoardingHouse(houseId);
+        if (res.success) {
+          App.toast('Property deleted successfully.', 'success');
+          loadLandlordProperties();
+        } else {
+          App.toast(res.message || 'Failed to delete property.', 'error');
+        }
+      } catch (err) {
+        console.error('Error deleting property:', err);
+        App.toast('Error deleting property.', 'error');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadLandlordProperties);
+  </script>
+</body>
+</html>

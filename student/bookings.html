@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Bookings - DORMIGO Student</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+</head>
+<body>
+
+  <div class="dashboard-layout">
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="../index.html" class="sidebar-brand">
+          <img src="../assets/img/logo.svg" alt="Dormigo" width="34" height="34">
+          <span>DORMIGO</span>
+        </a>
+        <button class="sidebar-close" onclick="toggleSidebar()">&times;</button>
+      </div>
+
+      <div class="sidebar-content">
+        <div class="nav-section-title">Navigation</div>
+        <a href="../index.html" class="sidebar-link">
+          <i class="fa-solid fa-house"></i> Home
+        </a>
+        <a href="../explore.html" class="sidebar-link">
+          <i class="fa-solid fa-compass"></i> Explore
+        </a>
+
+        <div class="nav-section-title">Student Portal</div>
+        <a href="dashboard.html" class="sidebar-link">
+          <i class="fa-solid fa-gauge-high"></i> Dashboard
+        </a>
+        <a href="bookings.html" class="sidebar-link active">
+          <i class="fa-solid fa-calendar-check"></i> My Bookings
+        </a>
+        <a href="payments.html" class="sidebar-link">
+          <i class="fa-solid fa-credit-card"></i> Payments
+        </a>
+        <a href="messages.html" class="sidebar-link">
+          <i class="fa-solid fa-comments"></i> Messages
+        </a>
+        <a href="reviews.html" class="sidebar-link">
+          <i class="fa-solid fa-star"></i> Reviews
+        </a>
+        <a href="notifications.html" class="sidebar-link">
+          <i class="fa-solid fa-bell"></i> Notifications
+        </a>
+        <a href="profile.html" class="sidebar-link">
+          <i class="fa-solid fa-user"></i> Profile
+        </a>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="user-avatar"><i class="fa-solid fa-user"></i></div>
+        <div class="user-info">
+          <div class="user-name" id="sidebar-user-name">Student</div>
+          <div class="user-role-badge">Student Tenant</div>
+        </div>
+        <button class="logout-btn" onclick="Auth.logout()"><i class="fa-solid fa-right-from-bracket"></i></button>
+      </div>
+    </aside>
+
+    <div class="main-wrapper">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+          <h2 class="page-title">My Bookings</h2>
+        </div>
+        <div class="topbar-right">
+          <a href="../explore.html" class="btn btn-sm btn-primary">
+            <i class="fa-solid fa-plus"></i> New Room Request
+          </a>
+        </div>
+      </header>
+
+      <main class="dashboard-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h1 style="font-size: 1.75rem; margin-bottom: 0.25rem;">My Room Bookings</h1>
+            <p>Track your reservation requests, approved rooms, and stay durations.</p>
+          </div>
+
+          <!-- STATUS FILTER TABS -->
+          <div style="display: flex; gap: 0.5rem; background: white; padding: 0.35rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+            <button class="btn btn-sm filter-tab active" onclick="filterBookings('ALL', this)">All</button>
+            <button class="btn btn-sm filter-tab" onclick="filterBookings('PENDING', this)">Pending</button>
+            <button class="btn btn-sm filter-tab" onclick="filterBookings('APPROVED', this)">Approved</button>
+            <button class="btn btn-sm filter-tab" onclick="filterBookings('ACTIVE', this)">Active</button>
+          </div>
+        </div>
+
+        <div id="bookings-container" style="display: flex; flex-direction: column; gap: 1.25rem;">
+          <div style="text-align: center; padding: 3rem; color: var(--text-muted);">
+            <i class="fa-solid fa-spinner fa-spin fa-2x" style="color: var(--primary);"></i>
+            <p style="margin-top: 0.5rem;">Loading bookings from database...</p>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script>
+    const currentUser = Auth.requireAuth(['STUDENT']);
+    let userBookings = [];
+    let currentFilter = 'ALL';
+
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('show');
+    }
+
+    async function loadBookings() {
+      if (!currentUser) return;
+      document.getElementById('sidebar-user-name').textContent = currentUser.full_name;
+
+      const container = document.getElementById('bookings-container');
+      try {
+        const res = await API.getBookings({ user_id: currentUser.user_id });
+        if (res.success && res.data) {
+          userBookings = res.data;
+          renderBookingsList();
+        } else {
+          container.innerHTML = `<div class="table-card p-4 text-center">No bookings found.</div>`;
+        }
+      } catch (err) {
+        console.error('Error fetching bookings:', err);
+        container.innerHTML = `<div class="table-card p-4 text-center text-danger">Failed to load bookings.</div>`;
+      }
+    }
+
+    function filterBookings(status, btn) {
+      currentFilter = status;
+      document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active', 'btn-primary'));
+      btn.classList.add('active', 'btn-primary');
+      renderBookingsList();
+    }
+
+    function renderBookingsList() {
+      const container = document.getElementById('bookings-container');
+      const filtered = userBookings.filter(b => {
+        if (currentFilter === 'ALL') return true;
+        return (b.status || '').toUpperCase() === currentFilter;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="table-card" style="padding: 3.5rem; text-align: center;">
+            <i class="fa-solid fa-calendar-xmark fa-3x" style="color: var(--text-light); margin-bottom: 1rem;"></i>
+            <h3>No Bookings in this Category</h3>
+            <p style="margin-bottom: 1.5rem;">You don't have any bookings matching the "${currentFilter}" filter.</p>
+            <a href="../explore.html" class="btn btn-primary btn-sm">Explore Boarding Houses</a>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map(b => {
+        const rent = parseFloat(b.agreed_monthly_rent || b.monthly_rent || 0);
+        const total = parseFloat(b.agreed_total_amount || 0);
+        const isApproved = (b.status || '').toUpperCase() === 'APPROVED';
+        const isPending = (b.status || '').toUpperCase() === 'PENDING';
+
+        return `
+          <div class="table-card" style="padding: 1.75rem;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1.25rem;">
+              <div>
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.4rem;">
+                  <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-light);">BOOKING #${b.booking_id}</span>
+                  ${App.statusBadge(b.status)}
+                </div>
+                <h3 style="font-size: 1.35rem; margin-bottom: 0.25rem;">
+                  <a href="../house-details.html?id=${b.house_id}" style="color: var(--text-main);">${App.escapeHtml(b.house_name)}</a>
+                </h3>
+                <div style="font-size: 0.9rem; color: var(--text-muted);">
+                  <i class="fa-solid fa-location-dot me-1" style="color: var(--primary);"></i> ${App.escapeHtml(b.address || 'Campus Location')}
+                </div>
+              </div>
+
+              <div style="text-align: right;">
+                <div style="font-size: 1.5rem; font-weight: 800; color: var(--primary);">
+                  ${App.formatCurrency(rent)} <span style="font-size: 0.8rem; font-weight: 500; color: var(--text-muted);">/ month</span>
+                </div>
+                <div style="font-size: 0.85rem; color: var(--text-muted);">
+                  Total Agreement: <strong>${App.formatCurrency(total)}</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- BOOKING METADATA GRID -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; background: var(--bg-muted); padding: 1rem 1.25rem; border-radius: var(--radius-md); margin-bottom: 1.25rem;">
+              <div>
+                <span style="font-size: 0.75rem; color: var(--text-light); text-transform: uppercase; font-weight: 700; display: block;">Room Assigned</span>
+                <strong style="font-size: 0.95rem; color: var(--text-main);">${App.escapeHtml(b.room_number)} (${App.escapeHtml(b.room_type || 'Solo')})</strong>
+              </div>
+
+              <div>
+                <span style="font-size: 0.75rem; color: var(--text-light); text-transform: uppercase; font-weight: 700; display: block;">Target Move-in</span>
+                <strong style="font-size: 0.95rem; color: var(--text-main);"><i class="fa-solid fa-calendar me-1"></i> ${App.formatDate(b.move_in_date)}</strong>
+              </div>
+
+              <div>
+                <span style="font-size: 0.75rem; color: var(--text-light); text-transform: uppercase; font-weight: 700; display: block;">Duration</span>
+                <strong style="font-size: 0.95rem; color: var(--text-main);">${b.duration_months} Months Lease</strong>
+              </div>
+
+              <div>
+                <span style="font-size: 0.75rem; color: var(--text-light); text-transform: uppercase; font-weight: 700; display: block;">Landlord</span>
+                <strong style="font-size: 0.95rem; color: var(--text-main);">${App.escapeHtml(b.landlord_name || 'Landlord')}</strong>
+              </div>
+            </div>
+
+            ${b.message_to_landlord ? `
+              <div style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1.25rem; background: white; border: 1px solid var(--border-color); padding: 0.75rem 1rem; border-radius: var(--radius-sm);">
+                <strong>Your Note:</strong> "${App.escapeHtml(b.message_to_landlord)}"
+              </div>
+            ` : ''}
+
+            <!-- ACTION BUTTONS -->
+            <div style="display: flex; justify-content: flex-end; gap: 0.75rem; align-items: center; border-top: 1px solid var(--border-subtle); padding-top: 1rem;">
+              ${isPending ? `
+                <button class="btn btn-sm btn-outline-danger" onclick="cancelBooking(${b.booking_id})">
+                  <i class="fa-solid fa-xmark"></i> Cancel Request
+                </button>
+              ` : ''}
+
+              ${isApproved ? `
+                <a href="payments.html?booking_id=${b.booking_id}" class="btn btn-primary btn-sm">
+                  <i class="fa-solid fa-credit-card"></i> Pay Now
+                </a>
+              ` : ''}
+
+              <a href="messages.html?partner_id=${b.landlord_id}" class="btn btn-outline-primary btn-sm">
+                <i class="fa-solid fa-comment-dots"></i> Message Landlord
+              </a>
+
+              <a href="../house-details.html?id=${b.house_id}" class="btn btn-secondary btn-sm">
+                View Property
+              </a>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function cancelBooking(bookingId) {
+      if (!confirm('Are you sure you want to cancel this booking request?')) return;
+      try {
+        const res = await API.updateBookingStatus(bookingId, 'CANCELLED');
+        if (res.success) {
+          App.toast('Booking request cancelled.', 'info');
+          loadBookings();
+        } else {
+          App.toast(res.message || 'Failed to cancel booking.', 'error');
+        }
+      } catch (err) {
+        console.error('Error cancelling booking:', err);
+        App.toast('Error cancelling booking.', 'error');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadBookings);
+  </script>
+</body>
+</html>

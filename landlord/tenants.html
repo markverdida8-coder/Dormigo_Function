@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tenants - DORMIGO Landlord</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+</head>
+<body>
+
+  <div class="dashboard-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="../index.html" class="sidebar-brand">
+          <img src="../assets/img/logo.svg" alt="Dormigo" width="34" height="34">
+          <span>DORMIGO</span>
+        </a>
+        <button class="sidebar-close" onclick="toggleSidebar()">&times;</button>
+      </div>
+
+      <div class="sidebar-content">
+        <div class="nav-section-title">Main Portal</div>
+        <a href="dashboard.html" class="sidebar-link"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+        <a href="properties.html" class="sidebar-link"><i class="fa-solid fa-building"></i> Properties</a>
+        <a href="rooms.html" class="sidebar-link"><i class="fa-solid fa-door-closed"></i> Rooms</a>
+
+        <div class="nav-section-title">Operations</div>
+        <a href="bookings.html" class="sidebar-link"><i class="fa-solid fa-clipboard-list"></i> Booking Requests</a>
+        <a href="tenants.html" class="sidebar-link active"><i class="fa-solid fa-users"></i> Tenants</a>
+        <a href="payments.html" class="sidebar-link"><i class="fa-solid fa-money-bill-wave"></i> Payments</a>
+
+        <div class="nav-section-title">Communication</div>
+        <a href="messages.html" class="sidebar-link"><i class="fa-solid fa-comments"></i> Messages</a>
+        <a href="reviews.html" class="sidebar-link"><i class="fa-solid fa-star"></i> Reviews</a>
+        <a href="notifications.html" class="sidebar-link"><i class="fa-solid fa-bell"></i> Notifications</a>
+        <a href="profile.html" class="sidebar-link"><i class="fa-solid fa-user-tie"></i> Profile</a>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="user-avatar"><i class="fa-solid fa-house-user"></i></div>
+        <div class="user-info">
+          <div class="user-name" id="sidebar-user-name">Landlord</div>
+          <div class="user-role-badge">Property Owner</div>
+        </div>
+        <button class="logout-btn" onclick="Auth.logout()"><i class="fa-solid fa-right-from-bracket"></i></button>
+      </div>
+    </aside>
+
+    <div class="main-wrapper">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+          <h2 class="page-title">Tenant Management</h2>
+        </div>
+      </header>
+
+      <main class="dashboard-content">
+        <div style="margin-bottom: 2rem;">
+          <h1 style="font-size: 1.75rem; margin-bottom: 0.25rem;">Active & Approved Tenants</h1>
+          <p>List of students currently residing or scheduled to move in across your boarding houses.</p>
+        </div>
+
+        <div class="table-card">
+          <div class="table-header">
+            <h3 class="table-title"><i class="fa-solid fa-user-graduate me-2" style="color: var(--primary);"></i> Current Tenants Directory</h3>
+            <div class="table-actions">
+              <input type="text" id="tenant-search" class="form-control" style="width: auto; font-size: 0.85rem;" placeholder="Search tenant name..." oninput="renderTenantsTable()">
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>Tenant Name</th>
+                  <th>Contact Details</th>
+                  <th>Property</th>
+                  <th>Room</th>
+                  <th>Move-in Date</th>
+                  <th>Booking Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="tenants-table-body">
+                <tr>
+                  <td colspan="7" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
+                    <i class="fa-solid fa-spinner fa-spin fa-2x" style="color: var(--primary);"></i>
+                    <p style="margin-top: 0.5rem;">Loading tenants directory...</p>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script>
+    const currentUser = Auth.requireAuth(['LANDLORD']);
+    let tenantsList = [];
+
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('show');
+    }
+
+    async function loadTenants() {
+      if (!currentUser) return;
+      document.getElementById('sidebar-user-name').textContent = currentUser.full_name;
+
+      try {
+        const res = await API.getBookings({ landlord_id: currentUser.user_id });
+        if (res.success && res.data) {
+          // Enforce: Show students with APPROVED or ACTIVE bookings
+          tenantsList = res.data.filter(b => b.status === 'APPROVED' || b.status === 'ACTIVE');
+          renderTenantsTable();
+        }
+      } catch (err) {
+        console.error('Error fetching tenants:', err);
+      }
+    }
+
+    function renderTenantsTable() {
+      const tbody = document.getElementById('tenants-table-body');
+      const search = (document.getElementById('tenant-search').value || '').toLowerCase().trim();
+
+      const filtered = tenantsList.filter(t => {
+        if (!search) return true;
+        return (t.full_name || '').toLowerCase().includes(search) ||
+               (t.house_name || '').toLowerCase().includes(search) ||
+               (t.room_number || '').toLowerCase().includes(search);
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+              No active or approved tenants found.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(t => `
+        <tr>
+          <td>
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+              <div class="user-avatar" style="width: 38px; height: 38px; font-size: 0.9rem;">
+                <i class="fa-solid fa-user-graduate"></i>
+              </div>
+              <div>
+                <strong>${App.escapeHtml(t.full_name)}</strong>
+                <div style="font-size: 0.75rem; color: var(--text-light);">ID: #${t.user_id}</div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div><i class="fa-solid fa-envelope me-1" style="color: var(--text-light); font-size: 0.8rem;"></i> ${App.escapeHtml(t.email)}</div>
+            <div style="font-size: 0.825rem; color: var(--text-muted);"><i class="fa-solid fa-phone me-1" style="color: var(--text-light); font-size: 0.8rem;"></i> ${App.escapeHtml(t.phone || 'N/A')}</div>
+          </td>
+          <td><strong>${App.escapeHtml(t.house_name)}</strong></td>
+          <td><span class="badge badge-blue">${App.escapeHtml(t.room_number)}</span></td>
+          <td>${App.formatDate(t.move_in_date)}</td>
+          <td>${App.statusBadge(t.status)}</td>
+          <td>
+            <div style="display: flex; gap: 0.4rem;">
+              <a href="messages.html?partner_id=${t.user_id}" class="btn btn-sm btn-outline-primary" title="Message Tenant">
+                <i class="fa-solid fa-comment-dots"></i> Message
+              </a>
+              <a href="payments.html?tenant=${encodeURIComponent(t.full_name)}" class="btn btn-sm btn-secondary" title="View Invoices">
+                <i class="fa-solid fa-receipt"></i> Payments
+              </a>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    document.addEventListener('DOMContentLoaded', loadTenants);
+  </script>
+</body>
+</html>

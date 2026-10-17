@@ -25,25 +25,9 @@ public class NotificationRouter {
         String type = notification.optString("type", "").toUpperCase(Locale.ROOT);
         int referenceId = notification.optInt("reference_id", 0);
         int notificationId = notification.optInt("notification_id", 0);
-        String notifTitle = notification.optString("title", "");
         String notifMsg = notification.optString("message", "");
 
         String senderName = parseSenderName(notifMsg, userIsLandlord ? "Tenant" : "Landlord");
-
-        String titleUpper = notifTitle != null ? notifTitle.toUpperCase(Locale.ROOT) : "";
-        String msgUpper = notifMsg != null ? notifMsg.toUpperCase(Locale.ROOT) : "";
-
-        if (titleUpper.contains("MAINTENANCE") || msgUpper.contains("MAINTENANCE")) {
-            Intent intent;
-            if (userIsLandlord) {
-                intent = new Intent(context, LandlordMaintenanceRequestsActivity.class);
-            } else {
-                intent = new Intent(context, StudentMaintenanceRequestsActivity.class);
-            }
-            if (notificationId > 0) intent.putExtra("NOTIFICATION_ID", notificationId);
-            context.startActivity(intent);
-            return;
-        }
 
         if (userIsAdmin) {
             routeAdmin(context, referenceId, notificationId);

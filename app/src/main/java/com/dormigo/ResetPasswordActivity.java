@@ -99,20 +99,19 @@ public class ResetPasswordActivity extends AppCompatActivity {
     private void togglePassword(EditText editText, ImageView icon, boolean visible) {
         if (editText == null || icon == null) return;
         int selection = editText.getSelectionStart();
-        int caps = InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS;
         if (visible) {
-            editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD | caps);
+            editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
             icon.setImageResource(R.drawable.ic_eye);
         } else {
-            editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD | caps);
+            editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
             icon.setImageResource(R.drawable.ic_eye_off);
         }
         editText.setSelection(selection);
     }
 
     private void validateAndResetPassword() {
-        String newPassword = passwordInput != null ? passwordInput.getText().toString() : "";
-        String confirmPassword = confirmPasswordInput != null ? confirmPasswordInput.getText().toString() : "";
+        String newPassword = passwordInput != null ? passwordInput.getText().toString().trim() : "";
+        String confirmPassword = confirmPasswordInput != null ? confirmPasswordInput.getText().toString().trim() : "";
 
         if (newPassword.isEmpty()) {
             Toast.makeText(this, "Please enter a new password.", Toast.LENGTH_SHORT).show();

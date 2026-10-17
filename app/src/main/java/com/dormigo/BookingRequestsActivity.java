@@ -163,8 +163,7 @@ public class BookingRequestsActivity extends AppCompatActivity {
             return;
         }
 
-        apiClient.getBookingsForStudent(
-                userId,
+        apiClient.getBookings(
                 new Callback() {
 
                     @Override
@@ -941,12 +940,15 @@ public class BookingRequestsActivity extends AppCompatActivity {
                 )
         );
 
-        boolean pricingReady = "CAPTURED_VERIFIED".equals(
-                booking.optString("pricing_snapshot_status", "")
-        );
+        int advanceMonths = booking.optInt("advance_months", 1);
+        int depositMonths = booking.optInt("deposit_months", 1);
+        double utilityDeposit = parseAmount(booking.optString("utility_deposit", "0"));
+        double otherFees = parseAmount(booking.optString("other_fees", "0"));
+        int paymentDueDay = booking.optInt("payment_due_day", 1);
         boolean initialCompleted = booking.optBoolean("initial_payment_completed", false);
         String dbNextDueDate = booking.optString("next_due_date", "");
 
+        double initialPayment = monthlyRent + (monthlyRent * advanceMonths) + (monthlyRent * depositMonths) + utilityDeposit + otherFees;
         String nextDueDate;
         if (initialCompleted && dbNextDueDate != null && !dbNextDueDate.isEmpty() && !"null".equals(dbNextDueDate)) {
             try {
@@ -957,7 +959,7 @@ public class BookingRequestsActivity extends AppCompatActivity {
                 nextDueDate = dbNextDueDate;
             }
         } else {
-            nextDueDate = "Not scheduled";
+            nextDueDate = calculateNextDueDate(moveInDate, paymentDueDay);
         }
 
         addInfoText(
@@ -971,9 +973,9 @@ public class BookingRequestsActivity extends AppCompatActivity {
         addInfoText(
                 card,
                 "Initial payment: "
-                        + (pricingReady
-                            ? formatMoney(booking.optDouble("initial_payment_amount", 0))
-                            : "Pricing under review")
+                        + formatMoney(
+                        initialPayment
+                )
         );
 
         addInfoText(

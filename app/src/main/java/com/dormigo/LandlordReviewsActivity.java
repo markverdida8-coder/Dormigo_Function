@@ -6,16 +6,12 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -30,11 +26,11 @@ import java.util.Locale;
 
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import okhttp3.Response;
 
 public class LandlordReviewsActivity extends AppCompatActivity {
-
-    private final ApiClient apiClient = new ApiClient();
 
     private int houseId;
     private String houseName;
@@ -96,7 +92,9 @@ public class LandlordReviewsActivity extends AppCompatActivity {
             return;
         }
 
-        apiClient.getReviewsForHouse(houseId, new Callback() {
+        String url = "http://172.20.10.3/Dormigo_Backend/api/reviews.php?house_id=" + houseId;
+        Request request = new Request.Builder().url(url).get().build();
+        new OkHttpClient().newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 runOnUiThread(() -> {
@@ -174,7 +172,6 @@ public class LandlordReviewsActivity extends AppCompatActivity {
             for (int i = 0; i < reviews.length(); i++) {
                 JSONObject r = reviews.optJSONObject(i);
                 if (r != null) {
-                    int reviewId = r.optInt("review_id", 0);
                     String studentName = r.optString("full_name", "Student");
                     int rating = r.optInt("rating", 5);
                     String comment = r.optString("comment", "");
@@ -267,136 +264,10 @@ public class LandlordReviewsActivity extends AppCompatActivity {
                         card.addView(tvDate);
                     }
 
-                    // Report Review Action
-                    TextView tvReport = new TextView(this);
-                    tvReport.setText("🚩 Report Review");
-                    tvReport.setTextColor(Color.parseColor("#C53030"));
-                    tvReport.setTextSize(12);
-                    tvReport.setTypeface(null, Typeface.BOLD);
-                    tvReport.setClickable(true);
-                    tvReport.setFocusable(true);
-                    LinearLayout.LayoutParams rParams = new LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.WRAP_CONTENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT
-                    );
-                    rParams.topMargin = dp(12);
-                    tvReport.setLayoutParams(rParams);
-                    tvReport.setOnClickListener(v -> showReportDialog(reviewId));
-                    card.addView(tvReport);
-
                     reviewsContainer.addView(card);
                 }
             }
         }
-    }
-
-    private void showReportDialog(int reviewId) {
-        String[] reasons = {
-            "Suspected fake review",
-            "Harassment or abusive language",
-            "Spam or unrelated content",
-            "False or misleading information",
-            "Other"
-        };
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Report Review");
-
-        LinearLayout layout = new LinearLayout(this);
-        layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setPadding(dp(20), dp(12), dp(20), dp(12));
-
-        TextView tvReasonPrompt = new TextView(this);
-        tvReasonPrompt.setText("Select reason for reporting:");
-        tvReasonPrompt.setTextColor(Color.parseColor("#1A1A1A"));
-        tvReasonPrompt.setTextSize(14);
-        tvReasonPrompt.setTypeface(null, Typeface.BOLD);
-        layout.addView(tvReasonPrompt);
-
-        final RadioGroup radioGroup = new RadioGroup(this);
-        radioGroup.setOrientation(RadioGroup.VERTICAL);
-        LinearLayout.LayoutParams rgParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        rgParams.topMargin = dp(8);
-        radioGroup.setLayoutParams(rgParams);
-
-        RadioButton[] radioButtons = new RadioButton[reasons.length];
-        for (int i = 0; i < reasons.length; i++) {
-            radioButtons[i] = new RadioButton(this);
-            radioButtons[i].setText(reasons[i]);
-            radioButtons[i].setTextColor(Color.parseColor("#1A1A1A"));
-            radioButtons[i].setTextSize(14);
-            if (i == 0) radioButtons[i].setChecked(true);
-            radioGroup.addView(radioButtons[i]);
-        }
-        layout.addView(radioGroup);
-
-        TextView tvDescPrompt = new TextView(this);
-        tvDescPrompt.setText("Additional details (optional):");
-        tvDescPrompt.setTextColor(Color.parseColor("#1A1A1A"));
-        tvDescPrompt.setTextSize(14);
-        tvDescPrompt.setTypeface(null, Typeface.BOLD);
-        LinearLayout.LayoutParams dpParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        dpParams.topMargin = dp(16);
-        tvDescPrompt.setLayoutParams(dpParams);
-        layout.addView(tvDescPrompt);
-
-        final EditText inputDesc = new EditText(this);
-        inputDesc.setHint("Provide optional explanation...");
-        inputDesc.setPadding(dp(12), dp(12), dp(12), dp(12));
-        inputDesc.setBackgroundResource(R.drawable.bg_input_field);
-        LinearLayout.LayoutParams edParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        edParams.topMargin = dp(8);
-        inputDesc.setLayoutParams(edParams);
-        layout.addView(inputDesc);
-
-        builder.setView(layout);
-
-        builder.setPositiveButton("Submit Report", (dialog, which) -> {
-            String selectedReason = reasons[0];
-            for (int i = 0; i < radioButtons.length; i++) {
-                if (radioButtons[i].isChecked()) {
-                    selectedReason = reasons[i];
-                    break;
-                }
-            }
-            String description = inputDesc.getText().toString().trim();
-
-            apiClient.reportReview(reviewId, selectedReason, description, new Callback() {
-                @Override
-                public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                    runOnUiThread(() -> Toast.makeText(LandlordReviewsActivity.this, "Network error reporting review.", Toast.LENGTH_SHORT).show());
-                }
-
-                @Override
-                public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                    String body = response.body() != null ? response.body().string() : "";
-                    runOnUiThread(() -> {
-                        try {
-                            JSONObject json = new JSONObject(body);
-                            if (json.optBoolean("success", false)) {
-                                Toast.makeText(LandlordReviewsActivity.this, "Review reported successfully. Our administration will investigate.", Toast.LENGTH_LONG).show();
-                            } else {
-                                Toast.makeText(LandlordReviewsActivity.this, json.optString("message", "Failed to report review."), Toast.LENGTH_LONG).show();
-                            }
-                        } catch (Exception e) {
-                            Toast.makeText(LandlordReviewsActivity.this, "Failed to parse report response.", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
-            });
-        });
-
-        builder.setNegativeButton("Cancel", null);
-        builder.show();
     }
 
     private void renderRatingBreakdown(JSONArray reviews, int totalCount) {

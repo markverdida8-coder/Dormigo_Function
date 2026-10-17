@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DORMIGO - Student Boarding House Finder & Management</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <!-- NAVIGATION -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="nav-brand">
+        <img src="assets/img/logo.svg" alt="Dormigo Logo" width="36" height="36">
+        <span>DORMIGO</span>
+      </a>
+
+      <ul class="nav-menu" id="nav-menu">
+        <li><a href="index.html" class="nav-link active">Home</a></li>
+        <li><a href="explore.html" class="nav-link">Explore</a></li>
+        <li><a href="about.html" class="nav-link">About</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <div id="nav-auth-container">
+          <a href="login.html" class="btn btn-outline-primary btn-sm">Log In</a>
+          <a href="register.html" class="btn btn-primary btn-sm">Register</a>
+        </div>
+        <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO SECTION -->
+  <section class="hero">
+    <div class="container hero-content">
+      <div class="hero-badge">
+        <i class="fa-solid fa-graduation-cap"></i> Student Accommodation Platform
+      </div>
+      <h1 class="hero-title">Find a place that feels like home.</h1>
+      <p class="hero-subtitle">
+        Discover verified boarding houses, solo rooms, and bedspaces near your university. Connect directly with trusted landlords without hassle.
+      </p>
+
+      <!-- SEARCH BAR -->
+      <form class="search-card" id="home-search-form" onsubmit="handleHeroSearch(event)">
+        <div class="search-input-wrap">
+          <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          <input 
+            type="text" 
+            id="hero-search-query"
+            class="search-input" 
+            placeholder="Search boarding houses by name, address or location..."
+            autocomplete="off"
+          >
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg">
+          <i class="fa-solid fa-search"></i> Search
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <!-- FEATURED BOARDING HOUSES -->
+  <section class="section">
+    <div class="container">
+      <div class="section-title-wrap">
+        <span class="section-tag"><i class="fa-solid fa-star"></i> Featured Places</span>
+        <h2 class="section-title">Featured Boarding Houses</h2>
+        <p class="section-desc">Hand-picked, high-rated student accommodations near campuses with verified amenities and safety rules.</p>
+      </div>
+
+      <div class="properties-grid" id="featured-properties-container">
+        <!-- Rendered dynamically from API -->
+        <div style="grid-column: 1/-1; text-align: center; padding: 3rem;">
+          <i class="fa-solid fa-circle-notch fa-spin fa-2x" style="color: var(--primary);"></i>
+          <p style="margin-top: 1rem;">Loading boarding houses from database...</p>
+        </div>
+      </div>
+
+      <div style="text-align: center; margin-top: 3.5rem;">
+        <a href="explore.html" class="btn btn-outline-primary btn-lg">
+          View All Boarding Houses <i class="fa-solid fa-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW DORMIGO WORKS -->
+  <section class="section" style="background-color: #FFFFFF; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);">
+    <div class="container">
+      <div class="section-title-wrap">
+        <span class="section-tag"><i class="fa-solid fa-route"></i> Simple Process</span>
+        <h2 class="section-title">HOW DORMIGO WORKS</h2>
+        <p class="section-desc">Finding student housing shouldn't be stressful. Here is how Dormigo guides you from search to move-in.</p>
+      </div>
+
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-number">1</div>
+          <h3 class="step-title">Search</h3>
+          <p class="step-desc">Filter boarding houses by price, distance to campus, solo/shared room types, and amenities.</p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-number">2</div>
+          <h3 class="step-title">Compare</h3>
+          <p class="step-desc">Inspect real photos, curated room rules, curfew policies, and honest peer reviews from students.</p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-number">3</div>
+          <h3 class="step-title">Request a Room</h3>
+          <p class="step-desc">Pick an available room, specify your move-in date and duration, and send a direct note to the landlord.</p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-number">4</div>
+          <h3 class="step-title">Wait for Approval</h3>
+          <p class="step-desc">Get instant notifications once the landlord reviews your application and approves your request.</p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-number">5</div>
+          <h3 class="step-title">Move In</h3>
+          <p class="step-desc">Settle your payment, confirm your check-in details, and settle comfortably into your new home!</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LANDLORD CTA BANNER -->
+  <section class="section">
+    <div class="container">
+      <div class="landlord-cta">
+        <div class="landlord-cta-content">
+          <span style="background: rgba(255,255,255,0.2); padding: 0.3rem 0.8rem; border-radius: var(--radius-pill); font-size: 0.85rem; font-weight: 700; text-transform: uppercase;">For Property Owners</span>
+          <h2 style="margin-top: 0.75rem;">Own a boarding house?</h2>
+          <p>Manage your properties, rooms, tenants, and booking requests using Dormigo. Track monthly payments, verify student tenants, and keep full occupancy effortlessly.</p>
+          <a href="register.html?role=landlord" class="btn btn-primary btn-lg" style="background: #FFFFFF; color: var(--primary); border: none;">
+            <i class="fa-solid fa-house-chimney-medical"></i> List Your Property
+          </a>
+        </div>
+        <div style="font-size: 7rem; opacity: 0.25; display: none;" class="d-lg-block">
+          <i class="fa-solid fa-building-user"></i>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT DORMIGO PREVIEW -->
+  <section class="section" style="background-color: var(--bg-muted); border-top: 1px solid var(--border-color);">
+    <div class="container">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 3rem; align-items: center;">
+        <div>
+          <span class="section-tag"><i class="fa-solid fa-shield-halved"></i> Dedicated to Students</span>
+          <h2 style="font-size: 2.25rem; margin-bottom: 1.25rem;">Built for students, by students.</h2>
+          <p style="margin-bottom: 1.25rem; font-size: 1.05rem;">
+            DORMIGO is a dedicated boarding house finder and management platform tailored specifically to the unique needs of college students and boarding house operators.
+          </p>
+          <p style="margin-bottom: 1.75rem;">
+            Unlike generic hotel booking portals, Dormigo prioritizes long-term student stays, transparent house rules, curfew times, study desk access, and student ID verification for peace of mind.
+          </p>
+          <a href="about.html" class="btn btn-outline-primary">
+            Learn More About Our Mission <i class="fa-solid fa-arrow-right"></i>
+          </a>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+          <div style="background: white; padding: 1.75rem; border-radius: var(--radius-lg); border: 1px solid var(--border-color); text-align: center;">
+            <div style="width: 50px; height: 50px; border-radius: 12px; background: var(--primary-soft); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin: 0 auto 1rem;">
+              <i class="fa-solid fa-id-card"></i>
+            </div>
+            <h4 style="margin-bottom: 0.35rem;">Verified IDs</h4>
+            <p style="font-size: 0.85rem;">Student and landlord document verification via Admin.</p>
+          </div>
+
+          <div style="background: white; padding: 1.75rem; border-radius: var(--radius-lg); border: 1px solid var(--border-color); text-align: center;">
+            <div style="width: 50px; height: 50px; border-radius: 12px; background: var(--accent-amber-light); color: var(--accent-amber); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin: 0 auto 1rem;">
+              <i class="fa-solid fa-shield-check"></i>
+            </div>
+            <h4 style="margin-bottom: 0.35rem;">Safety First</h4>
+            <p style="font-size: 0.85rem;">Clear curfew, visitor rules, and CCTV disclosure.</p>
+          </div>
+
+          <div style="background: white; padding: 1.75rem; border-radius: var(--radius-lg); border: 1px solid var(--border-color); text-align: center;">
+            <div style="width: 50px; height: 50px; border-radius: 12px; background: var(--accent-blue-light); color: var(--accent-blue); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin: 0 auto 1rem;">
+              <i class="fa-solid fa-receipt"></i>
+            </div>
+            <h4 style="margin-bottom: 0.35rem;">Rent Tracking</h4>
+            <p style="font-size: 0.85rem;">Transparent payment logs, due dates, and receipts.</p>
+          </div>
+
+          <div style="background: white; padding: 1.75rem; border-radius: var(--radius-lg); border: 1px solid var(--border-color); text-align: center;">
+            <div style="width: 50px; height: 50px; border-radius: 12px; background: #DCFCE7; color: #15803D; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin: 0 auto 1rem;">
+              <i class="fa-solid fa-comments"></i>
+            </div>
+            <h4 style="margin-bottom: 0.35rem;">Direct Chat</h4>
+            <p style="font-size: 0.85rem;">Real-time messaging between students and landlords.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand">
+            <img src="assets/img/logo.svg" alt="Dormigo" width="32" height="32">
+            <span>DORMIGO</span>
+          </div>
+          <p class="footer-desc">
+            The premier boarding house finder and dormitory management ecosystem designed specifically for university students, landlords, and administrators.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="footer-heading">Quick Links</h4>
+          <ul class="footer-links">
+            <li><a href="index.html" class="footer-link">Home</a></li>
+            <li><a href="explore.html" class="footer-link">Explore Houses</a></li>
+            <li><a href="about.html" class="footer-link">About Us</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-heading">Portals</h4>
+          <ul class="footer-links">
+            <li><a href="login.html" class="footer-link">Student Login</a></li>
+            <li><a href="login.html?role=landlord" class="footer-link">Landlord Login</a></li>
+            <li><a href="login.html?role=admin" class="footer-link">Admin Portal</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-heading">Contact & Help</h4>
+          <ul class="footer-links">
+            <li><span class="footer-link"><i class="fa-solid fa-location-dot me-2"></i> Cebu City, Philippines</span></li>
+            <li><span class="footer-link"><i class="fa-solid fa-envelope me-2"></i> support@dormigo.com</span></li>
+            <li><span class="footer-link"><i class="fa-solid fa-phone me-2"></i> +63 912 345 6789</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>&copy; 2026 DORMIGO System. All rights reserved.</div>
+        <div>Boarding House Finder & Management System</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- SCRIPTS -->
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    // Handle mobile nav toggle
+    document.getElementById('nav-toggle').addEventListener('click', () => {
+      document.getElementById('nav-menu').classList.toggle('show');
+    });
+
+    // Update nav auth state
+    App.renderNavAuth();
+
+    function handleHeroSearch(e) {
+      e.preventDefault();
+      const query = document.getElementById('hero-search-query').value.trim();
+      window.location.href = `explore.html?search=${encodeURIComponent(query)}`;
+    }
+
+    // Load featured boarding houses from PostgreSQL backend
+    async function loadFeaturedHouses() {
+      const container = document.getElementById('featured-properties-container');
+      try {
+        const response = await API.getBoardingHouses({ status: 'ACTIVE' });
+        if (!response.success || !response.data || response.data.length === 0) {
+          container.innerHTML = `
+            <div style="grid-column: 1/-1; text-align: center; padding: 3rem; background: white; border-radius: var(--radius-lg);">
+              <i class="fa-solid fa-house-chimney-crack fa-3x" style="color: var(--text-light); margin-bottom: 1rem;"></i>
+              <h3>No Boarding Houses Available</h3>
+              <p>Check back later or explore other areas.</p>
+            </div>
+          `;
+          return;
+        }
+
+        const houses = response.data;
+        container.innerHTML = houses.map(house => {
+          const photo = (house.photo_paths && house.photo_paths.length > 0)
+            ? house.photo_paths[0]
+            : null;
+          const photoUrl = App.resolvePhotoUrl(photo);
+
+          const amenitiesHtml = (house.amenities || []).slice(0, 3).map(a => 
+            `<span class="amenity-chip"><i class="fa-solid fa-check"></i> ${App.escapeHtml(a.amenity_name)}</span>`
+          ).join('');
+
+          const startingRent = parseFloat(house.starting_rent || house.min_rent || 0);
+
+          return `
+            <div class="property-card">
+              <div class="property-img-wrap">
+                <img src="${photoUrl}" alt="${App.escapeHtml(house.house_name)}" class="property-img" loading="lazy">
+                <div class="property-price-badge">
+                  Starts at ${App.formatCurrency(startingRent)}/mo
+                </div>
+                <div class="property-status-badge">
+                  ${App.statusBadge(house.status)}
+                </div>
+              </div>
+
+              <div class="property-body">
+                <h3 class="property-title">${App.escapeHtml(house.house_name)}</h3>
+                <div class="property-address">
+                  <i class="fa-solid fa-location-dot"></i>
+                  <span>${App.escapeHtml(house.address)}</span>
+                </div>
+
+                <div class="property-stats">
+                  <div class="property-stat-item">
+                    <i class="fa-solid fa-door-open"></i>
+                    <span><strong>${house.available_rooms || 0}</strong> / ${house.total_rooms || 0} Rooms Available</span>
+                  </div>
+                  <div class="property-rating">
+                    <i class="fa-solid fa-star"></i>
+                    <span>${house.avg_rating > 0 ? parseFloat(house.avg_rating).toFixed(1) : '5.0'}</span>
+                    <span style="color: var(--text-light); font-size: 0.75rem;">(${house.reviews_count || 1})</span>
+                  </div>
+                </div>
+
+                <div class="property-amenities">
+                  ${amenitiesHtml || '<span class="amenity-chip">Essential Amenities</span>'}
+                </div>
+
+                <div class="property-footer">
+                  <span style="font-size: 0.85rem; color: var(--text-muted);">
+                    <i class="fa-solid fa-user-tie me-1"></i> ${App.escapeHtml(house.landlord_name || 'Landlord')}
+                  </span>
+                  <a href="house-details.html?id=${house.house_id}" class="btn btn-primary btn-sm">
+                    View Details <i class="fa-solid fa-chevron-right"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+      } catch (err) {
+        console.error('Error loading featured houses:', err);
+        container.innerHTML = `
+          <div style="grid-column: 1/-1; text-align: center; padding: 2rem; color: var(--accent-red);">
+            <i class="fa-solid fa-triangle-exclamation fa-2x"></i>
+            <p style="margin-top: 0.5rem;">Failed to load properties. Please check database connection.</p>
+          </div>
+        `;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadFeaturedHouses);
+  </script>
+</body>
+</html>

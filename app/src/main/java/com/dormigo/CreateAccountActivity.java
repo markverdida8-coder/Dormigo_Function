@@ -7,12 +7,10 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
-import android.text.Editable;
 import android.text.InputType;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextPaint;
-import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.util.Log;
@@ -162,9 +160,6 @@ public class CreateAccountActivity extends AppCompatActivity {
         EditText firstNameInput =
                 findViewById(R.id.firstNameInput);
 
-        EditText middleNameInput =
-                findViewById(R.id.middleNameInput);
-
         EditText lastNameInput =
                 findViewById(R.id.lastNameInput);
 
@@ -240,9 +235,6 @@ public class CreateAccountActivity extends AppCompatActivity {
                 );
 
         schoolCampusInput.setAdapter(adapter);
-        schoolCampusInput.setOnClickListener(v -> schoolCampusInput.showDropDown());
-        schoolCampusInput.setFocusable(false);
-        schoolCampusInput.setCursorVisible(false);
 
         // Upload Dropzone Logic
         LinearLayout uploadDropzone = findViewById(R.id.uploadDropzone);
@@ -301,16 +293,6 @@ public class CreateAccountActivity extends AppCompatActivity {
                     toggleConfirmPasswordVisibility,
                     isConfirmPasswordVisible
             );
-        });
-
-        passwordInput.addTextChangedListener(new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (s.toString().matches("^(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])\\S{8,}$")) {
-                    passwordInput.setError(null);
-                }
-            }
-            @Override public void afterTextChanged(Editable s) {}
         });
 
         // Create Account Logic
@@ -374,21 +356,6 @@ public class CreateAccountActivity extends AppCompatActivity {
                 return;
             }
 
-            // Check password strength and length
-            String PASSWORD_REGEX = "^(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])\\S{8,}$";
-            if (!pass.matches(PASSWORD_REGEX)) {
-                passwordInput.setError("Password must contain at least 8 characters, including 1 uppercase letter, 1 number, and 1 special character.");
-                passwordInput.requestFocus();
-                Toast.makeText(
-                        CreateAccountActivity.this,
-                        "Password must contain at least 8 characters, including 1 uppercase letter, 1 number, and 1 special character.",
-                        Toast.LENGTH_LONG
-                ).show();
-                return;
-            } else {
-                passwordInput.setError(null);
-            }
-
             // Check password confirmation
             if (!Objects.equals(pass, confirmPass)) {
 
@@ -418,16 +385,9 @@ public class CreateAccountActivity extends AppCompatActivity {
                 return;
             }
 
-            String middleName =
-                    middleNameInput != null
-                            ? middleNameInput.getText().toString().trim()
-                            : "";
-
-            // Combine first, middle, and last name
+            // Combine first and last name
             String fullName =
-                    middleName.isEmpty()
-                            ? firstName + " " + lastName
-                            : firstName + " " + middleName + " " + lastName;
+                    firstName + " " + lastName;
 
             // Disable button during request
             btnCreateAccount.setEnabled(false);
@@ -777,8 +737,7 @@ public class CreateAccountActivity extends AppCompatActivity {
         if (visible) {
 
             editText.setInputType(
-                    InputType.TYPE_CLASS_TEXT
-                            | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                    InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
             );
 
             imageView.setImageResource(

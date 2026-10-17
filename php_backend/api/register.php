@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/web_session.php';
 require_once 'db.php';
 
 $data = json_decode(file_get_contents("php://input"), true);
@@ -33,6 +34,7 @@ try {
     ]);
 
     $newUser = $stmt->fetch();
+    dormigoWebSessionSetUser($newUser);
 
     echo json_encode([
         "success" => true,

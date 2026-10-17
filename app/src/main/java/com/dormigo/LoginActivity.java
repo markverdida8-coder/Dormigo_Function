@@ -436,8 +436,7 @@ public class LoginActivity extends AppCompatActivity {
         if (visible) {
 
             editText.setInputType(
-                    InputType.TYPE_CLASS_TEXT |
-                            InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                    InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
             );
 
             imageView.setImageResource(

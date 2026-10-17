@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Landlord Dashboard - DORMIGO</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+</head>
+<body>
+
+  <div class="dashboard-layout">
+    <!-- LANDLORD SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="../index.html" class="sidebar-brand">
+          <img src="../assets/img/logo.svg" alt="Dormigo" width="34" height="34">
+          <span>DORMIGO</span>
+        </a>
+        <button class="sidebar-close" onclick="toggleSidebar()">&times;</button>
+      </div>
+
+      <div class="sidebar-content">
+        <div class="nav-section-title">Main Portal</div>
+        <a href="dashboard.html" class="sidebar-link active">
+          <i class="fa-solid fa-chart-pie"></i> Dashboard
+        </a>
+        <a href="properties.html" class="sidebar-link">
+          <i class="fa-solid fa-building"></i> Properties
+        </a>
+        <a href="rooms.html" class="sidebar-link">
+          <i class="fa-solid fa-door-closed"></i> Rooms
+        </a>
+
+        <div class="nav-section-title">Operations</div>
+        <a href="bookings.html" class="sidebar-link">
+          <i class="fa-solid fa-clipboard-list"></i> Booking Requests
+          <span class="badge badge-warning" id="sidebar-pending-bookings" style="display: none;">0</span>
+        </a>
+        <a href="tenants.html" class="sidebar-link">
+          <i class="fa-solid fa-users"></i> Tenants
+        </a>
+        <a href="payments.html" class="sidebar-link">
+          <i class="fa-solid fa-money-bill-wave"></i> Payments
+        </a>
+
+        <div class="nav-section-title">Communication</div>
+        <a href="messages.html" class="sidebar-link">
+          <i class="fa-solid fa-comments"></i> Messages
+          <span class="badge badge-success" id="sidebar-unread-msgs" style="display: none;">0</span>
+        </a>
+        <a href="reviews.html" class="sidebar-link">
+          <i class="fa-solid fa-star"></i> Reviews
+        </a>
+        <a href="notifications.html" class="sidebar-link">
+          <i class="fa-solid fa-bell"></i> Notifications
+          <span class="badge badge-danger" id="sidebar-unread-notifs" style="display: none;">0</span>
+        </a>
+        <a href="profile.html" class="sidebar-link">
+          <i class="fa-solid fa-user-tie"></i> Profile
+        </a>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="user-avatar"><i class="fa-solid fa-house-user"></i></div>
+        <div class="user-info">
+          <div class="user-name" id="sidebar-user-name">Landlord</div>
+          <div class="user-role-badge">Property Owner</div>
+        </div>
+        <button class="logout-btn" onclick="Auth.logout()"><i class="fa-solid fa-right-from-bracket"></i></button>
+      </div>
+    </aside>
+
+    <div class="main-wrapper">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+          <h2 class="page-title">Landlord Dashboard</h2>
+        </div>
+        <div class="topbar-right">
+          <a href="add-property.html" class="btn btn-sm btn-primary">
+            <i class="fa-solid fa-plus"></i> Add Property
+          </a>
+          <a href="notifications.html" class="topbar-btn">
+            <i class="fa-solid fa-bell"></i>
+            <span class="notif-badge" id="topbar-notif-badge" style="display: none;">0</span>
+          </a>
+        </div>
+      </header>
+
+      <main class="dashboard-content">
+        <!-- WELCOME BANNER -->
+        <div style="background: linear-gradient(135deg, #1B5E4C 0%, #103B30 100%); border-radius: var(--radius-xl); padding: 2rem 2.5rem; color: white; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem; box-shadow: var(--shadow-md);">
+          <div>
+            <span style="background: rgba(255,255,255,0.2); padding: 0.3rem 0.8rem; border-radius: var(--radius-pill); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">
+              Boarding House Management
+            </span>
+            <h1 style="color: white; font-size: 2rem; margin: 0.5rem 0 0.4rem;" id="welcome-landlord-title">
+              Welcome back, Landlord!
+            </h1>
+            <p style="color: rgba(255,255,255,0.85); font-size: 0.95rem; margin: 0;">
+              Here is your occupancy overview, tenant bookings, and collection progress.
+            </p>
+          </div>
+          <div>
+            <a href="add-property.html" class="btn btn-primary" style="background: white; color: var(--primary); border: none;">
+              <i class="fa-solid fa-house-chimney-medical"></i> + List New Boarding House
+            </a>
+          </div>
+        </div>
+
+        <!-- 7 STATS CARDS AS REQUIRED -->
+        <div class="stats-grid">
+          <!-- 1. Total Properties -->
+          <div class="stat-card">
+            <div class="stat-icon stat-icon-green"><i class="fa-solid fa-building"></i></div>
+            <div class="stat-info">
+              <div class="stat-value" id="stat-total-properties">0</div>
+              <div class="stat-label">Total Properties</div>
+            </div>
+          </div>
+
+          <!-- 2. Total Rooms -->
+          <div class="stat-card">
+            <div class="stat-icon stat-icon-blue"><i class="fa-solid fa-door-closed"></i></div>
+            <div class="stat-info">
+              <div class="stat-value" id="stat-total-rooms">0</div>
+              <div class="stat-label">Total Rooms</div>
+            </div>
+          </div>
+
+          <!-- 3. Available Rooms -->
+          <div class="stat-card">
+            <div class="stat-icon stat-icon-green"><i class="fa-solid fa-door-open"></i></div>
+            <div class="stat-info">
+              <div class="stat-value" id="stat-available-rooms">0</div>
+              <div class="stat-label">Available Rooms</div>
+            </div>
+          </div>
+
+          <!-- 4. Occupied Rooms -->
+          <div class="stat-card">
+            <div class="stat-icon stat-icon-amber"><i class="fa-solid fa-person-shelter"></i></div>
+            <div class="stat-info">
+              <div class="stat-value" id="stat-occupied-rooms">0</div>
+              <div class="stat-label">Occupied Rooms</div>
+            </div>
+          </div>
+
+          <!-- 5. Pending Booking Requests -->
+          <div class="stat-card">
+            <div class="stat-icon stat-icon-amber"><i class="fa-solid fa-clipboard-question"></i></div>
+            <div class="stat-info">
+              <div class="stat-value" id="stat-pending-requests">0</div>
+              <div class="stat-label">Pending Requests</div>
+            </div>
+          </div>
+
+          <!-- 6. Current Tenants -->
+          <div class="stat-card">
+            <div class="stat-icon stat-icon-blue"><i class="fa-solid fa-user-group"></i></div>
+            <div class="stat-info">
+              <div class="stat-value" id="stat-current-tenants">0</div>
+              <div class="stat-label">Current Tenants</div>
+            </div>
+          </div>
+
+          <!-- 7. Payment Summary -->
+          <div class="stat-card">
+            <div class="stat-icon stat-icon-green"><i class="fa-solid fa-peso-sign"></i></div>
+            <div class="stat-info">
+              <div class="stat-value" id="stat-collected-revenue">₱0.00</div>
+              <div class="stat-label">Total Collected</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2-COLUMN SECTION: RECENT BOOKINGS & RECENT PAYMENTS -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 2rem; margin-bottom: 2rem;">
+          
+          <!-- RECENT BOOKING REQUESTS -->
+          <div class="table-card" style="padding: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+              <h3 style="font-size: 1.15rem;"><i class="fa-solid fa-bell me-2" style="color: var(--primary);"></i> Recent Booking Requests</h3>
+              <a href="bookings.html" style="font-size: 0.85rem; font-weight: 600;">View All Requests</a>
+            </div>
+
+            <div id="recent-bookings-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
+              <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                <i class="fa-solid fa-spinner fa-spin"></i> Loading booking requests...
+              </div>
+            </div>
+          </div>
+
+          <!-- RECENT PAYMENTS -->
+          <div class="table-card" style="padding: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+              <h3 style="font-size: 1.15rem;"><i class="fa-solid fa-receipt me-2" style="color: var(--primary);"></i> Recent Payments</h3>
+              <a href="payments.html" style="font-size: 0.85rem; font-weight: 600;">View All Payments</a>
+            </div>
+
+            <div id="recent-payments-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
+              <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                <i class="fa-solid fa-spinner fa-spin"></i> Loading recent payments...
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- PROPERTY OCCUPANCY OVERVIEW -->
+        <div class="table-card" style="padding: 1.5rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+            <h3 style="font-size: 1.15rem;"><i class="fa-solid fa-hotel me-2" style="color: var(--primary);"></i> Property Occupancy Overview</h3>
+            <a href="properties.html" class="btn btn-sm btn-outline-primary">Manage Properties</a>
+          </div>
+
+          <div id="property-occupancy-container" style="display: flex; flex-direction: column; gap: 1rem;">
+            <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+              <i class="fa-solid fa-spinner fa-spin"></i> Loading occupancy rates...
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script>
+    const currentUser = Auth.requireAuth(['LANDLORD']);
+
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('show');
+    }
+
+    async function initLandlordDashboard() {
+      if (!currentUser) return;
+      document.getElementById('sidebar-user-name').textContent = currentUser.full_name;
+      document.getElementById('welcome-landlord-title').textContent = `Welcome back, ${currentUser.full_name}!`;
+
+      await loadLandlordStats();
+      await loadRecentBookings();
+      await loadRecentPayments();
+      await loadOccupancyOverview();
+    }
+
+    async function loadLandlordStats() {
+      try {
+        const res = await API.getStats('landlord', currentUser.user_id);
+        if (res.success && res.data) {
+          const s = res.data;
+          document.getElementById('stat-total-properties').textContent = s.total_properties || 0;
+          document.getElementById('stat-total-rooms').textContent = s.total_rooms || 0;
+          document.getElementById('stat-available-rooms').textContent = s.available_rooms || 0;
+          document.getElementById('stat-occupied-rooms').textContent = s.occupied_rooms || 0;
+          document.getElementById('stat-pending-requests').textContent = s.pending_booking_requests || 0;
+          document.getElementById('stat-current-tenants').textContent = s.current_tenants || 0;
+          document.getElementById('stat-collected-revenue').textContent = App.formatCurrency(s.total_collected || 0);
+
+          if (s.pending_booking_requests > 0) {
+            const badge = document.getElementById('sidebar-pending-bookings');
+            badge.textContent = s.pending_booking_requests;
+            badge.style.display = 'inline-flex';
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching landlord stats:', err);
+      }
+    }
+
+    async function loadRecentBookings() {
+      const container = document.getElementById('recent-bookings-list');
+      try {
+        const res = await API.getBookings({ landlord_id: currentUser.user_id });
+        if (res.success && res.data) {
+          const list = res.data.slice(0, 4);
+          if (list.length === 0) {
+            container.innerHTML = `<p style="text-align: center; color: var(--text-muted); padding: 1.5rem;">No booking requests received yet.</p>`;
+            return;
+          }
+
+          container.innerHTML = list.map(b => `
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.85rem; border-radius: var(--radius-md); background: var(--bg-muted); border: 1px solid var(--border-color);">
+              <div>
+                <strong style="font-size: 0.95rem; color: var(--text-main);">${App.escapeHtml(b.full_name)}</strong>
+                <div style="font-size: 0.825rem; color: var(--text-muted);">
+                  ${App.escapeHtml(b.house_name)} &bull; ${App.escapeHtml(b.room_number)}
+                </div>
+                <div style="font-size: 0.75rem; color: var(--text-light); margin-top: 2px;">
+                  Move-in: ${App.formatDate(b.move_in_date)} &bull; ${b.duration_months} Mos
+                </div>
+              </div>
+              <div style="text-align: right;">
+                <div style="margin-bottom: 0.35rem;">${App.statusBadge(b.status)}</div>
+                <a href="bookings.html" class="btn btn-sm btn-outline-primary" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;">
+                  Review
+                </a>
+              </div>
+            </div>
+          `).join('');
+        }
+      } catch (err) {
+        console.error('Error fetching recent bookings:', err);
+      }
+    }
+
+    async function loadRecentPayments() {
+      const container = document.getElementById('recent-payments-list');
+      try {
+        const res = await API.getPayments({ landlord_id: currentUser.user_id });
+        if (res.success && res.data) {
+          const list = res.data.slice(0, 4);
+          if (list.length === 0) {
+            container.innerHTML = `<p style="text-align: center; color: var(--text-muted); padding: 1.5rem;">No payments recorded yet.</p>`;
+            return;
+          }
+
+          container.innerHTML = list.map(p => `
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.85rem; border-radius: var(--radius-md); background: var(--bg-muted); border: 1px solid var(--border-color);">
+              <div>
+                <strong style="font-size: 0.95rem; color: var(--text-main);">${App.escapeHtml(p.tenant_name)}</strong>
+                <div style="font-size: 0.825rem; color: var(--text-muted);">
+                  ${App.escapeHtml(p.house_name)} &bull; ${App.escapeHtml(p.room_number)}
+                </div>
+                <div style="font-size: 0.75rem; color: var(--text-light); margin-top: 2px;">
+                  Ref: ${App.escapeHtml(p.transaction_ref || 'N/A')} &bull; ${App.formatDate(p.due_date)}
+                </div>
+              </div>
+              <div style="text-align: right;">
+                <div style="font-weight: 800; color: var(--primary); font-size: 1.05rem;">
+                  ${App.formatCurrency(p.amount)}
+                </div>
+                <div style="margin-top: 2px;">${App.statusBadge(p.status)}</div>
+              </div>
+            </div>
+          `).join('');
+        }
+      } catch (err) {
+        console.error('Error fetching recent payments:', err);
+      }
+    }
+
+    async function loadOccupancyOverview() {
+      const container = document.getElementById('property-occupancy-container');
+      try {
+        const res = await API.getBoardingHouses({ landlord_id: currentUser.user_id });
+        if (res.success && res.data) {
+          const houses = res.data;
+          if (houses.length === 0) {
+            container.innerHTML = `
+              <div style="text-align: center; padding: 2rem;">
+                <p>You haven't added any properties yet.</p>
+                <a href="add-property.html" class="btn btn-sm btn-primary">Add Your First Property</a>
+              </div>
+            `;
+            return;
+          }
+
+          container.innerHTML = houses.map(h => {
+            const total = parseInt(h.total_rooms) || 0;
+            const occupied = parseInt(h.occupied_rooms) || 0;
+            const available = parseInt(h.available_rooms) || 0;
+            const percent = total > 0 ? Math.round((occupied / total) * 100) : 0;
+
+            return `
+              <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.25rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem;">
+                  <div>
+                    <strong style="font-size: 1.05rem;">${App.escapeHtml(h.house_name)}</strong>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">${App.escapeHtml(h.address)}</div>
+                  </div>
+                  <div style="text-align: right;">
+                    <span style="font-weight: 800; font-size: 1.1rem; color: var(--primary);">${percent}% Occupied</span>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">${occupied} Occupied &bull; ${available} Available &bull; ${total} Total</div>
+                  </div>
+                </div>
+
+                <!-- PROGRESS BAR -->
+                <div style="height: 10px; background: #E2E8F0; border-radius: 5px; overflow: hidden;">
+                  <div style="height: 100%; width: ${percent}%; background: var(--primary); border-radius: 5px; transition: width 0.5s ease;"></div>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+      } catch (err) {
+        console.error('Error fetching occupancy overview:', err);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', initLandlordDashboard);
+  </script>
+</body>
+</html>

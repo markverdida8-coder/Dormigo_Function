@@ -195,7 +195,7 @@
                     android:layout_height="48dp"
                     android:layout_marginTop="6dp"
                     android:background="@drawable/bg_input_field"
-                    android:hint="Enter your school"
+                    android:hint="School or Campus Name"
                     android:inputType="textCapWords"
                     android:maxLines="1"
                     android:paddingHorizontal="14dp"

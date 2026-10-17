@@ -1,5 +1,13 @@
 <?php
+require_once __DIR__ . '/web_session.php';
 require_once 'db.php';
+
+if (($_GET['action'] ?? '') === 'logout') {
+    dormigoWebSessionStart();
+    unset($_SESSION['web_user_id'], $_SESSION['web_user_type']);
+    echo json_encode(['success' => true]);
+    exit();
+}
 
 $data = json_decode(file_get_contents("php://input"), true);
 
@@ -7,7 +15,7 @@ if (!isset($data['email']) || !isset($data['password'])) {
     echo json_encode(["success" => false, "message" => "Email and password are required."]);
     exit();
 }
-
+    
 $email = trim($data['email']);
 $password = trim($data['password']);
 
@@ -18,6 +26,7 @@ try {
 
     if ($user && ($password === $user['password'] || password_verify($password, $user['password']))) {
         unset($user['password']);
+        dormigoWebSessionSetUser($user);
         echo json_encode([
             "success" => true,
             "message" => "Login successful.",

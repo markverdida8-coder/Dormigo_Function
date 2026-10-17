@@ -1,17 +1,40 @@
-*.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
+# Android and Gradle build output
+.gradle/
+**/build/
+*.apk
+*.aab
+*.ap_
+*.dex
 local.properties
 
-/app/build/
+# Android signing material
+*.jks
+*.keystore
+key.properties
+*.p12
+*.pfx
+*.pem
+*.key
+
+# IDE and operating-system files
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+php_backend/api/*.local.php
+secrets/
+
+# Runtime-generated data
+*.log
+php_backend/logs/
+php_backend/uploads/
+uploads/
+
+# Outdated destructive database reset script
+dormigo_database.sql
