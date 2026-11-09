@@ -10,7 +10,7 @@ Dormigo is a boarding-house discovery and management system. This repository con
 | Mark Levi Canales | [markverdida8-coder](https://github.com/markverdida8-coder) |
 | Mark Levi Canales | [mavecanalesswu-cpu](https://github.com/mavecanalesswu-cpu) |
 
-Mark Levi Canales uses two GitHub accounts for contributions to this repository.
+Mark Levi Canales used two GitHub accounts for contributions for this repository.
 
 ## Repository Components
 
