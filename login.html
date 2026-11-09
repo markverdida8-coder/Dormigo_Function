@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - DORMIGO</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body style="background-color: var(--bg-page);">
+
+  <!-- NAVBAR -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="nav-brand">
+        <img src="assets/img/logo.svg" alt="Dormigo Logo" width="36" height="36">
+        <span>DORMIGO</span>
+      </a>
+
+      <div class="nav-actions">
+        <span style="font-size: 0.9rem; color: var(--text-muted);">Don't have an account?</span>
+        <a href="register.html" class="btn btn-primary btn-sm">Register</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="auth-logo">
+          <img src="assets/img/logo.svg" alt="Dormigo" width="40" height="40">
+          <span>DORMIGO</span>
+        </div>
+        <h2 style="font-size: 1.5rem; margin-bottom: 0.35rem;">Welcome Back</h2>
+        <p>Log in to access your boarding house portal</p>
+      </div>
+
+      <!-- ROLE SELECTOR TABS -->
+      <div class="auth-tabs" id="role-tabs">
+        <div class="auth-tab active" data-role="STUDENT" onclick="setLoginRole('STUDENT')">
+          <i class="fa-solid fa-graduation-cap me-1"></i> Student
+        </div>
+        <div class="auth-tab" data-role="LANDLORD" onclick="setLoginRole('LANDLORD')">
+          <i class="fa-solid fa-house-chimney-user me-1"></i> Landlord
+        </div>
+        <div class="auth-tab" data-role="ADMIN" onclick="setLoginRole('ADMIN')">
+          <i class="fa-solid fa-shield-halved me-1"></i> Admin
+        </div>
+      </div>
+
+      <form id="login-form" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label class="form-label" for="login-email">Email Address</label>
+          <div style="position: relative;">
+            <input 
+              type="email" 
+              id="login-email" 
+              class="form-control" 
+              placeholder="name@example.com" 
+              required
+            >
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+            <label class="form-label" for="login-password" style="margin-bottom: 0;">Password</label>
+            <a href="javascript:void(0)" onclick="App.toast('Please contact support or administrator to reset your password.', 'info')" style="font-size: 0.8rem;">Forgot password?</a>
+          </div>
+          <div style="position: relative;">
+            <input 
+              type="password" 
+              id="login-password" 
+              class="form-control" 
+              placeholder="Enter your password" 
+              required
+            >
+            <button 
+              type="button" 
+              onclick="togglePasswordVisibility('login-password', this)" 
+              style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-light); cursor: pointer;"
+            >
+              <i class="fa-solid fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block btn-lg" id="btn-login" style="margin-top: 1.5rem;">
+          <i class="fa-solid fa-right-to-bracket"></i> Sign In
+        </button>
+      </form>
+
+      <!-- QUICK DEMO PRESETS -->
+      <div style="margin-top: 1.75rem; padding-top: 1.25rem; border-top: 1px solid var(--border-subtle); text-align: center;">
+        <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 0.75rem;">
+          Quick Fill Test Accounts
+        </span>
+        <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
+          <button type="button" class="btn btn-sm btn-secondary" onclick="fillDemo('test@gmail.com', 'student123', 'STUDENT')">
+            <i class="fa-solid fa-user-graduate"></i> Student
+          </button>
+          <button type="button" class="btn btn-sm btn-secondary" onclick="fillDemo('landlord@gmail.com', 'landlord123', 'LANDLORD')">
+            <i class="fa-solid fa-house-user"></i> Landlord
+          </button>
+          <button type="button" class="btn btn-sm btn-secondary" onclick="fillDemo('admin@dormigo.com', 'admin123', 'ADMIN')">
+            <i class="fa-solid fa-user-shield"></i> Admin
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    // Redirect if already logged in
+    Auth.redirectIfLoggedIn();
+
+    let selectedRole = 'STUDENT';
+
+    // Parse URL param for preset role
+    const urlParams = new URLSearchParams(window.location.search);
+    const roleParam = urlParams.get('role');
+    if (roleParam) {
+      setLoginRole(roleParam.toUpperCase());
+    }
+
+    function setLoginRole(role) {
+      selectedRole = role;
+      document.querySelectorAll('#role-tabs .auth-tab').forEach(tab => {
+        if (tab.dataset.role === role) {
+          tab.classList.add('active');
+        } else {
+          tab.classList.remove('active');
+        }
+      });
+    }
+
+    function fillDemo(email, pass, role) {
+      setLoginRole(role);
+      document.getElementById('login-email').value = email;
+      document.getElementById('login-password').value = pass;
+    }
+
+    function togglePasswordVisibility(inputId, btn) {
+      const input = document.getElementById(inputId);
+      const icon = btn.querySelector('i');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'fa-solid fa-eye-slash';
+      } else {
+        input.type = 'password';
+        icon.className = 'fa-solid fa-eye';
+      }
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value.trim();
+
+      const btn = document.getElementById('btn-login');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Signing in...';
+
+      try {
+        const response = await API.login(email, password);
+        if (response.success && response.user) {
+          const user = response.user;
+          Auth.setUser(user);
+          App.toast(`Welcome back, ${user.full_name}! Redirecting...`, 'success');
+
+          setTimeout(() => {
+            // Check for redirect param
+            const redirect = urlParams.get('redirect');
+            if (redirect && !redirect.includes('login.html')) {
+              window.location.href = redirect;
+            } else {
+              window.location.href = Auth.getDashboardUrl(user.user_type);
+            }
+          }, 800);
+        } else {
+          App.toast(response.message || 'Invalid email or password.', 'error');
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Sign In';
+        }
+      } catch (err) {
+        console.error('Login error:', err);
+        App.toast('Login failed. Please check your credentials.', 'error');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Sign In';
+      }
+    }
+  </script>
+</body>
+</html>

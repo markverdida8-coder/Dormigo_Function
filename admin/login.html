@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login - DORMIGO Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="assets/css/admin.css">
+  <style>
+    .otp-input-field {
+      font-size: 1.75rem !important;
+      font-weight: 800 !important;
+      letter-spacing: 0.5rem !important;
+      text-align: center !important;
+      font-family: 'Courier New', Courier, monospace !important;
+      padding: 0.75rem 1rem !important;
+      border: 2px solid var(--adm-border) !important;
+      transition: all 0.2s ease !important;
+    }
+    .otp-input-field:focus {
+      border-color: var(--adm-primary) !important;
+      box-shadow: 0 0 0 4px var(--adm-primary-soft) !important;
+    }
+    .debug-badge {
+      background: #FEF3C7;
+      color: #92400E;
+      border: 1px dashed #F59E0B;
+      padding: 0.6rem 0.85rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .resend-btn {
+      background: none;
+      border: none;
+      color: var(--adm-primary);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: underline;
+      padding: 0;
+    }
+    .resend-btn:disabled {
+      color: var(--adm-text-light);
+      cursor: not-allowed;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body class="adm-login-page">
+
+  <div class="adm-login-card">
+    <!-- Brand Logo -->
+    <div class="adm-login-logo">
+      <div class="adm-login-logo-icon">
+        <i class="fa-solid fa-house-lock"></i>
+      </div>
+      <div class="adm-login-logo-text">
+        DORMIGO
+        <small>Administration Portal</small>
+      </div>
+    </div>
+
+    <!-- Error Alert Box -->
+    <div id="login-error" style="display: none; background: #FEE2E2; color: #DC2626; border: 1px solid #FECACA; padding: 0.75rem 1rem; border-radius: 10px; font-size: 0.875rem; margin-bottom: 1.25rem; align-items: center; gap: 0.5rem;">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <span id="login-error-text">Invalid email or password.</span>
+    </div>
+
+    <!-- Success / Notice Alert Box -->
+    <div id="login-notice" style="display: none; background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0; padding: 0.75rem 1rem; border-radius: 10px; font-size: 0.875rem; margin-bottom: 1.25rem; align-items: center; gap: 0.5rem;">
+      <i class="fa-solid fa-circle-check"></i>
+      <span id="login-notice-text">Notice message.</span>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════════════ -->
+    <!-- STEP 1: CREDENTIALS FORM -->
+    <!-- ══════════════════════════════════════════════════════════════════════ -->
+    <div id="step-credentials">
+      <h1 class="adm-login-heading">Admin Sign In</h1>
+      <p class="adm-login-sub">Restricted access for authorized Dormigo system administrators only.</p>
+
+      <form id="admin-login-form" autocomplete="off">
+        <div class="adm-form-group">
+          <label class="adm-form-label" for="admin-email">Administrator Email</label>
+          <div style="position: relative;">
+            <input 
+              type="email" 
+              id="admin-email" 
+              class="adm-form-control" 
+              placeholder="dormigohelp@gmail.com" 
+              required 
+              style="padding-left: 2.6rem;">
+            <i class="fa-solid fa-envelope" style="position: absolute; left: 0.95rem; top: 50%; transform: translateY(-50%); color: var(--adm-text-light); font-size: 0.95rem;"></i>
+          </div>
+        </div>
+
+        <div class="adm-form-group">
+          <label class="adm-form-label" for="admin-password">Password</label>
+          <div class="adm-password-wrap">
+            <input 
+              type="password" 
+              id="admin-password" 
+              class="adm-form-control" 
+              placeholder="Enter admin password" 
+              required 
+              style="padding-left: 2.6rem;">
+            <i class="fa-solid fa-lock" style="position: absolute; left: 0.95rem; top: 50%; transform: translateY(-50%); color: var(--adm-text-light); font-size: 0.95rem;"></i>
+            <button type="button" class="adm-pw-toggle" id="toggle-pw" title="Show/Hide Password">
+              <i class="fa-solid fa-eye" id="toggle-pw-icon"></i>
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" class="adm-btn adm-btn-primary adm-btn-block adm-btn-lg" id="btn-submit" style="margin-top: 1.5rem;">
+          <span id="btn-submit-text"><i class="fa-solid fa-shield-halved me-1"></i> Verify & Continue</span>
+          <span id="btn-submit-spinner" style="display: none;"><i class="fa-solid fa-spinner fa-spin me-1"></i> Checking...</span>
+        </button>
+      </form>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════════════ -->
+    <!-- STEP 2: TWO-FACTOR EMAIL OTP VERIFICATION -->
+    <!-- ══════════════════════════════════════════════════════════════════════ -->
+    <div id="step-otp" style="display: none;">
+      <div style="text-align: center; margin-bottom: 1.25rem;">
+        <div style="width: 56px; height: 56px; background: var(--adm-primary-soft); color: var(--adm-primary); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 0.75rem;">
+          <i class="fa-solid fa-envelope-shield"></i>
+        </div>
+        <h1 class="adm-login-heading" style="margin-bottom: 0.25rem;">Security Verification</h1>
+        <p class="adm-login-sub" style="margin-bottom: 0;">
+          A 6-digit authorization code was sent to:
+        </p>
+        <div style="font-weight: 700; color: var(--adm-text-main); font-size: 0.95rem;" id="otp-masked-email">ad***@dormigo.com</div>
+      </div>
+
+      <!-- Local debug helper banner (shown if debug_code returned) -->
+      <div id="otp-debug-box" class="debug-badge" style="display: none;">
+        <span><i class="fa-solid fa-bug me-1"></i> Local Dev Code: <strong id="debug-code-val">------</strong></span>
+        <button type="button" id="btn-autofill-otp" class="resend-btn" style="color: #92400E; font-size: 0.75rem;">Autofill</button>
+      </div>
+
+      <form id="admin-otp-form" autocomplete="off">
+        <div class="adm-form-group">
+          <label class="adm-form-label" style="text-align: center; display: block;" for="otp-code">Enter 6-Digit Code</label>
+          <input 
+            type="text" 
+            id="otp-code" 
+            class="adm-form-control otp-input-field" 
+            placeholder="000000" 
+            maxlength="6" 
+            pattern="[0-9]{6}" 
+            inputmode="numeric" 
+            required 
+            autofocus>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem; font-size: 0.8rem; color: var(--adm-text-muted);">
+            <span>Expires in: <strong id="otp-timer">05:00</strong></span>
+            <button type="button" id="btn-resend" class="resend-btn" disabled>Resend Code</button>
+          </div>
+        </div>
+
+        <button type="submit" class="adm-btn adm-btn-primary adm-btn-block adm-btn-lg" id="btn-verify-otp" style="margin-top: 1.25rem;">
+          <span id="btn-verify-text"><i class="fa-solid fa-lock-open me-1"></i> Authenticate & Enter Portal</span>
+          <span id="btn-verify-spinner" style="display: none;"><i class="fa-solid fa-spinner fa-spin me-1"></i> Verifying...</span>
+        </button>
+
+        <div style="text-align: center; margin-top: 1rem;">
+          <button type="button" id="btn-back-to-login" style="background: none; border: none; color: var(--adm-text-muted); font-size: 0.825rem; cursor: pointer;">
+            <i class="fa-solid fa-arrow-left me-1"></i> Back to email & password
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Security Footer -->
+    <div class="adm-login-footer">
+      <p style="margin: 0; color: var(--adm-text-muted); font-size: 0.8rem;">
+        <i class="fa-solid fa-shield-halved" style="color: var(--adm-primary); margin-right: 4px;"></i>
+        Protected by Dormigo Two-Factor Session Security
+      </p>
+    </div>
+  </div>
+
+  <script src="assets/js/admin-api.js"></script>
+  <script src="assets/js/admin-auth.js"></script>
+  <script src="assets/js/admin-app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      // If already has authenticated admin session, redirect to dashboard
+      await AdminAuth.redirectIfLoggedIn();
+
+      // UI Element References
+      const stepCredentials = document.getElementById('step-credentials');
+      const stepOtp         = document.getElementById('step-otp');
+
+      const loginForm       = document.getElementById('admin-login-form');
+      const otpForm         = document.getElementById('admin-otp-form');
+
+      const errorDiv        = document.getElementById('login-error');
+      const errorText       = document.getElementById('login-error-text');
+
+      const noticeDiv       = document.getElementById('login-notice');
+      const noticeText      = document.getElementById('login-notice-text');
+
+      const btnSubmit       = document.getElementById('btn-submit');
+      const btnSubmitText   = document.getElementById('btn-submit-text');
+      const btnSubmitSpin   = document.getElementById('btn-submit-spinner');
+
+      const btnVerifyOtp    = document.getElementById('btn-verify-otp');
+      const btnVerifyText   = document.getElementById('btn-verify-text');
+      const btnVerifySpin   = document.getElementById('btn-verify-spinner');
+
+      const otpInput        = document.getElementById('otp-code');
+      const otpMaskedEmail  = document.getElementById('otp-masked-email');
+      const otpTimerEl      = document.getElementById('otp-timer');
+      const btnResend       = document.getElementById('btn-resend');
+      const btnBack         = document.getElementById('btn-back-to-login');
+
+      const otpDebugBox     = document.getElementById('otp-debug-box');
+      const debugCodeVal    = document.getElementById('debug-code-val');
+      const btnAutofillOtp  = document.getElementById('btn-autofill-otp');
+
+      let timerInterval = null;
+      let resendCountdown = 45;
+      let resendInterval = null;
+
+      function showError(msg) {
+        errorText.textContent = msg;
+        errorDiv.style.display = 'flex';
+        noticeDiv.style.display = 'none';
+      }
+
+      function showNotice(msg) {
+        noticeText.textContent = msg;
+        noticeDiv.style.display = 'flex';
+        errorDiv.style.display = 'none';
+      }
+
+      function clearMessages() {
+        errorDiv.style.display = 'none';
+        noticeDiv.style.display = 'none';
+      }
+
+      // Password toggle
+      const pwInput = document.getElementById('admin-password');
+      const toggleBtn = document.getElementById('toggle-pw');
+      const toggleIcon = document.getElementById('toggle-pw-icon');
+      toggleBtn.addEventListener('click', () => {
+        const isPassword = pwInput.type === 'password';
+        pwInput.type = isPassword ? 'text' : 'password';
+        toggleIcon.className = isPassword ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye';
+      });
+
+      // Start 5-minute countdown for OTP expiry
+      function startExpiryTimer(durationSeconds = 300) {
+        if (timerInterval) clearInterval(timerInterval);
+        let remaining = durationSeconds;
+
+        function updateDisplay() {
+          const m = String(Math.floor(remaining / 60)).padStart(2, '0');
+          const s = String(remaining % 60).padStart(2, '0');
+          otpTimerEl.textContent = `${m}:${s}`;
+          if (remaining <= 0) {
+            clearInterval(timerInterval);
+            otpTimerEl.textContent = 'EXPIRED';
+            showError('Verification code has expired. Please click Resend Code.');
+          }
+          remaining--;
+        }
+
+        updateDisplay();
+        timerInterval = setInterval(updateDisplay, 1000);
+      }
+
+      // Start 45-second countdown for Resend button rate limiting
+      function startResendCooldown(seconds = 45) {
+        if (resendInterval) clearInterval(resendInterval);
+        btnResend.disabled = true;
+        let sec = seconds;
+
+        function updateResend() {
+          if (sec > 0) {
+            btnResend.textContent = `Resend Code (${sec}s)`;
+            sec--;
+          } else {
+            clearInterval(resendInterval);
+            btnResend.disabled = false;
+            btnResend.textContent = 'Resend Code';
+          }
+        }
+
+        updateResend();
+        resendInterval = setInterval(updateResend, 1000);
+      }
+
+      // ── Step 1 Submit: Check email + password ─────────────────────────────
+      loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        clearMessages();
+
+        const email = document.getElementById('admin-email').value.trim();
+        const password = pwInput.value;
+        if (!email || !password) return;
+
+        btnSubmit.disabled = true;
+        btnSubmitText.style.display = 'none';
+        btnSubmitSpin.style.display = 'inline-block';
+
+        try {
+          const res = await AdminAPI.adminLogin(email, password);
+
+          if (res.success && res.requires_otp) {
+            // Transition to Step 2 (OTP)
+            stepCredentials.style.display = 'none';
+            stepOtp.style.display = 'block';
+
+            otpMaskedEmail.textContent = res.email_masked || email;
+            showNotice('Verification code generated. Please check your inbox.');
+
+            // Check if debug code returned (development mode)
+            if (res.debug_code) {
+              debugCodeVal.textContent = res.debug_code;
+              otpDebugBox.style.display = 'flex';
+              btnAutofillOtp.onclick = () => {
+                otpInput.value = res.debug_code;
+                otpInput.focus();
+              };
+            } else {
+              otpDebugBox.style.display = 'none';
+            }
+
+            otpInput.value = '';
+            otpInput.focus();
+
+            startExpiryTimer(300);
+            startResendCooldown(45);
+
+          } else if (res.success && res.user) {
+            // Direct login (if 2FA was bypassed)
+            AdminAuth.setUser(res.user);
+            window.location.href = 'dashboard.html';
+          } else {
+            showError(res.message || 'Invalid email or password.');
+          }
+
+        } catch (err) {
+          console.error('Login error:', err);
+          showError(err.message || 'Network error occurred. Please try again.');
+        } finally {
+          btnSubmit.disabled = false;
+          btnSubmitText.style.display = 'inline-block';
+          btnSubmitSpin.style.display = 'none';
+        }
+      });
+
+      // ── Step 2 Submit: Verify 6-digit OTP ─────────────────────────────────
+      otpForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        clearMessages();
+
+        const code = otpInput.value.trim();
+        if (code.length !== 6) {
+          showError('Please enter a complete 6-digit verification code.');
+          return;
+        }
+
+        btnVerifyOtp.disabled = true;
+        btnVerifyText.style.display = 'none';
+        btnVerifySpin.style.display = 'inline-block';
+
+        try {
+          const res = await AdminAPI.verifyLoginOtp(code);
+
+          if (res.success && res.user) {
+            AdminAuth.setUser(res.user);
+            showNotice('Verification successful! Entering portal...');
+            setTimeout(() => {
+              window.location.href = 'dashboard.html';
+            }, 600);
+          } else {
+            showError(res.message || 'Invalid or expired verification code.');
+            otpInput.select();
+          }
+
+        } catch (err) {
+          console.error('OTP Verification Error:', err);
+          showError(err.message || 'Verification failed. Please try again.');
+        } finally {
+          btnVerifyOtp.disabled = false;
+          btnVerifyText.style.display = 'inline-block';
+          btnVerifySpin.style.display = 'none';
+        }
+      });
+
+      // ── Resend OTP Button ─────────────────────────────────────────────────
+      btnResend.addEventListener('click', async () => {
+        clearMessages();
+        btnResend.disabled = true;
+
+        try {
+          const res = await AdminAPI.resendOtp('LOGIN_2FA');
+          if (res.success) {
+            showNotice('A fresh verification code has been dispatched.');
+            if (res.debug_code) {
+              debugCodeVal.textContent = res.debug_code;
+              otpDebugBox.style.display = 'flex';
+            }
+            startExpiryTimer(300);
+            startResendCooldown(45);
+          } else {
+            showError(res.message || 'Could not resend code.');
+            btnResend.disabled = false;
+          }
+        } catch (err) {
+          showError(err.message || 'Error resending code.');
+          btnResend.disabled = false;
+        }
+      });
+
+      // ── Back Button ───────────────────────────────────────────────────────
+      btnBack.addEventListener('click', () => {
+        clearMessages();
+        if (timerInterval) clearInterval(timerInterval);
+        if (resendInterval) clearInterval(resendInterval);
+        stepOtp.style.display = 'none';
+        stepCredentials.style.display = 'block';
+      });
+
+      // Format OTP input: only digits
+      otpInput.addEventListener('input', (e) => {
+        otpInput.value = otpInput.value.replace(/\D/g, '').slice(0, 6);
+      });
+    });
+  </script>
+</body>
+</html>

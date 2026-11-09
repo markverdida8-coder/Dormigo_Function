@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Dashboard - DORMIGO</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+</head>
+<body>
+
+  <div class="dashboard-layout">
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="../index.html" class="sidebar-brand">
+          <img src="../assets/img/logo.svg" alt="Dormigo" width="34" height="34">
+          <span>DORMIGO</span>
+        </a>
+        <button class="sidebar-close" onclick="toggleSidebar()">&times;</button>
+      </div>
+
+      <div class="sidebar-content">
+        <div class="nav-section-title">Navigation</div>
+        <a href="../index.html" class="sidebar-link">
+          <i class="fa-solid fa-house"></i> Home
+        </a>
+        <a href="../explore.html" class="sidebar-link">
+          <i class="fa-solid fa-compass"></i> Explore
+        </a>
+
+        <div class="nav-section-title">Student Portal</div>
+        <a href="dashboard.html" class="sidebar-link active">
+          <i class="fa-solid fa-gauge-high"></i> Dashboard
+        </a>
+        <a href="bookings.html" class="sidebar-link">
+          <i class="fa-solid fa-calendar-check"></i> My Bookings
+          <span class="badge badge-warning" id="badge-pending-bookings" style="display: none;">0</span>
+        </a>
+        <a href="payments.html" class="sidebar-link">
+          <i class="fa-solid fa-credit-card"></i> Payments
+        </a>
+        <a href="messages.html" class="sidebar-link">
+          <i class="fa-solid fa-comments"></i> Messages
+          <span class="badge badge-success" id="badge-unread-msgs" style="display: none;">0</span>
+        </a>
+        <a href="reviews.html" class="sidebar-link">
+          <i class="fa-solid fa-star"></i> Reviews
+        </a>
+        <a href="notifications.html" class="sidebar-link">
+          <i class="fa-solid fa-bell"></i> Notifications
+          <span class="badge badge-danger" id="badge-unread-notifs" style="display: none;">0</span>
+        </a>
+        <a href="profile.html" class="sidebar-link">
+          <i class="fa-solid fa-user"></i> Profile
+        </a>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="user-avatar" id="sidebar-user-avatar">
+          <i class="fa-solid fa-user"></i>
+        </div>
+        <div class="user-info">
+          <div class="user-name" id="sidebar-user-name">Loading...</div>
+          <div class="user-role-badge">Student Tenant</div>
+        </div>
+        <button class="logout-btn" onclick="Auth.logout()" title="Logout">
+          <i class="fa-solid fa-right-from-bracket"></i>
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN WRAPPER -->
+    <div class="main-wrapper">
+      <!-- TOPBAR -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle" onclick="toggleSidebar()">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <h2 class="page-title">Student Dashboard</h2>
+        </div>
+
+        <div class="topbar-right">
+          <a href="notifications.html" class="topbar-btn" title="Notifications">
+            <i class="fa-solid fa-bell"></i>
+            <span class="notif-badge" id="topbar-notif-badge" style="display: none;">0</span>
+          </a>
+          <a href="messages.html" class="topbar-btn" title="Messages">
+            <i class="fa-solid fa-comment-dots"></i>
+          </a>
+          <a href="profile.html" class="user-avatar" style="width: 38px; height: 38px; text-decoration: none;">
+            <i class="fa-solid fa-user"></i>
+          </a>
+        </div>
+      </header>
+
+      <!-- CONTENT -->
+      <main class="dashboard-content">
+        <!-- WELCOME BANNER -->
+        <div style="background: linear-gradient(135deg, #1B5E4C 0%, #144638 100%); border-radius: var(--radius-xl); padding: 2rem 2.5rem; color: white; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: gap; gap: 1.5rem; box-shadow: var(--shadow-md);">
+          <div>
+            <span style="background: rgba(255,255,255,0.2); padding: 0.3rem 0.8rem; border-radius: var(--radius-pill); font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">
+              Student Portal
+            </span>
+            <h1 style="color: white; font-size: 2rem; margin: 0.5rem 0 0.4rem;" id="welcome-student-name">
+              Welcome back, Student!
+            </h1>
+            <p style="color: rgba(255,255,255,0.85); font-size: 0.95rem; margin: 0;">
+              Manage your room bookings, rent payments, inquiries, and landlord communications.
+            </p>
+          </div>
+          <div>
+            <a href="../explore.html" class="btn btn-primary" style="background: white; color: var(--primary); border: none;">
+              <i class="fa-solid fa-magnifying-glass"></i> Find Another Room
+            </a>
+          </div>
+        </div>
+
+        <!-- QUICK STATS -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon stat-icon-green">
+              <i class="fa-solid fa-calendar-check"></i>
+            </div>
+            <div class="stat-info">
+              <div class="stat-value" id="stat-active-booking">--</div>
+              <div class="stat-label">Current Booking</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon stat-icon-amber">
+              <i class="fa-solid fa-hourglass-half"></i>
+            </div>
+            <div class="stat-info">
+              <div class="stat-value" id="stat-pending-requests">0</div>
+              <div class="stat-label">Pending Requests</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon stat-icon-blue">
+              <i class="fa-solid fa-wallet"></i>
+            </div>
+            <div class="stat-info">
+              <div class="stat-value" id="stat-payment-status">Up to Date</div>
+              <div class="stat-label">Payment Status</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon stat-icon-green">
+              <i class="fa-solid fa-comments"></i>
+            </div>
+            <div class="stat-info">
+              <div class="stat-value" id="stat-unread-messages">0</div>
+              <div class="stat-label">Unread Messages</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CURRENT / LATEST BOOKING SECTION -->
+        <div class="table-card" style="padding: 1.5rem; margin-bottom: 2rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+            <h3 style="font-size: 1.25rem;"><i class="fa-solid fa-bed me-2" style="color: var(--primary);"></i> Current or Latest Booking</h3>
+            <a href="bookings.html" class="btn btn-sm btn-outline-primary">View All Bookings</a>
+          </div>
+
+          <div id="latest-booking-container">
+            <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+              <i class="fa-solid fa-spinner fa-spin fa-2x" style="color: var(--primary);"></i>
+              <p style="margin-top: 0.5rem;">Loading booking information...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2-COLUMN SECTION: RECENT NOTIFICATIONS & RECOMMENDED BOARDING HOUSES -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 2rem;">
+          
+          <!-- RECENT NOTIFICATIONS -->
+          <div class="table-card" style="padding: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+              <h3 style="font-size: 1.15rem;"><i class="fa-solid fa-bell me-2" style="color: var(--primary);"></i> Recent Notifications</h3>
+              <a href="notifications.html" style="font-size: 0.85rem; font-weight: 600;">View All</a>
+            </div>
+
+            <div id="recent-notifications-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
+              <div style="text-align: center; padding: 1.5rem; color: var(--text-muted);">
+                <i class="fa-solid fa-spinner fa-spin"></i> Loading notifications...
+              </div>
+            </div>
+          </div>
+
+          <!-- RECOMMENDED HOUSES -->
+          <div class="table-card" style="padding: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+              <h3 style="font-size: 1.15rem;"><i class="fa-solid fa-compass me-2" style="color: var(--primary);"></i> Recommended Near Campus</h3>
+              <a href="../explore.html" style="font-size: 0.85rem; font-weight: 600;">Explore All</a>
+            </div>
+
+            <div id="recommended-houses-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
+              <div style="text-align: center; padding: 1.5rem; color: var(--text-muted);">
+                <i class="fa-solid fa-spinner fa-spin"></i> Loading recommendations...
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script>
+    // Enforce student role
+    const currentUser = Auth.requireAuth(['STUDENT']);
+
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('show');
+    }
+
+    async function initDashboard() {
+      if (!currentUser) return;
+
+      document.getElementById('welcome-student-name').textContent = `Welcome back, ${currentUser.full_name}!`;
+      document.getElementById('sidebar-user-name').textContent = currentUser.full_name;
+
+      // Load bookings
+      await loadStudentBookings();
+
+      // Load notifications
+      await loadStudentNotifications();
+
+      // Load messages counter
+      await loadStudentMessages();
+
+      // Load recommended boarding houses
+      await loadRecommendedHouses();
+    }
+
+    async function loadStudentBookings() {
+      const container = document.getElementById('latest-booking-container');
+      try {
+        const res = await API.getBookings({ user_id: currentUser.user_id });
+        if (res.success && res.data && res.data.length > 0) {
+          const bookings = res.data;
+          const pending = bookings.filter(b => b.status === 'PENDING').length;
+          const active = bookings.find(b => b.status === 'APPROVED' || b.status === 'ACTIVE');
+
+          document.getElementById('stat-pending-requests').textContent = pending;
+          if (pending > 0) {
+            const badge = document.getElementById('badge-pending-bookings');
+            badge.textContent = pending;
+            badge.style.display = 'inline-flex';
+          }
+
+          if (active) {
+            document.getElementById('stat-active-booking').textContent = active.room_number || 'Room Active';
+          } else {
+            document.getElementById('stat-active-booking').textContent = 'None';
+          }
+
+          const latest = bookings[0];
+          const rent = parseFloat(latest.agreed_monthly_rent || latest.monthly_rent || 0);
+          const isApproved = latest.status === 'APPROVED';
+
+          container.innerHTML = `
+            <div style="background: var(--bg-muted); border-radius: var(--radius-lg); padding: 1.5rem; border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.25rem;">
+              <div>
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.4rem;">
+                  <h4 style="font-size: 1.2rem; margin: 0;">${App.escapeHtml(latest.house_name)}</h4>
+                  ${App.statusBadge(latest.status)}
+                </div>
+                <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.4rem;">
+                  <i class="fa-solid fa-location-dot me-1"></i> ${App.escapeHtml(latest.address || 'Campus area')}
+                </div>
+                <div style="font-size: 0.9rem; color: var(--text-main);">
+                  <strong>${App.escapeHtml(latest.room_number)}</strong> (${App.escapeHtml(latest.room_type || 'Solo')}) &bull; Move-in: ${App.formatDate(latest.move_in_date)} &bull; ${latest.duration_months} Months
+                </div>
+              </div>
+
+              <div style="text-align: right;">
+                <div style="font-size: 1.5rem; font-weight: 800; color: var(--primary);">
+                  ${App.formatCurrency(rent)} / mo
+                </div>
+                <div style="font-size: 0.825rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+                  Total Contract: ${App.formatCurrency(latest.agreed_total_amount)}
+                </div>
+                <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                  ${isApproved ? `
+                    <a href="payments.html?booking_id=${latest.booking_id}" class="btn btn-sm btn-primary">
+                      <i class="fa-solid fa-credit-card"></i> Pay Now
+                    </a>
+                  ` : ''}
+                  <a href="../house-details.html?id=${latest.house_id}" class="btn btn-sm btn-outline-primary">
+                    View House
+                  </a>
+                </div>
+              </div>
+            </div>
+          `;
+        } else {
+          document.getElementById('stat-active-booking').textContent = 'None';
+          container.innerHTML = `
+            <div style="text-align: center; padding: 2.5rem; background: var(--bg-muted); border-radius: var(--radius-lg);">
+              <i class="fa-solid fa-bed fa-2x" style="color: var(--text-light); margin-bottom: 0.75rem;"></i>
+              <h4 style="margin-bottom: 0.25rem;">No Active Bookings Yet</h4>
+              <p style="margin-bottom: 1.25rem; font-size: 0.9rem;">Browse through verified student boarding houses and reserve your room.</p>
+              <a href="../explore.html" class="btn btn-primary btn-sm">Explore Boarding Houses</a>
+            </div>
+          `;
+        }
+      } catch (err) {
+        console.error('Error loading student bookings:', err);
+        container.innerHTML = `<p class="text-danger">Failed to load booking details.</p>`;
+      }
+    }
+
+    async function loadStudentNotifications() {
+      const container = document.getElementById('recent-notifications-list');
+      try {
+        const res = await API.getNotifications(currentUser.user_id);
+        if (res.success && res.data) {
+          const notifs = res.data.slice(0, 4);
+          const unread = res.unread_count || 0;
+
+          if (unread > 0) {
+            const badge = document.getElementById('badge-unread-notifs');
+            badge.textContent = unread;
+            badge.style.display = 'inline-flex';
+
+            const topbarBadge = document.getElementById('topbar-notif-badge');
+            topbarBadge.textContent = unread;
+            topbarBadge.style.display = 'inline-block';
+          }
+
+          if (notifs.length === 0) {
+            container.innerHTML = `<p style="color: var(--text-muted); font-size: 0.9rem; text-align: center; padding: 1rem;">No notifications right now.</p>`;
+            return;
+          }
+
+          container.innerHTML = notifs.map(n => `
+            <div style="display: flex; gap: 0.75rem; padding: 0.75rem; border-radius: var(--radius-md); background: ${n.is_read ? 'transparent' : 'var(--primary-soft)'}; border: 1px solid var(--border-subtle);">
+              <div style="color: var(--primary); font-size: 1.1rem; margin-top: 2px;"><i class="fa-solid fa-bell"></i></div>
+              <div style="flex: 1; min-width: 0;">
+                <div style="font-size: 0.875rem; font-weight: 700; color: var(--text-main);">${App.escapeHtml(n.title)}</div>
+                <div style="font-size: 0.825rem; color: var(--text-muted);">${App.escapeHtml(n.message)}</div>
+                <div style="font-size: 0.725rem; color: var(--text-light); margin-top: 0.2rem;">${App.formatDateTime(n.created_at)}</div>
+              </div>
+            </div>
+          `).join('');
+        }
+      } catch (err) {
+        console.error('Error fetching notifications:', err);
+      }
+    }
+
+    async function loadStudentMessages() {
+      try {
+        const res = await API.getConversations(currentUser.user_id);
+        if (res.success && res.data) {
+          const totalUnread = res.data.reduce((acc, c) => acc + (c.unread_count || 0), 0);
+          document.getElementById('stat-unread-messages').textContent = totalUnread;
+          if (totalUnread > 0) {
+            const badge = document.getElementById('badge-unread-msgs');
+            badge.textContent = totalUnread;
+            badge.style.display = 'inline-flex';
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching messages count:', err);
+      }
+    }
+
+    async function loadRecommendedHouses() {
+      const container = document.getElementById('recommended-houses-list');
+      try {
+        const res = await API.getBoardingHouses({ status: 'ACTIVE' });
+        if (res.success && res.data) {
+          const houses = res.data.slice(0, 3);
+          if (houses.length === 0) {
+            container.innerHTML = `<p style="color: var(--text-muted); font-size: 0.9rem; text-align: center;">No houses listed.</p>`;
+            return;
+          }
+
+          container.innerHTML = houses.map(h => {
+            const photo = (h.photo_paths && h.photo_paths.length > 0) ? h.photo_paths[0] : null;
+            const photoUrl = App.resolvePhotoUrl(photo);
+            return `
+              <div style="display: flex; gap: 0.85rem; align-items: center; padding: 0.6rem; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); transition: var(--transition);">
+                <img src="${photoUrl}" alt="${App.escapeHtml(h.house_name)}" style="width: 60px; height: 60px; border-radius: var(--radius-sm); object-fit: cover;">
+                <div style="flex: 1; min-width: 0;">
+                  <a href="../house-details.html?id=${h.house_id}" style="font-weight: 700; font-size: 0.925rem; color: var(--text-main); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    ${App.escapeHtml(h.house_name)}
+                  </a>
+                  <div style="font-size: 0.8rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    ${App.escapeHtml(h.address)}
+                  </div>
+                  <div style="font-size: 0.825rem; font-weight: 700; color: var(--primary); margin-top: 2px;">
+                    Starts at ${App.formatCurrency(h.starting_rent || h.min_rent)} / mo
+                  </div>
+                </div>
+                <a href="../house-details.html?id=${h.house_id}" class="btn btn-sm btn-outline-primary" style="padding: 0.35rem 0.65rem;">
+                  View
+                </a>
+              </div>
+            `;
+          }).join('');
+        }
+      } catch (err) {
+        console.error('Error fetching recommended houses:', err);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', initDashboard);
+  </script>
+</body>
+</html>

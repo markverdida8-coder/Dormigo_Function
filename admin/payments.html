@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payments Monitoring - DORMIGO Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="assets/css/admin.css">
+</head>
+<body>
+
+  <div class="adm-layout" id="adm-layout-body">
+    <div>
+      <!-- Page Header -->
+      <div class="adm-page-header">
+        <div>
+          <h1>Payments Monitoring</h1>
+          <p>Financial ledger of rent collections, student remittance transactions, GCash references, and payment statuses.</p>
+        </div>
+      </div>
+
+      <!-- REVENUE SUMMARY CARDS -->
+      <div class="adm-stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-bottom: 1.5rem;">
+        <div class="adm-stat-card">
+          <div class="adm-stat-icon adm-si-green"><i class="fa-solid fa-peso-sign"></i></div>
+          <div class="adm-stat-body">
+            <div class="adm-stat-value" id="stat-total-paid">₱0.00</div>
+            <div class="adm-stat-label">Total Verified Revenue</div>
+          </div>
+        </div>
+
+        <div class="adm-stat-card">
+          <div class="adm-stat-icon adm-si-amber"><i class="fa-solid fa-clock"></i></div>
+          <div class="adm-stat-body">
+            <div class="adm-stat-value" id="stat-total-pending">₱0.00</div>
+            <div class="adm-stat-label">Pending Payments Amount</div>
+          </div>
+        </div>
+
+        <div class="adm-stat-card">
+          <div class="adm-stat-icon adm-si-teal"><i class="fa-solid fa-receipt"></i></div>
+          <div class="adm-stat-body">
+            <div class="adm-stat-value" id="stat-total-transactions">0</div>
+            <div class="adm-stat-label">Total Transactions</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAIN TABLE CARD -->
+      <div class="adm-card">
+        <div class="adm-card-header">
+          <div class="adm-card-title">
+            <i class="fa-solid fa-credit-card"></i> Transaction History
+          </div>
+        </div>
+
+        <!-- FILTERS -->
+        <div class="adm-filters">
+          <div class="adm-search-wrap">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="payment-search" class="adm-search-input" placeholder="Search student, ref #, payment ID..." oninput="filterPayments()">
+          </div>
+
+          <select id="status-filter" class="adm-filter-select" onchange="filterPayments()">
+            <option value="">All Statuses</option>
+            <option value="PAID">Paid</option>
+            <option value="CONFIRMED">Confirmed</option>
+            <option value="PENDING">Pending</option>
+            <option value="FAILED">Failed</option>
+            <option value="CANCELLED">Cancelled</option>
+          </select>
+
+          <input type="date" id="date-filter" class="adm-filter-select" onchange="filterPayments()" title="Filter by due/payment date">
+
+          <input type="text" id="property-filter" class="adm-form-control" placeholder="Property name..." style="max-width: 170px; padding: 0.55rem 0.9rem;" oninput="filterPayments()">
+
+          <button class="adm-btn adm-btn-secondary adm-btn-sm" onclick="resetFilters()">
+            <i class="fa-solid fa-filter-circle-xmark"></i> Reset
+          </button>
+        </div>
+
+        <div class="adm-table-wrap">
+          <table class="adm-table">
+            <thead>
+              <tr>
+                <th style="width: 70px;">ID</th>
+                <th>Student</th>
+                <th>Boarding House & Room</th>
+                <th>Booking #</th>
+                <th>Period</th>
+                <th>Amount</th>
+                <th>Method</th>
+                <th>Payment Date</th>
+                <th>Transaction Ref</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="payments-tbody">
+              <tr>
+                <td colspan="10" style="text-align: center; color: var(--adm-text-muted); padding: 3rem;">
+                  <i class="fa-solid fa-spinner fa-spin" style="font-size: 1.5rem; color: var(--adm-primary);"></i>
+                  <div style="margin-top: 0.5rem;">Loading financial transactions...</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="adm-table-footer">
+          <div>Showing <span id="visible-count">0</span> of <span id="total-count">0</span> payment transactions</div>
+          <div style="font-size: 0.8rem; color: var(--adm-text-muted);">
+            Payments are authenticated and submitted via the Dormigo mobile app.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="assets/js/admin-api.js"></script>
+  <script src="assets/js/admin-auth.js"></script>
+  <script src="assets/js/admin-app.js"></script>
+  <script src="assets/js/admin-layout.js"></script>
+  <script>
+    let allPaymentsList = [];
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      const user = await AdminLayout.init('payments', 'Payments');
+      if (!user) return;
+
+      await loadPayments();
+    });
+
+    async function loadPayments() {
+      try {
+        const res = await AdminAPI.getPayments();
+        if (res.success && res.data) {
+          allPaymentsList = res.data;
+          updateSummaryMetrics();
+          filterPayments();
+        } else {
+          document.getElementById('payments-tbody').innerHTML = `
+            <tr><td colspan="10" style="text-align: center; color: var(--adm-red); padding: 2rem;">Failed to load payments.</td></tr>
+          `;
+        }
+      } catch (err) {
+        console.error('Error fetching payments:', err);
+        document.getElementById('payments-tbody').innerHTML = `
+          <tr><td colspan="10" style="text-align: center; color: var(--adm-red); padding: 2rem;">Network error fetching payments.</td></tr>
+        `;
+      }
+    }
+
+    function updateSummaryMetrics() {
+      let totalPaid = 0;
+      let totalPending = 0;
+
+      allPaymentsList.forEach(p => {
+        const amt = parseFloat(p.amount) || 0;
+        const st = (p.status || '').toUpperCase();
+        if (st === 'PAID' || st === 'CONFIRMED') totalPaid += amt;
+        if (st === 'PENDING') totalPending += amt;
+      });
+
+      document.getElementById('stat-total-paid').textContent = AdminApp.formatCurrency(totalPaid);
+      document.getElementById('stat-total-pending').textContent = AdminApp.formatCurrency(totalPending);
+      document.getElementById('stat-total-transactions').textContent = allPaymentsList.length;
+    }
+
+    function filterPayments() {
+      const query = document.getElementById('payment-search').value.toLowerCase().trim();
+      const status = document.getElementById('status-filter').value.toUpperCase();
+      const date = document.getElementById('date-filter').value;
+      const propFilter = document.getElementById('property-filter').value.toLowerCase().trim();
+
+      const filtered = allPaymentsList.filter(p => {
+        if (status && (p.status || '').toUpperCase() !== status) return false;
+
+        if (date) {
+          const pDate = (p.payment_date || p.due_date || '').slice(0, 10);
+          if (pDate !== date) return false;
+        }
+
+        if (propFilter) {
+          const house = (p.house_name || '').toLowerCase();
+          if (!house.includes(propFilter)) return false;
+        }
+
+        if (query) {
+          const tenant = (p.tenant_name || '').toLowerCase();
+          const email = (p.tenant_email || '').toLowerCase();
+          const ref = (p.transaction_ref || '').toLowerCase();
+          const id = String(p.payment_id || '');
+          const bId = String(p.booking_id || '');
+          if (!tenant.includes(query) && !email.includes(query) && !ref.includes(query) && !id.includes(query) && !bId.includes(query)) {
+            return false;
+          }
+        }
+        return true;
+      });
+
+      renderPayments(filtered);
+    }
+
+    function resetFilters() {
+      document.getElementById('payment-search').value = '';
+      document.getElementById('status-filter').value = '';
+      document.getElementById('date-filter').value = '';
+      document.getElementById('property-filter').value = '';
+      filterPayments();
+    }
+
+    function renderPayments(payments) {
+      const tbody = document.getElementById('payments-tbody');
+      document.getElementById('visible-count').textContent = payments.length;
+      document.getElementById('total-count').textContent = allPaymentsList.length;
+
+      if (payments.length === 0) {
+        tbody.innerHTML = `
+          <tr><td colspan="10" style="text-align: center; color: var(--adm-text-muted); padding: 3rem;">
+            <i class="fa-solid fa-receipt" style="font-size: 2rem; color: var(--adm-text-light); margin-bottom: 0.5rem; display: block;"></i>
+            No payment records matching the selected search or filter criteria.
+          </td></tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = payments.map(p => `
+        <tr>
+          <td style="font-weight: 700; color: var(--adm-primary);">#${p.payment_id}</td>
+          <td>
+            <div class="adm-user-cell">
+              <div class="adm-avatar">${AdminApp.avatarInitials(p.tenant_name)}</div>
+              <div>
+                <div class="adm-user-name">${AdminApp.escapeHtml(p.tenant_name || 'Student')}</div>
+                <div class="adm-user-email">${AdminApp.escapeHtml(p.tenant_email || '—')}</div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <strong style="color: var(--adm-text-main);">${AdminApp.escapeHtml(p.house_name || 'Property')}</strong>
+            <div style="font-size: 0.75rem; color: var(--adm-text-muted);">${AdminApp.escapeHtml(p.room_number || '')}</div>
+          </td>
+          <td style="font-weight: 600; color: var(--adm-text-muted);">#${p.booking_id || '—'}</td>
+          <td style="font-size: 0.85rem;">Period ${p.payment_period || 1}</td>
+          <td style="font-weight: 700; color: var(--adm-text-main); font-size: 0.95rem;">${AdminApp.formatCurrency(p.amount)}</td>
+          <td>
+            <span style="font-size: 0.85rem; font-weight: 600; background: var(--adm-bg-muted); padding: 0.2rem 0.5rem; border-radius: 4px;">
+              ${AdminApp.escapeHtml(p.payment_method || 'GCash')}
+            </span>
+          </td>
+          <td style="font-size: 0.8rem; color: var(--adm-text-muted);">${AdminApp.formatDate(p.payment_date || p.due_date)}</td>
+          <td style="font-family: monospace; font-size: 0.85rem; color: var(--adm-text-muted);">${AdminApp.escapeHtml(p.transaction_ref || '—')}</td>
+          <td>${AdminApp.statusBadge(p.status)}</td>
+        </tr>
+      `).join('');
+    }
+  </script>
+</body>
+</html>

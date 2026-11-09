@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notifications - DORMIGO Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="assets/css/admin.css">
+</head>
+<body>
+
+  <div class="adm-layout" id="adm-layout-body">
+    <div>
+      <!-- Page Header -->
+      <div class="adm-page-header">
+        <div>
+          <h1>System Notifications</h1>
+          <p>Activity alerts, booking updates, payment notices, and platform verification dispatches.</p>
+        </div>
+      </div>
+
+      <!-- SUMMARY CARDS -->
+      <div class="adm-stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 1.5rem;">
+        <div class="adm-stat-card">
+          <div class="adm-stat-icon adm-si-teal"><i class="fa-solid fa-bell"></i></div>
+          <div class="adm-stat-body">
+            <div class="adm-stat-value" id="stat-total">0</div>
+            <div class="adm-stat-label">Total Notifications</div>
+          </div>
+        </div>
+
+        <div class="adm-stat-card">
+          <div class="adm-stat-icon adm-si-red"><i class="fa-solid fa-envelope-open-text"></i></div>
+          <div class="adm-stat-body">
+            <div class="adm-stat-value" id="stat-unread">0</div>
+            <div class="adm-stat-label">Unread Alerts</div>
+          </div>
+        </div>
+
+        <div class="adm-stat-card">
+          <div class="adm-stat-icon adm-si-green"><i class="fa-solid fa-envelope-circle-check"></i></div>
+          <div class="adm-stat-body">
+            <div class="adm-stat-value" id="stat-read">0</div>
+            <div class="adm-stat-label">Read Notifications</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAIN TABLE CARD -->
+      <div class="adm-card">
+        <div class="adm-card-header">
+          <div class="adm-card-title">
+            <i class="fa-solid fa-bell"></i> Notification Log
+          </div>
+        </div>
+
+        <!-- FILTERS -->
+        <div class="adm-filters">
+          <div class="adm-search-wrap">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="notif-search" class="adm-search-input" placeholder="Search title, message, or user..." oninput="filterNotifications()">
+          </div>
+
+          <select id="type-filter" class="adm-filter-select" onchange="filterNotifications()">
+            <option value="">All Types</option>
+            <option value="REQUEST">Booking Requests</option>
+            <option value="PAYMENT">Payments</option>
+            <option value="MESSAGE">Messages</option>
+            <option value="SYSTEM">System Alerts</option>
+          </select>
+
+          <select id="status-filter" class="adm-filter-select" onchange="filterNotifications()">
+            <option value="">All Read Status</option>
+            <option value="UNREAD">Unread Only</option>
+            <option value="READ">Read Only</option>
+          </select>
+
+          <button class="adm-btn adm-btn-secondary adm-btn-sm" onclick="resetFilters()">
+            <i class="fa-solid fa-filter-circle-xmark"></i> Reset
+          </button>
+        </div>
+
+        <div class="adm-table-wrap">
+          <table class="adm-table">
+            <thead>
+              <tr>
+                <th style="width: 70px;">ID</th>
+                <th>Target Recipient</th>
+                <th>Type</th>
+                <th>Title</th>
+                <th>Message Details</th>
+                <th>Timestamp</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="notifications-tbody">
+              <tr>
+                <td colspan="7" style="text-align: center; color: var(--adm-text-muted); padding: 3rem;">
+                  <i class="fa-solid fa-spinner fa-spin" style="font-size: 1.5rem; color: var(--adm-primary);"></i>
+                  <div style="margin-top: 0.5rem;">Loading notification feed...</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="adm-table-footer">
+          <div>Showing <span id="visible-count">0</span> of <span id="total-count">0</span> notifications</div>
+          <div style="font-size: 0.8rem; color: var(--adm-text-muted);">
+            Notifications are sent to students and landlords via the Dormigo notification engine.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="assets/js/admin-api.js"></script>
+  <script src="assets/js/admin-auth.js"></script>
+  <script src="assets/js/admin-app.js"></script>
+  <script src="assets/js/admin-layout.js"></script>
+  <script>
+    let allNotifications = [];
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      const user = await AdminLayout.init('notifications', 'Notifications');
+      if (!user) return;
+
+      await loadNotifications();
+    });
+
+    async function loadNotifications() {
+      try {
+        const res = await AdminAPI.getAllNotifications();
+        if (res.success && res.data) {
+          allNotifications = res.data;
+          updateMetrics();
+          filterNotifications();
+        } else {
+          document.getElementById('notifications-tbody').innerHTML = `
+            <tr><td colspan="7" style="text-align: center; color: var(--adm-red); padding: 2rem;">Failed to load notifications.</td></tr>
+          `;
+        }
+      } catch (err) {
+        console.error('Error fetching notifications:', err);
+        document.getElementById('notifications-tbody').innerHTML = `
+          <tr><td colspan="7" style="text-align: center; color: var(--adm-red); padding: 2rem;">Network error fetching notifications.</td></tr>
+        `;
+      }
+    }
+
+    function updateMetrics() {
+      const total = allNotifications.length;
+      const unread = allNotifications.filter(n => !n.is_read).length;
+      const read = total - unread;
+
+      document.getElementById('stat-total').textContent = total;
+      document.getElementById('stat-unread').textContent = unread;
+      document.getElementById('stat-read').textContent = read;
+    }
+
+    function filterNotifications() {
+      const query = document.getElementById('notif-search').value.toLowerCase().trim();
+      const typeVal = document.getElementById('type-filter').value.toUpperCase();
+      const statusVal = document.getElementById('status-filter').value;
+
+      const filtered = allNotifications.filter(n => {
+        if (typeVal && (n.type || '').toUpperCase() !== typeVal) return false;
+
+        if (statusVal === 'UNREAD' && n.is_read) return false;
+        if (statusVal === 'READ' && !n.is_read) return false;
+
+        if (query) {
+          const title = (n.title || '').toLowerCase();
+          const msg = (n.message || '').toLowerCase();
+          const user = (n.full_name || '').toLowerCase();
+          const id = String(n.notification_id || '');
+          if (!title.includes(query) && !msg.includes(query) && !user.includes(query) && !id.includes(query)) {
+            return false;
+          }
+        }
+        return true;
+      });
+
+      renderNotifications(filtered);
+    }
+
+    function resetFilters() {
+      document.getElementById('notif-search').value = '';
+      document.getElementById('type-filter').value = '';
+      document.getElementById('status-filter').value = '';
+      filterNotifications();
+    }
+
+    function typeBadge(type) {
+      const t = String(type || '').toUpperCase();
+      const config = {
+        REQUEST: { cls: 'adm-badge-blue', icon: 'fa-calendar-check' },
+        PAYMENT: { cls: 'adm-badge-green', icon: 'fa-credit-card' },
+        MESSAGE: { cls: 'adm-badge-amber', icon: 'fa-comment' },
+        SYSTEM:  { cls: 'adm-badge-muted', icon: 'fa-gear' }
+      };
+      const c = config[t] || config.SYSTEM;
+      return `<span class="adm-badge ${c.cls}"><i class="fa-solid ${c.icon}"></i> ${t}</span>`;
+    }
+
+    function renderNotifications(notifs) {
+      const tbody = document.getElementById('notifications-tbody');
+      document.getElementById('visible-count').textContent = notifs.length;
+      document.getElementById('total-count').textContent = allNotifications.length;
+
+      if (notifs.length === 0) {
+        tbody.innerHTML = `
+          <tr><td colspan="7" style="text-align: center; color: var(--adm-text-muted); padding: 3rem;">
+            <i class="fa-solid fa-bell-slash" style="font-size: 2rem; color: var(--adm-text-light); margin-bottom: 0.5rem; display: block;"></i>
+            No notifications found matching filter criteria.
+          </td></tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = notifs.map(n => `
+        <tr style="${!n.is_read ? 'background-color: #F8FAF9;' : ''}">
+          <td style="font-weight: 700; color: var(--adm-text-muted);">#${n.notification_id}</td>
+          <td>
+            <div class="adm-user-cell">
+              <div class="adm-avatar">${AdminApp.avatarInitials(n.full_name)}</div>
+              <div>
+                <div class="adm-user-name">${AdminApp.escapeHtml(n.full_name || `User #${n.user_id}`)}</div>
+                <div class="adm-user-email">${AdminApp.escapeHtml(n.email || (n.user_type || 'User'))}</div>
+              </div>
+            </div>
+          </td>
+          <td>${typeBadge(n.type)}</td>
+          <td><strong style="color: var(--adm-text-main); font-size: 0.9rem;">${AdminApp.escapeHtml(n.title)}</strong></td>
+          <td style="font-size: 0.85rem; color: var(--adm-text-main); max-width: 360px;">
+            ${AdminApp.escapeHtml(n.message)}
+          </td>
+          <td style="font-size: 0.8rem; color: var(--adm-text-muted);">${AdminApp.formatDateTime(n.created_at)}</td>
+          <td>
+            ${n.is_read 
+              ? '<span class="adm-badge adm-badge-muted"><i class="fa-solid fa-check"></i> Read</span>' 
+              : '<span class="adm-badge adm-badge-warning"><i class="fa-solid fa-circle"></i> Unread</span>'}
+          </td>
+        </tr>
+      `).join('');
+    }
+  </script>
+</body>
+</html>

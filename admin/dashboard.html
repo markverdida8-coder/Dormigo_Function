@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - DORMIGO Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="assets/css/admin.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <div class="adm-layout" id="adm-layout-body">
+    <div>
+      <!-- Page Header -->
+      <div class="adm-page-header">
+        <div>
+          <h1>System Overview</h1>
+          <p>Real-time platform metrics, user verifications, boarding houses, and transaction logs.</p>
+        </div>
+        <div class="adm-page-actions">
+          <button class="adm-btn adm-btn-secondary" onclick="loadDashboardData()" title="Refresh Data">
+            <i class="fa-solid fa-arrows-rotate"></i> Refresh
+          </button>
+        </div>
+      </div>
+
+      <!-- 10 REQUIRED STATISTIC CARDS -->
+      <div class="adm-stats-grid">
+        <!-- 1. Total Students -->
+        <a href="users.html?tab=students" class="adm-stat-card">
+          <div class="adm-stat-icon adm-si-green"><i class="fa-solid fa-user-graduate"></i></div>
+          <div class="adm-stat-body">
+            <div class="adm-stat-value" id="stat-students">0</div>
+            <div class="adm-stat-label">Total Students</div>
+          </div>
+        </a>
+
+        <!-- 2. Total Landlords -->
+        <a href="users.html?tab=landlords" class="adm-stat-card">
+          <div class="adm-stat-icon adm-si-blue"><i class="fa-solid fa-house-user"></i></div>
+          <div class="adm-stat-body">
+            <div class="adm-stat-value" id="stat-landlords">0</div>
+            <div class="adm-stat-label">Total Landlords</div>
+          </div>
+        </a>
+
+        <!-- 3. Total Boarding Houses -->
+        <a href="boarding-houses.html" class="adm-stat-card">
+          <div class="adm-stat-icon adm-si-teal"><i class="fa-solid fa-building"></i></div>
+          <div class="adm-stat-body">
+            <div class="adm-stat-value" id="stat-houses">0</div>
+            <div class="adm-stat-label">Boarding Houses</div>
+          </div>
+        </a>
+
+        <!-- 4. Total Rooms -->
+        <div class="adm-stat-card">
+          <div class="adm-stat-icon adm-si-blue"><i class="fa-solid fa-door-closed"></i></div>
+          <div class="adm-stat-body">
+            <div class="adm-stat-value" id="stat-rooms">0</div>
+            <div class="adm-stat-label">Total Rooms</div>
+          </div>
+        </div>
+
+        <!-- 5. Available Rooms -->
+        <div class="adm-stat-card">
+          <div class="adm-stat-icon adm-si-green"><i class="fa-solid fa-door-open"></i></div>
+          <div class="adm-stat-body">
+            <div class="adm-stat-value" id="stat-avail-rooms">0</div>
+            <div class="adm-stat-label">Available Rooms</div>
+          </div>
+        </div>
+
+        <!-- 6. Occupied Rooms -->
+        <div class="adm-stat-card">
+          <div class="adm-stat-icon adm-si-amber"><i class="fa-solid fa-bed"></i></div>
+          <div class="adm-stat-body">
+            <div class="adm-stat-value" id="stat-occupied-rooms">0</div>
+            <div class="adm-stat-label">Occupied Rooms</div>
+          </div>
+        </div>
+
+        <!-- 7. Pending Student Verifications -->
+        <a href="verifications-students.html" class="adm-stat-card">
+          <div class="adm-stat-icon adm-si-amber"><i class="fa-solid fa-id-card"></i></div>
+          <div class="adm-stat-body">
+            <div class="adm-stat-value" id="stat-pending-student">0</div>
+            <div class="adm-stat-label">Pending Student IDs</div>
+          </div>
+        </a>
+
+        <!-- 8. Pending Landlord Verifications -->
+        <a href="verifications-landlords.html" class="adm-stat-card">
+          <div class="adm-stat-icon adm-si-amber"><i class="fa-solid fa-certificate"></i></div>
+          <div class="adm-stat-body">
+            <div class="adm-stat-value" id="stat-pending-landlord">0</div>
+            <div class="adm-stat-label">Pending Landlord Docs</div>
+          </div>
+        </a>
+
+        <!-- 9. Approved Verifications -->
+        <div class="adm-stat-card">
+          <div class="adm-stat-icon adm-si-green"><i class="fa-solid fa-shield-check"></i></div>
+          <div class="adm-stat-body">
+            <div class="adm-stat-value" id="stat-approved">0</div>
+            <div class="adm-stat-label">Approved Verifications</div>
+          </div>
+        </div>
+
+        <!-- 10. Rejected Verifications -->
+        <div class="adm-stat-card">
+          <div class="adm-stat-icon adm-si-red"><i class="fa-solid fa-shield-halved"></i></div>
+          <div class="adm-stat-body">
+            <div class="adm-stat-value" id="stat-rejected">0</div>
+            <div class="adm-stat-label">Rejected Verifications</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHARTS ROW: User Growth/Ratio & Room Availability & Booking Status -->
+      <div class="adm-chart-grid">
+        <!-- Room Availability Chart -->
+        <div class="adm-chart-card">
+          <div class="adm-chart-title">
+            <i class="fa-solid fa-chart-pie"></i> Room Availability Status
+          </div>
+          <div style="height: 230px; position: relative;">
+            <canvas id="roomAvailabilityChart"></canvas>
+          </div>
+        </div>
+
+        <!-- User Ratio Chart -->
+        <div class="adm-chart-card">
+          <div class="adm-chart-title">
+            <i class="fa-solid fa-users"></i> Platform User Distribution
+          </div>
+          <div style="height: 230px; position: relative;">
+            <canvas id="userDistributionChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Booking Status Chart -->
+        <div class="adm-chart-card">
+          <div class="adm-chart-title">
+            <i class="fa-solid fa-calendar-check"></i> Bookings by Status
+          </div>
+          <div style="height: 230px; position: relative;">
+            <canvas id="bookingStatusChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- TWO-COLUMN SECTION: RECENT VERIFICATIONS & RECENT REGISTRATIONS -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(460px, 1fr)); gap: 1.5rem; margin-bottom: 1.75rem;">
+        
+        <!-- Recent Verification Requests -->
+        <div class="adm-card" style="margin-bottom: 0;">
+          <div class="adm-card-header">
+            <div class="adm-card-title">
+              <i class="fa-solid fa-clock-rotate-left"></i> Recent Verification Requests
+            </div>
+            <div class="adm-card-actions">
+              <a href="verifications-students.html" class="adm-btn adm-btn-outline adm-btn-sm">Students</a>
+              <a href="verifications-landlords.html" class="adm-btn adm-btn-outline adm-btn-sm">Landlords</a>
+            </div>
+          </div>
+          <div class="adm-table-wrap">
+            <table class="adm-table">
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Role</th>
+                  <th>Submitted</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="recent-verifications-tbody">
+                <tr><td colspan="5" style="text-align: center; color: var(--adm-text-muted); padding: 2rem;"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Recent User Registrations -->
+        <div class="adm-card" style="margin-bottom: 0;">
+          <div class="adm-card-header">
+            <div class="adm-card-title">
+              <i class="fa-solid fa-user-plus"></i> Recent User Registrations
+            </div>
+            <a href="users.html" class="adm-btn adm-btn-outline adm-btn-sm">View All Users</a>
+          </div>
+          <div class="adm-table-wrap">
+            <table class="adm-table">
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Type</th>
+                  <th>Joined Date</th>
+                  <th>Contact</th>
+                </tr>
+              </thead>
+              <tbody id="recent-users-tbody">
+                <tr><td colspan="4" style="text-align: center; color: var(--adm-text-muted); padding: 2rem;"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- TWO-COLUMN SECTION: RECENT BOARDING HOUSES & RECENT BOOKINGS -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(460px, 1fr)); gap: 1.5rem; margin-bottom: 1.75rem;">
+        
+        <!-- Recent Boarding Houses -->
+        <div class="adm-card" style="margin-bottom: 0;">
+          <div class="adm-card-header">
+            <div class="adm-card-title">
+              <i class="fa-solid fa-building"></i> Recent Boarding Houses
+            </div>
+            <a href="boarding-houses.html" class="adm-btn adm-btn-outline adm-btn-sm">View All</a>
+          </div>
+          <div class="adm-table-wrap">
+            <table class="adm-table">
+              <thead>
+                <tr>
+                  <th>Property</th>
+                  <th>Landlord</th>
+                  <th>Rooms</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="recent-houses-tbody">
+                <tr><td colspan="4" style="text-align: center; color: var(--adm-text-muted); padding: 2rem;"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Recent Bookings -->
+        <div class="adm-card" style="margin-bottom: 0;">
+          <div class="adm-card-header">
+            <div class="adm-card-title">
+              <i class="fa-solid fa-calendar-check"></i> Recent Booking Requests
+            </div>
+            <a href="bookings.html" class="adm-btn adm-btn-outline adm-btn-sm">View All</a>
+          </div>
+          <div class="adm-table-wrap">
+            <table class="adm-table">
+              <thead>
+                <tr>
+                  <th>Student</th>
+                  <th>Property / Room</th>
+                  <th>Move-in</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="recent-bookings-tbody">
+                <tr><td colspan="4" style="text-align: center; color: var(--adm-text-muted); padding: 2rem;"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RECENT PAYMENTS SECTION -->
+      <div class="adm-card">
+        <div class="adm-card-header">
+          <div class="adm-card-title">
+            <i class="fa-solid fa-credit-card"></i> Recent Payments
+          </div>
+          <a href="payments.html" class="adm-btn adm-btn-outline adm-btn-sm">View All Payments</a>
+        </div>
+        <div class="adm-table-wrap">
+          <table class="adm-table">
+            <thead>
+              <tr>
+                <th>Payment ID</th>
+                <th>Student</th>
+                <th>Property</th>
+                <th>Amount</th>
+                <th>Method</th>
+                <th>Date</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="recent-payments-tbody">
+              <tr><td colspan="7" style="text-align: center; color: var(--adm-text-muted); padding: 2rem;"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="assets/js/admin-api.js"></script>
+  <script src="assets/js/admin-auth.js"></script>
+  <script src="assets/js/admin-app.js"></script>
+  <script src="assets/js/admin-layout.js"></script>
+  <script>
+    let roomChartInstance = null;
+    let userChartInstance = null;
+    let bookingChartInstance = null;
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      const user = await AdminLayout.init('dashboard', 'Admin Dashboard');
+      if (!user) return;
+
+      await loadDashboardData();
+    });
+
+    async function loadDashboardData() {
+      await Promise.all([
+        loadStatsAndCharts(),
+        loadRecentVerifications(),
+        loadRecentUsers(),
+        loadRecentHouses(),
+        loadRecentBookings(),
+        loadRecentPayments()
+      ]);
+    }
+
+    async function loadStatsAndCharts() {
+      try {
+        const res = await AdminAPI.getAdminStats();
+        if (res.success && res.data) {
+          const s = res.data;
+          document.getElementById('stat-students').textContent = s.total_students || 0;
+          document.getElementById('stat-landlords').textContent = s.total_landlords || 0;
+          document.getElementById('stat-houses').textContent = s.total_boarding_houses || 0;
+          document.getElementById('stat-rooms').textContent = s.total_rooms || 0;
+          document.getElementById('stat-avail-rooms').textContent = s.available_rooms || 0;
+          document.getElementById('stat-occupied-rooms').textContent = s.occupied_rooms || 0;
+          document.getElementById('stat-pending-student').textContent = s.pending_student_verifications || 0;
+          document.getElementById('stat-pending-landlord').textContent = s.pending_landlord_verifications || 0;
+          document.getElementById('stat-approved').textContent = s.verified_users || 0;
+          document.getElementById('stat-rejected').textContent = s.rejected_verifications || 0;
+
+          // Render Room Availability Doughnut Chart
+          renderRoomChart(s.available_rooms || 0, s.occupied_rooms || 0, Math.max(0, (s.total_rooms || 0) - (s.available_rooms || 0) - (s.occupied_rooms || 0)));
+
+          // Render User Distribution Chart
+          renderUserChart(s.total_students || 0, s.total_landlords || 0);
+        }
+      } catch (err) {
+        console.error('Error loading admin stats:', err);
+      }
+    }
+
+    function renderRoomChart(avail, occ, other) {
+      const ctx = document.getElementById('roomAvailabilityChart');
+      if (!ctx) return;
+      if (roomChartInstance) roomChartInstance.destroy();
+
+      roomChartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Available', 'Occupied', 'Maintenance / Other'],
+          datasets: [{
+            data: [avail, occ, other],
+            backgroundColor: ['#10B981', '#F59E0B', '#94A3B8'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { boxWidth: 12, font: { family: "'Plus Jakarta Sans', sans-serif" } } }
+          },
+          cutout: '68%'
+        }
+      });
+    }
+
+    function renderUserChart(students, landlords) {
+      const ctx = document.getElementById('userDistributionChart');
+      if (!ctx) return;
+      if (userChartInstance) userChartInstance.destroy();
+
+      userChartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Students', 'Landlords'],
+          datasets: [{
+            data: [students, landlords],
+            backgroundColor: ['#1B5E4C', '#2563EB'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { boxWidth: 12, font: { family: "'Plus Jakarta Sans', sans-serif" } } }
+          },
+          cutout: '68%'
+        }
+      });
+    }
+
+    async function loadRecentVerifications() {
+      const tbody = document.getElementById('recent-verifications-tbody');
+      try {
+        const [svRes, lvRes] = await Promise.all([
+          AdminAPI.getStudentVerifications(),
+          AdminAPI.getLandlordVerifications()
+        ]);
+
+        let items = [];
+        if (svRes.success && svRes.data) {
+          items = items.concat(svRes.data.map(i => ({ ...i, role: 'STUDENT', link: 'verifications-students.html' })));
+        }
+        if (lvRes.success && lvRes.data) {
+          items = items.concat(lvRes.data.map(i => ({ ...i, role: 'LANDLORD', link: 'verifications-landlords.html' })));
+        }
+
+        // Sort by submitted_at desc, take 5
+        items.sort((a, b) => new Date(b.submitted_at || 0) - new Date(a.submitted_at || 0));
+        const top5 = items.slice(0, 5);
+
+        if (top5.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--adm-text-muted); padding: 1.5rem;">No verification requests.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = top5.map(v => `
+          <tr>
+            <td>
+              <div class="adm-user-cell">
+                <div class="adm-avatar">${AdminApp.avatarInitials(v.full_name)}</div>
+                <div>
+                  <div class="adm-user-name">${AdminApp.escapeHtml(v.full_name || 'Unnamed')}</div>
+                  <div class="adm-user-email">${AdminApp.escapeHtml(v.email || '—')}</div>
+                </div>
+              </div>
+            </td>
+            <td>${AdminApp.userTypeBadge(v.role)}</td>
+            <td style="font-size: 0.8rem; color: var(--adm-text-muted);">${AdminApp.formatDate(v.submitted_at)}</td>
+            <td>${AdminApp.statusBadge(v.verification_status)}</td>
+            <td>
+              <a href="${v.link}" class="adm-btn adm-btn-outline adm-btn-sm" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;">
+                Review
+              </a>
+            </td>
+          </tr>
+        `).join('');
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--adm-red); padding: 1rem;">Failed to load verifications.</td></tr>`;
+      }
+    }
+
+    async function loadRecentUsers() {
+      const tbody = document.getElementById('recent-users-tbody');
+      try {
+        const res = await AdminAPI.getUsers();
+        if (res.success && res.data) {
+          const top5 = res.data.slice(0, 5);
+          if (top5.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--adm-text-muted); padding: 1.5rem;">No users found.</td></tr>`;
+            return;
+          }
+          tbody.innerHTML = top5.map(u => `
+            <tr>
+              <td>
+                <div class="adm-user-cell">
+                  <div class="adm-avatar">${AdminApp.avatarInitials(u.full_name)}</div>
+                  <div>
+                    <div class="adm-user-name">${AdminApp.escapeHtml(u.full_name || 'Unnamed')}</div>
+                    <div class="adm-user-email">${AdminApp.escapeHtml(u.email || '—')}</div>
+                  </div>
+                </div>
+              </td>
+              <td>${AdminApp.userTypeBadge(u.user_type)}</td>
+              <td style="font-size: 0.8rem; color: var(--adm-text-muted);">${AdminApp.formatDate(u.created_at)}</td>
+              <td style="font-size: 0.8rem; color: var(--adm-text-muted);">${AdminApp.escapeHtml(u.phone || '—')}</td>
+            </tr>
+          `).join('');
+        }
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--adm-red); padding: 1rem;">Failed to load users.</td></tr>`;
+      }
+    }
+
+    async function loadRecentHouses() {
+      const tbody = document.getElementById('recent-houses-tbody');
+      try {
+        const res = await AdminAPI.getBoardingHouses();
+        if (res.success && res.data) {
+          const top5 = res.data.slice(0, 5);
+          if (top5.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--adm-text-muted); padding: 1.5rem;">No boarding houses registered.</td></tr>`;
+            return;
+          }
+          tbody.innerHTML = top5.map(h => `
+            <tr>
+              <td>
+                <strong style="color: var(--adm-text-main);">${AdminApp.escapeHtml(h.house_name)}</strong>
+                <div style="font-size: 0.775rem; color: var(--adm-text-muted);">${AdminApp.escapeHtml(h.address || '—')}</div>
+              </td>
+              <td style="font-size: 0.85rem;">${AdminApp.escapeHtml(h.landlord_name || '—')}</td>
+              <td>
+                <span style="font-weight: 700; color: var(--adm-primary);">${h.available_rooms || 0}</span>
+                <span style="color: var(--adm-text-muted); font-size: 0.8rem;"> / ${h.total_rooms || 0} avail</span>
+              </td>
+              <td>${AdminApp.statusBadge(h.status)}</td>
+            </tr>
+          `).join('');
+        }
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--adm-red); padding: 1rem;">Failed to load properties.</td></tr>`;
+      }
+    }
+
+    async function loadRecentBookings() {
+      const tbody = document.getElementById('recent-bookings-tbody');
+      try {
+        const res = await AdminAPI.getBookings();
+        if (res.success && res.data) {
+          const bookings = res.data;
+
+          // Render Bookings Chart with counts
+          const statusCounts = { PENDING: 0, APPROVED: 0, ACTIVE: 0, CANCELLED: 0, DECLINED: 0, COMPLETED: 0 };
+          bookings.forEach(b => {
+            const s = (b.status || '').toUpperCase();
+            if (statusCounts.hasOwnProperty(s)) statusCounts[s]++;
+          });
+          renderBookingChart(statusCounts);
+
+          const top5 = bookings.slice(0, 5);
+          if (top5.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--adm-text-muted); padding: 1.5rem;">No booking records.</td></tr>`;
+            return;
+          }
+          tbody.innerHTML = top5.map(b => `
+            <tr>
+              <td>
+                <div class="adm-user-name">${AdminApp.escapeHtml(b.full_name || 'Student')}</div>
+                <div class="adm-user-email">${AdminApp.escapeHtml(b.email || '—')}</div>
+              </td>
+              <td>
+                <div style="font-weight: 600;">${AdminApp.escapeHtml(b.house_name || 'Property')}</div>
+                <div style="font-size: 0.75rem; color: var(--adm-text-muted);">${AdminApp.escapeHtml(b.room_number || '')} (${AdminApp.escapeHtml(b.room_type || '')})</div>
+              </td>
+              <td style="font-size: 0.8rem; color: var(--adm-text-muted);">${AdminApp.formatDate(b.move_in_date)}</td>
+              <td>${AdminApp.statusBadge(b.status)}</td>
+            </tr>
+          `).join('');
+        }
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--adm-red); padding: 1rem;">Failed to load bookings.</td></tr>`;
+      }
+    }
+
+    function renderBookingChart(counts) {
+      const ctx = document.getElementById('bookingStatusChart');
+      if (!ctx) return;
+      if (bookingChartInstance) bookingChartInstance.destroy();
+
+      bookingChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Pending', 'Approved', 'Active', 'Cancelled', 'Declined'],
+          datasets: [{
+            label: 'Bookings',
+            data: [counts.PENDING || 0, counts.APPROVED || 0, counts.ACTIVE || 0, counts.CANCELLED || 0, counts.DECLINED || 0],
+            backgroundColor: ['#F59E0B', '#10B981', '#3B82F6', '#94A3B8', '#EF4444'],
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, ticks: { precision: 0 } },
+            x: { grid: { display: false } }
+          }
+        }
+      });
+    }
+
+    async function loadRecentPayments() {
+      const tbody = document.getElementById('recent-payments-tbody');
+      try {
+        const res = await AdminAPI.getPayments();
+        if (res.success && res.data) {
+          const top5 = res.data.slice(0, 5);
+          if (top5.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--adm-text-muted); padding: 1.5rem;">No payment transactions recorded.</td></tr>`;
+            return;
+          }
+          tbody.innerHTML = top5.map(p => `
+            <tr>
+              <td style="font-weight: 700; color: var(--adm-primary);">#${p.payment_id}</td>
+              <td>
+                <div class="adm-user-name">${AdminApp.escapeHtml(p.tenant_name || 'Student')}</div>
+                <div class="adm-user-email">${AdminApp.escapeHtml(p.tenant_email || '—')}</div>
+              </td>
+              <td>
+                <div>${AdminApp.escapeHtml(p.house_name || '—')}</div>
+                <div style="font-size: 0.75rem; color: var(--adm-text-muted);">${AdminApp.escapeHtml(p.room_number || '')}</div>
+              </td>
+              <td style="font-weight: 700; color: var(--adm-text-main);">${AdminApp.formatCurrency(p.amount)}</td>
+              <td style="font-size: 0.8rem; color: var(--adm-text-muted);">${AdminApp.escapeHtml(p.payment_method || '—')}</td>
+              <td style="font-size: 0.8rem; color: var(--adm-text-muted);">${AdminApp.formatDate(p.payment_date || p.due_date)}</td>
+              <td>${AdminApp.statusBadge(p.status)}</td>
+            </tr>
+          `).join('');
+        }
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--adm-red); padding: 1rem;">Failed to load payments.</td></tr>`;
+      }
+    }
+  </script>
+</body>
+</html>

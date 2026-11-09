@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reviews Monitoring - DORMIGO Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="assets/css/admin.css">
+</head>
+<body>
+
+  <div class="adm-layout" id="adm-layout-body">
+    <div>
+      <!-- Page Header -->
+      <div class="adm-page-header">
+        <div>
+          <h1>Reviews & Feedback Monitoring</h1>
+          <p>Oversight of resident tenant feedback, boarding house quality ratings, and student reviews across the platform.</p>
+        </div>
+      </div>
+
+      <!-- SUMMARY CARDS -->
+      <div class="adm-stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-bottom: 1.5rem;">
+        <div class="adm-stat-card">
+          <div class="adm-stat-icon adm-si-teal"><i class="fa-solid fa-comments"></i></div>
+          <div class="adm-stat-body">
+            <div class="adm-stat-value" id="stat-total-reviews">0</div>
+            <div class="adm-stat-label">Total Student Reviews</div>
+          </div>
+        </div>
+
+        <div class="adm-stat-card">
+          <div class="adm-stat-icon adm-si-amber"><i class="fa-solid fa-star"></i></div>
+          <div class="adm-stat-body">
+            <div class="adm-stat-value" id="stat-avg-rating">0.0</div>
+            <div class="adm-stat-label">Platform Average Rating</div>
+          </div>
+        </div>
+
+        <div class="adm-stat-card">
+          <div class="adm-stat-icon adm-si-green"><i class="fa-solid fa-thumbs-up"></i></div>
+          <div class="adm-stat-body">
+            <div class="adm-stat-value" id="stat-5star-reviews">0</div>
+            <div class="adm-stat-label">5-Star Excellence Ratings</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAIN TABLE CARD -->
+      <div class="adm-card">
+        <div class="adm-card-header">
+          <div class="adm-card-title">
+            <i class="fa-solid fa-star"></i> Student Ratings & Comments
+          </div>
+        </div>
+
+        <!-- FILTERS -->
+        <div class="adm-filters">
+          <div class="adm-search-wrap">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="review-search" class="adm-search-input" placeholder="Search student, property, comment text..." oninput="filterReviews()">
+          </div>
+
+          <select id="rating-filter" class="adm-filter-select" onchange="filterReviews()">
+            <option value="">All Star Ratings</option>
+            <option value="5">5 Stars Only</option>
+            <option value="4">4 Stars Only</option>
+            <option value="3">3 Stars Only</option>
+            <option value="2">2 Stars Only</option>
+            <option value="1">1 Star Only</option>
+          </select>
+
+          <input type="date" id="date-filter" class="adm-filter-select" onchange="filterReviews()" title="Filter by date">
+
+          <button class="adm-btn adm-btn-secondary adm-btn-sm" onclick="resetFilters()">
+            <i class="fa-solid fa-filter-circle-xmark"></i> Reset
+          </button>
+        </div>
+
+        <div class="adm-table-wrap">
+          <table class="adm-table">
+            <thead>
+              <tr>
+                <th style="width: 70px;">ID</th>
+                <th>Student</th>
+                <th>Boarding House</th>
+                <th style="width: 140px;">Rating</th>
+                <th>Comment / Feedback</th>
+                <th style="width: 120px;">Created Date</th>
+              </tr>
+            </thead>
+            <tbody id="reviews-tbody">
+              <tr>
+                <td colspan="6" style="text-align: center; color: var(--adm-text-muted); padding: 3rem;">
+                  <i class="fa-solid fa-spinner fa-spin" style="font-size: 1.5rem; color: var(--adm-primary);"></i>
+                  <div style="margin-top: 0.5rem;">Loading student reviews...</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="adm-table-footer">
+          <div>Showing <span id="visible-count">0</span> of <span id="total-count">0</span> reviews</div>
+          <div style="font-size: 0.8rem; color: var(--adm-text-muted);">
+            Reviews are submitted exclusively by verified student tenants in the Dormigo Android app.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="assets/js/admin-api.js"></script>
+  <script src="assets/js/admin-auth.js"></script>
+  <script src="assets/js/admin-app.js"></script>
+  <script src="assets/js/admin-layout.js"></script>
+  <script>
+    let allReviewsList = [];
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      const user = await AdminLayout.init('reviews', 'Reviews');
+      if (!user) return;
+
+      await loadReviews();
+    });
+
+    async function loadReviews() {
+      try {
+        const res = await AdminAPI.getReviews();
+        if (res.success && res.data) {
+          allReviewsList = res.data;
+          updateReviewMetrics();
+          filterReviews();
+        } else {
+          document.getElementById('reviews-tbody').innerHTML = `
+            <tr><td colspan="6" style="text-align: center; color: var(--adm-red); padding: 2rem;">Failed to load reviews.</td></tr>
+          `;
+        }
+      } catch (err) {
+        console.error('Error fetching reviews:', err);
+        document.getElementById('reviews-tbody').innerHTML = `
+          <tr><td colspan="6" style="text-align: center; color: var(--adm-red); padding: 2rem;">Network error fetching reviews.</td></tr>
+        `;
+      }
+    }
+
+    function updateReviewMetrics() {
+      const total = allReviewsList.length;
+      let sum = 0;
+      let fiveStar = 0;
+
+      allReviewsList.forEach(r => {
+        const rating = parseInt(r.rating) || 0;
+        sum += rating;
+        if (rating === 5) fiveStar++;
+      });
+
+      const avg = total > 0 ? (sum / total).toFixed(1) : '0.0';
+
+      document.getElementById('stat-total-reviews').textContent = total;
+      document.getElementById('stat-avg-rating').textContent = avg;
+      document.getElementById('stat-5star-reviews').textContent = fiveStar;
+    }
+
+    function filterReviews() {
+      const query = document.getElementById('review-search').value.toLowerCase().trim();
+      const ratingVal = document.getElementById('rating-filter').value;
+      const dateVal = document.getElementById('date-filter').value;
+
+      const filtered = allReviewsList.filter(r => {
+        if (ratingVal && String(r.rating) !== ratingVal) return false;
+
+        if (dateVal) {
+          const rDate = (r.created_at || '').slice(0, 10);
+          if (rDate !== dateVal) return false;
+        }
+
+        if (query) {
+          const student = (r.full_name || '').toLowerCase();
+          const house = (r.house_name || '').toLowerCase();
+          const comment = (r.comment || '').toLowerCase();
+          const id = String(r.review_id || '');
+          if (!student.includes(query) && !house.includes(query) && !comment.includes(query) && !id.includes(query)) {
+            return false;
+          }
+        }
+        return true;
+      });
+
+      renderReviews(filtered);
+    }
+
+    function resetFilters() {
+      document.getElementById('review-search').value = '';
+      document.getElementById('rating-filter').value = '';
+      document.getElementById('date-filter').value = '';
+      filterReviews();
+    }
+
+    function renderReviews(reviews) {
+      const tbody = document.getElementById('reviews-tbody');
+      document.getElementById('visible-count').textContent = reviews.length;
+      document.getElementById('total-count').textContent = allReviewsList.length;
+
+      if (reviews.length === 0) {
+        tbody.innerHTML = `
+          <tr><td colspan="6" style="text-align: center; color: var(--adm-text-muted); padding: 3rem;">
+            <i class="fa-solid fa-star-half-stroke" style="font-size: 2rem; color: var(--adm-text-light); margin-bottom: 0.5rem; display: block;"></i>
+            No reviews match the selected filter criteria.
+          </td></tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = reviews.map(r => `
+        <tr>
+          <td style="font-weight: 700; color: var(--adm-text-muted);">#${r.review_id}</td>
+          <td>
+            <div class="adm-user-cell">
+              <div class="adm-avatar">${AdminApp.avatarInitials(r.full_name)}</div>
+              <div>
+                <div class="adm-user-name">${AdminApp.escapeHtml(r.full_name || 'Student')}</div>
+                <div class="adm-user-email">${AdminApp.escapeHtml(r.email || '—')}</div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <strong style="color: var(--adm-text-main); font-size: 0.9rem;">${AdminApp.escapeHtml(r.house_name || 'Property')}</strong>
+            <div style="font-size: 0.75rem; color: var(--adm-text-muted);">${AdminApp.escapeHtml(r.address || '—')}</div>
+          </td>
+          <td>
+            <div>${AdminApp.starRating(r.rating)}</div>
+            <div style="font-size: 0.75rem; color: var(--adm-text-muted); font-weight: 600;">${r.rating} / 5.0</div>
+          </td>
+          <td style="font-size: 0.875rem; color: var(--adm-text-main); max-width: 380px;">
+            <div style="line-height: 1.5;">${AdminApp.escapeHtml(r.comment || 'No written comment.')}</div>
+          </td>
+          <td style="font-size: 0.8rem; color: var(--adm-text-muted);">${AdminApp.formatDate(r.created_at)}</td>
+        </tr>
+      `).join('');
+    }
+  </script>
+</body>
+</html>

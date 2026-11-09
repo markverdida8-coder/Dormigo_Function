@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Property - DORMIGO Landlord</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+  <style>
+    .form-card {
+      background: white;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-color);
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+    .amenities-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 0.75rem;
+    }
+    .amenity-checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      background: var(--bg-muted);
+      padding: 0.6rem 0.85rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="dashboard-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="../index.html" class="sidebar-brand">
+          <img src="../assets/img/logo.svg" alt="Dormigo" width="34" height="34">
+          <span>DORMIGO</span>
+        </a>
+        <button class="sidebar-close" onclick="toggleSidebar()">&times;</button>
+      </div>
+
+      <div class="sidebar-content">
+        <div class="nav-section-title">Main Portal</div>
+        <a href="dashboard.html" class="sidebar-link"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+        <a href="properties.html" class="sidebar-link active"><i class="fa-solid fa-building"></i> Properties</a>
+        <a href="rooms.html" class="sidebar-link"><i class="fa-solid fa-door-closed"></i> Rooms</a>
+
+        <div class="nav-section-title">Operations</div>
+        <a href="bookings.html" class="sidebar-link"><i class="fa-solid fa-clipboard-list"></i> Booking Requests</a>
+        <a href="tenants.html" class="sidebar-link"><i class="fa-solid fa-users"></i> Tenants</a>
+        <a href="payments.html" class="sidebar-link"><i class="fa-solid fa-money-bill-wave"></i> Payments</a>
+
+        <div class="nav-section-title">Communication</div>
+        <a href="messages.html" class="sidebar-link"><i class="fa-solid fa-comments"></i> Messages</a>
+        <a href="reviews.html" class="sidebar-link"><i class="fa-solid fa-star"></i> Reviews</a>
+        <a href="notifications.html" class="sidebar-link"><i class="fa-solid fa-bell"></i> Notifications</a>
+        <a href="profile.html" class="sidebar-link"><i class="fa-solid fa-user-tie"></i> Profile</a>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="user-avatar"><i class="fa-solid fa-house-user"></i></div>
+        <div class="user-info">
+          <div class="user-name" id="sidebar-user-name">Landlord</div>
+          <div class="user-role-badge">Property Owner</div>
+        </div>
+        <button class="logout-btn" onclick="Auth.logout()"><i class="fa-solid fa-right-from-bracket"></i></button>
+      </div>
+    </aside>
+
+    <div class="main-wrapper">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+          <h2 class="page-title">Edit Property</h2>
+        </div>
+        <div class="topbar-right">
+          <a href="properties.html" class="btn btn-sm btn-secondary">
+            <i class="fa-solid fa-arrow-left"></i> Back to Properties
+          </a>
+        </div>
+      </header>
+
+      <main class="dashboard-content" style="max-width: 900px; margin: 0 auto;">
+        <div style="margin-bottom: 2rem;">
+          <h1 style="font-size: 1.75rem; margin-bottom: 0.25rem;">Update Boarding House Details</h1>
+          <p>Modify house description, student rules, amenities, and listing visibility status.</p>
+        </div>
+
+        <form id="edit-property-form" onsubmit="handleUpdateProperty(event)">
+          <div class="form-card">
+            <div class="form-group">
+              <label class="form-label" for="edit-name">Boarding House Name *</label>
+              <input type="text" id="edit-name" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="edit-address">Complete Address *</label>
+              <input type="text" id="edit-address" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="edit-description">Description *</label>
+              <textarea id="edit-description" class="form-control" rows="4" required></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="edit-rules">House Rules & Curfew *</label>
+              <textarea id="edit-rules" class="form-control" rows="4" required></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="edit-status">Property Status *</label>
+              <select id="edit-status" class="form-select" required>
+                <option value="ACTIVE">ACTIVE (Published to students)</option>
+                <option value="INACTIVE">INACTIVE (Hidden from search)</option>
+                <option value="PENDING">PENDING</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-card">
+            <h3 style="font-size: 1.2rem; margin-bottom: 1.25rem;">
+              <i class="fa-solid fa-list-check me-2" style="color: var(--primary);"></i> Amenities
+            </h3>
+            <div class="amenities-grid" id="edit-amenities-checklist">
+              <span style="color: var(--text-muted);">Loading amenities...</span>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-bottom: 4rem;">
+            <a href="properties.html" class="btn btn-secondary btn-lg">Cancel</a>
+            <button type="submit" class="btn btn-primary btn-lg" id="btn-save-property">
+              <i class="fa-solid fa-floppy-disk"></i> Save Property Changes
+            </button>
+          </div>
+        </form>
+      </main>
+    </div>
+  </div>
+
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script>
+    const currentUser = Auth.requireAuth(['LANDLORD']);
+    const urlParams = new URLSearchParams(window.location.search);
+    const houseId = parseInt(urlParams.get('id'));
+
+    if (!houseId) {
+      window.location.href = 'properties.html';
+    }
+
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('show');
+    }
+
+    async function initEditProperty() {
+      if (!currentUser) return;
+      document.getElementById('sidebar-user-name').textContent = currentUser.full_name;
+
+      // Load master amenities and property details from API
+      await loadAmenitiesAndProperty();
+    }
+
+    async function loadAmenitiesAndProperty() {
+      try {
+        const amRes = await API.getAmenities();
+        const amList = amRes.success ? amRes.data : [];
+
+        const houseRes = await API.getBoardingHouseById(houseId);
+        if (!houseRes.success || !houseRes.data) {
+          App.toast('Property not found.', 'error');
+          window.location.href = 'properties.html';
+          return;
+        }
+
+        const h = houseRes.data;
+        document.getElementById('edit-name').value = h.house_name;
+        document.getElementById('edit-address').value = h.address;
+        document.getElementById('edit-description').value = h.description || '';
+        document.getElementById('edit-rules').value = h.house_rules || '';
+        document.getElementById('edit-status').value = h.status;
+
+        const currentAmenityIds = (h.amenities || []).map(a => a.amenity_id);
+
+        const container = document.getElementById('edit-amenities-checklist');
+        container.innerHTML = amList.map(a => {
+          const isChecked = currentAmenityIds.includes(a.amenity_id);
+          return `
+            <label class="amenity-checkbox-label">
+              <input type="checkbox" name="amenity_id" value="${a.amenity_id}" ${isChecked ? 'checked' : ''}>
+              <span>${App.escapeHtml(a.amenity_name)}</span>
+            </label>
+          `;
+        }).join('');
+      } catch (err) {
+        console.error('Error loading property for edit:', err);
+      }
+    }
+
+    async function handleUpdateProperty(e) {
+      e.preventDefault();
+
+      const name = document.getElementById('edit-name').value.trim();
+      const address = document.getElementById('edit-address').value.trim();
+      const desc = document.getElementById('edit-description').value.trim();
+      const rules = document.getElementById('edit-rules').value.trim();
+      const status = document.getElementById('edit-status').value;
+
+      const checkedAmenities = Array.from(document.querySelectorAll('input[name="amenity_id"]:checked'))
+        .map(cb => parseInt(cb.value));
+
+      const btn = document.getElementById('btn-save-property');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+
+      try {
+        const payload = {
+          house_id: houseId,
+          house_name: name,
+          address: address,
+          description: desc,
+          house_rules: rules,
+          status: status,
+          amenity_ids: checkedAmenities
+        };
+
+        const res = await API.updateBoardingHouse(payload);
+        if (res.success) {
+          App.toast('Property updated successfully!', 'success');
+          setTimeout(() => {
+            window.location.href = 'properties.html';
+          }, 1000);
+        } else {
+          App.toast(res.message || 'Failed to update property.', 'error');
+        }
+      } catch (err) {
+        console.error('Error updating property:', err);
+        App.toast('Error saving property changes.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save Property Changes';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', initEditProperty);
+  </script>
+</body>
+</html>

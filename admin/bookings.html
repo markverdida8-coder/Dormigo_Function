@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bookings Monitoring - DORMIGO Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="assets/css/admin.css">
+</head>
+<body>
+
+  <div class="adm-layout" id="adm-layout-body">
+    <div>
+      <!-- Page Header -->
+      <div class="adm-page-header">
+        <div>
+          <h1>Bookings Monitoring</h1>
+          <p>Track all student room reservation requests, tenancy commitments, move-in schedules, and active bookings.</p>
+        </div>
+      </div>
+
+      <!-- MAIN CARD -->
+      <div class="adm-card">
+        <div class="adm-card-header">
+          <div class="adm-card-title">
+            <i class="fa-solid fa-calendar-check"></i> System Booking Records
+          </div>
+        </div>
+
+        <!-- FILTERS -->
+        <div class="adm-filters">
+          <div class="adm-search-wrap">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="booking-search" class="adm-search-input" placeholder="Search student, property, or booking ID..." oninput="filterBookings()">
+          </div>
+
+          <select id="status-filter" class="adm-filter-select" onchange="filterBookings()">
+            <option value="">All Statuses</option>
+            <option value="PENDING">Pending</option>
+            <option value="APPROVED">Approved</option>
+            <option value="ACTIVE">Active Tenancy</option>
+            <option value="COMPLETED">Completed</option>
+            <option value="CANCELLED">Cancelled</option>
+            <option value="DECLINED">Declined</option>
+          </select>
+
+          <input type="date" id="date-filter" class="adm-filter-select" onchange="filterBookings()" title="Filter by move-in date">
+
+          <button class="adm-btn adm-btn-secondary adm-btn-sm" onclick="resetFilters()">
+            <i class="fa-solid fa-filter-circle-xmark"></i> Reset
+          </button>
+        </div>
+
+        <div class="adm-table-wrap">
+          <table class="adm-table">
+            <thead>
+              <tr>
+                <th style="width: 80px;">Booking ID</th>
+                <th>Student</th>
+                <th>Boarding House</th>
+                <th>Room Details</th>
+                <th>Move-in Date</th>
+                <th>Duration</th>
+                <th>Monthly Rent</th>
+                <th>Total Agreed</th>
+                <th>Request Date</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="bookings-tbody">
+              <tr>
+                <td colspan="10" style="text-align: center; color: var(--adm-text-muted); padding: 3rem;">
+                  <i class="fa-solid fa-spinner fa-spin" style="font-size: 1.5rem; color: var(--adm-primary);"></i>
+                  <div style="margin-top: 0.5rem;">Loading bookings log...</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="adm-table-footer">
+          <div>Showing <span id="visible-count">0</span> of <span id="total-count">0</span> booking records</div>
+          <div style="font-size: 0.8rem; color: var(--adm-text-muted);">
+            Note: Booking approvals & declines are performed by landlords inside the Dormigo Android app.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="assets/js/admin-api.js"></script>
+  <script src="assets/js/admin-auth.js"></script>
+  <script src="assets/js/admin-app.js"></script>
+  <script src="assets/js/admin-layout.js"></script>
+  <script>
+    let allBookingsList = [];
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      const user = await AdminLayout.init('bookings', 'Bookings');
+      if (!user) return;
+
+      await loadBookings();
+    });
+
+    async function loadBookings() {
+      try {
+        const res = await AdminAPI.getBookings();
+        if (res.success && res.data) {
+          allBookingsList = res.data;
+          filterBookings();
+        } else {
+          document.getElementById('bookings-tbody').innerHTML = `
+            <tr><td colspan="10" style="text-align: center; color: var(--adm-red); padding: 2rem;">Failed to load bookings.</td></tr>
+          `;
+        }
+      } catch (err) {
+        console.error('Error fetching bookings:', err);
+        document.getElementById('bookings-tbody').innerHTML = `
+          <tr><td colspan="10" style="text-align: center; color: var(--adm-red); padding: 2rem;">Network error fetching bookings.</td></tr>
+        `;
+      }
+    }
+
+    function filterBookings() {
+      const query = document.getElementById('booking-search').value.toLowerCase().trim();
+      const status = document.getElementById('status-filter').value.toUpperCase();
+      const date = document.getElementById('date-filter').value;
+
+      const filtered = allBookingsList.filter(b => {
+        if (status && (b.status || '').toUpperCase() !== status) return false;
+
+        if (date) {
+          const moveIn = (b.move_in_date || '').slice(0, 10);
+          if (moveIn !== date) return false;
+        }
+
+        if (query) {
+          const student = (b.full_name || '').toLowerCase();
+          const house = (b.house_name || '').toLowerCase();
+          const email = (b.email || '').toLowerCase();
+          const id = String(b.booking_id || '');
+          if (!student.includes(query) && !house.includes(query) && !email.includes(query) && !id.includes(query)) {
+            return false;
+          }
+        }
+        return true;
+      });
+
+      renderBookings(filtered);
+    }
+
+    function resetFilters() {
+      document.getElementById('booking-search').value = '';
+      document.getElementById('status-filter').value = '';
+      document.getElementById('date-filter').value = '';
+      filterBookings();
+    }
+
+    function renderBookings(bookings) {
+      const tbody = document.getElementById('bookings-tbody');
+      document.getElementById('visible-count').textContent = bookings.length;
+      document.getElementById('total-count').textContent = allBookingsList.length;
+
+      if (bookings.length === 0) {
+        tbody.innerHTML = `
+          <tr><td colspan="10" style="text-align: center; color: var(--adm-text-muted); padding: 3rem;">
+            <i class="fa-solid fa-calendar-xmark" style="font-size: 2rem; color: var(--adm-text-light); margin-bottom: 0.5rem; display: block;"></i>
+            No booking records matching the search or filter criteria.
+          </td></tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = bookings.map(b => `
+        <tr>
+          <td style="font-weight: 700; color: var(--adm-text-muted);">#${b.booking_id}</td>
+          <td>
+            <div class="adm-user-cell">
+              <div class="adm-avatar">${AdminApp.avatarInitials(b.full_name)}</div>
+              <div>
+                <div class="adm-user-name">${AdminApp.escapeHtml(b.full_name || 'Student')}</div>
+                <div class="adm-user-email">${AdminApp.escapeHtml(b.email || '—')}</div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <strong style="color: var(--adm-text-main);">${AdminApp.escapeHtml(b.house_name || 'Property')}</strong>
+            <div style="font-size: 0.75rem; color: var(--adm-text-muted);">${AdminApp.escapeHtml(b.address || '—')}</div>
+          </td>
+          <td>
+            <div>${AdminApp.escapeHtml(b.room_number || '')}</div>
+            <div style="font-size: 0.75rem; color: var(--adm-text-muted);">${AdminApp.escapeHtml(b.room_type || '')}</div>
+          </td>
+          <td style="font-size: 0.85rem; font-weight: 600;">${AdminApp.formatDate(b.move_in_date)}</td>
+          <td style="font-size: 0.85rem;">${b.duration_months || 1} mo(s)</td>
+          <td style="font-weight: 700; color: var(--adm-primary);">${AdminApp.formatCurrency(b.agreed_monthly_rent || 0)}</td>
+          <td style="font-weight: 700; color: var(--adm-text-main);">${AdminApp.formatCurrency(b.agreed_total_amount || 0)}</td>
+          <td style="font-size: 0.8rem; color: var(--adm-text-muted);">${AdminApp.formatDate(b.created_at)}</td>
+          <td>${AdminApp.statusBadge(b.status)}</td>
+        </tr>
+      `).join('');
+    }
+  </script>
+</body>
+</html>

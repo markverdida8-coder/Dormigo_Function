@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Room Management - DORMIGO Landlord</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
+</head>
+<body>
+
+  <div class="dashboard-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="../index.html" class="sidebar-brand">
+          <img src="../assets/img/logo.svg" alt="Dormigo" width="34" height="34">
+          <span>DORMIGO</span>
+        </a>
+        <button class="sidebar-close" onclick="toggleSidebar()">&times;</button>
+      </div>
+
+      <div class="sidebar-content">
+        <div class="nav-section-title">Main Portal</div>
+        <a href="dashboard.html" class="sidebar-link"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+        <a href="properties.html" class="sidebar-link"><i class="fa-solid fa-building"></i> Properties</a>
+        <a href="rooms.html" class="sidebar-link active"><i class="fa-solid fa-door-closed"></i> Rooms</a>
+
+        <div class="nav-section-title">Operations</div>
+        <a href="bookings.html" class="sidebar-link"><i class="fa-solid fa-clipboard-list"></i> Booking Requests</a>
+        <a href="tenants.html" class="sidebar-link"><i class="fa-solid fa-users"></i> Tenants</a>
+        <a href="payments.html" class="sidebar-link"><i class="fa-solid fa-money-bill-wave"></i> Payments</a>
+
+        <div class="nav-section-title">Communication</div>
+        <a href="messages.html" class="sidebar-link"><i class="fa-solid fa-comments"></i> Messages</a>
+        <a href="reviews.html" class="sidebar-link"><i class="fa-solid fa-star"></i> Reviews</a>
+        <a href="notifications.html" class="sidebar-link"><i class="fa-solid fa-bell"></i> Notifications</a>
+        <a href="profile.html" class="sidebar-link"><i class="fa-solid fa-user-tie"></i> Profile</a>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="user-avatar"><i class="fa-solid fa-house-user"></i></div>
+        <div class="user-info">
+          <div class="user-name" id="sidebar-user-name">Landlord</div>
+          <div class="user-role-badge">Property Owner</div>
+        </div>
+        <button class="logout-btn" onclick="Auth.logout()"><i class="fa-solid fa-right-from-bracket"></i></button>
+      </div>
+    </aside>
+
+    <div class="main-wrapper">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+          <h2 class="page-title">Room Management</h2>
+        </div>
+        <div class="topbar-right">
+          <button class="btn btn-sm btn-primary" onclick="openAddRoomModal()">
+            <i class="fa-solid fa-plus"></i> Add New Room
+          </button>
+        </div>
+      </header>
+
+      <main class="dashboard-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h1 style="font-size: 1.75rem; margin-bottom: 0.25rem;">Room Inventory</h1>
+            <p>Control room status, rent amounts, capacity, and student availability.</p>
+          </div>
+          <button class="btn btn-primary" onclick="openAddRoomModal()">
+            <i class="fa-solid fa-plus"></i> + Add Room
+          </button>
+        </div>
+
+        <!-- TABLE CARD -->
+        <div class="table-card">
+          <div class="table-header">
+            <h3 class="table-title"><i class="fa-solid fa-bed me-2" style="color: var(--primary);"></i> Rooms List</h3>
+            <div class="table-actions">
+              <select id="property-filter" class="form-select" style="width: auto; font-size: 0.85rem;" onchange="renderRoomsTable()">
+                <option value="ALL">All Properties</option>
+              </select>
+
+              <select id="status-filter" class="form-select" style="width: auto; font-size: 0.85rem;" onchange="renderRoomsTable()">
+                <option value="ALL">All Statuses</option>
+                <option value="AVAILABLE">AVAILABLE Only</option>
+                <option value="OCCUPIED">OCCUPIED Only</option>
+                <option value="MAINTENANCE">MAINTENANCE Only</option>
+                <option value="INACTIVE">INACTIVE Only</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>Room No.</th>
+                  <th>Boarding House</th>
+                  <th>Type</th>
+                  <th>Capacity</th>
+                  <th>Monthly Rent</th>
+                  <th>Status</th>
+                  <th>Quick Action</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="rooms-table-body">
+                <tr>
+                  <td colspan="8" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
+                    <i class="fa-solid fa-spinner fa-spin fa-2x" style="color: var(--primary);"></i>
+                    <p style="margin-top: 0.5rem;">Loading room data...</p>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- ADD / EDIT ROOM MODAL -->
+  <div class="modal-backdrop" id="room-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title" id="room-modal-title"><i class="fa-solid fa-door-open me-2" style="color: var(--primary);"></i> Add Room</h3>
+        <button class="modal-close" onclick="closeRoomModal()">&times;</button>
+      </div>
+      <form id="room-form" onsubmit="handleSaveRoom(event)">
+        <div class="modal-body">
+          <input type="hidden" id="modal-room-id">
+
+          <div class="form-group" id="modal-house-group">
+            <label class="form-label" for="modal-house-id">Boarding House *</label>
+            <select id="modal-house-id" class="form-select" required>
+              <option value="">Select property...</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="modal-room-number">Room Number / Name *</label>
+            <input type="text" id="modal-room-number" class="form-control" placeholder="e.g. Room 101 or Unit 2A" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="modal-room-type">Room Type *</label>
+            <select id="modal-room-type" class="form-select" required>
+              <option value="Solo room">Solo room</option>
+              <option value="Shared room">Shared room</option>
+              <option value="Bedspace">Bedspace</option>
+              <option value="Studio">Studio</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="modal-room-capacity">Capacity (pax) *</label>
+            <input type="number" id="modal-room-capacity" class="form-control" value="1" min="1" max="10" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="modal-room-rent">Monthly Rent (₱) *</label>
+            <input type="number" id="modal-room-rent" class="form-control" placeholder="2500.00" min="500" step="100" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="modal-room-status">Room Status *</label>
+            <select id="modal-room-status" class="form-select" required>
+              <option value="AVAILABLE">AVAILABLE (Accepting requests)</option>
+              <option value="OCCUPIED">OCCUPIED (Tenant moved in)</option>
+              <option value="MAINTENANCE">MAINTENANCE (Repair/cleaning)</option>
+              <option value="INACTIVE">INACTIVE (Not rentable)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeRoomModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btn-save-room">
+            <i class="fa-solid fa-floppy-disk"></i> Save Room
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script>
+    const currentUser = Auth.requireAuth(['LANDLORD']);
+    let landlordHouses = [];
+    let landlordRooms = [];
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const preselectedHouseId = urlParams.get('house_id');
+
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('show');
+    }
+
+    async function initRoomsManagement() {
+      if (!currentUser) return;
+      document.getElementById('sidebar-user-name').textContent = currentUser.full_name;
+
+      await loadLandlordHouses();
+      await loadRooms();
+    }
+
+    async function loadLandlordHouses() {
+      try {
+        const res = await API.getBoardingHouses({ landlord_id: currentUser.user_id });
+        if (res.success && res.data) {
+          landlordHouses = res.data;
+
+          // Populate filter dropdown
+          const propFilter = document.getElementById('property-filter');
+          propFilter.innerHTML = '<option value="ALL">All Properties</option>' + 
+            landlordHouses.map(h => `<option value="${h.house_id}">${App.escapeHtml(h.house_name)}</option>`).join('');
+
+          if (preselectedHouseId) {
+            propFilter.value = preselectedHouseId;
+          }
+
+          // Populate modal dropdown
+          const modalSelect = document.getElementById('modal-house-id');
+          modalSelect.innerHTML = '<option value="">Select property...</option>' + 
+            landlordHouses.map(h => `<option value="${h.house_id}">${App.escapeHtml(h.house_name)}</option>`).join('');
+        }
+      } catch (err) {
+        console.error('Error fetching houses:', err);
+      }
+    }
+
+    async function loadRooms() {
+      try {
+        const res = await API.getRooms({ landlord_id: currentUser.user_id });
+        if (res.success && res.data) {
+          landlordRooms = res.data;
+          renderRoomsTable();
+        }
+      } catch (err) {
+        console.error('Error fetching rooms:', err);
+      }
+    }
+
+    function renderRoomsTable() {
+      const tbody = document.getElementById('rooms-table-body');
+      const propFilter = document.getElementById('property-filter').value;
+      const statusFilter = document.getElementById('status-filter').value;
+
+      const filtered = landlordRooms.filter(r => {
+        if (propFilter !== 'ALL' && r.house_id != propFilter) return false;
+        if (statusFilter !== 'ALL' && (r.status || '').toUpperCase() !== statusFilter) return false;
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
+              No rooms found matching the selected filter.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(r => `
+        <tr>
+          <td><strong>${App.escapeHtml(r.room_number)}</strong></td>
+          <td>${App.escapeHtml(r.house_name || 'Property')}</td>
+          <td><span class="badge badge-blue">${App.escapeHtml(r.room_type)}</span></td>
+          <td><i class="fa-solid fa-user me-1" style="color: var(--text-light);"></i> ${r.capacity} pax</td>
+          <td><strong>${App.formatCurrency(r.monthly_rent)}</strong></td>
+          <td>${App.statusBadge(r.status)}</td>
+          <td>
+            <select class="form-select form-select-sm" style="width: auto; padding: 0.2rem 0.5rem; font-size: 0.8rem;" onchange="changeRoomStatusQuick(${r.room_id}, this.value)">
+              <option value="AVAILABLE" ${r.status === 'AVAILABLE' ? 'selected' : ''}>Available</option>
+              <option value="OCCUPIED" ${r.status === 'OCCUPIED' ? 'selected' : ''}>Occupied</option>
+              <option value="MAINTENANCE" ${r.status === 'MAINTENANCE' ? 'selected' : ''}>Maintenance</option>
+              <option value="INACTIVE" ${r.status === 'INACTIVE' ? 'selected' : ''}>Inactive</option>
+            </select>
+          </td>
+          <td>
+            <div style="display: flex; gap: 0.4rem;">
+              <button class="btn btn-sm btn-outline-primary" onclick="openEditRoomModal(${r.room_id})" title="Edit">
+                <i class="fa-solid fa-pen-to-square"></i>
+              </button>
+              <button class="btn btn-sm btn-danger" onclick="deleteRoom(${r.room_id}, '${App.escapeHtml(r.room_number)}')" title="Delete">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function changeRoomStatusQuick(roomId, newStatus) {
+      try {
+        const res = await API.updateRoom({ room_id: roomId, status: newStatus });
+        if (res.success) {
+          App.toast(`Room status set to ${newStatus}.`, 'success');
+          loadRooms();
+        } else {
+          App.toast(res.message || 'Status update failed.', 'error');
+        }
+      } catch (err) {
+        console.error('Error changing room status:', err);
+      }
+    }
+
+    function openAddRoomModal() {
+      document.getElementById('room-modal-title').innerHTML = '<i class="fa-solid fa-door-open me-2" style="color: var(--primary);"></i> Add Room';
+      document.getElementById('modal-room-id').value = '';
+      document.getElementById('modal-house-group').style.display = 'block';
+      if (preselectedHouseId) {
+        document.getElementById('modal-house-id').value = preselectedHouseId;
+      }
+      document.getElementById('modal-room-number').value = '';
+      document.getElementById('modal-room-type').value = 'Solo room';
+      document.getElementById('modal-room-capacity').value = 1;
+      document.getElementById('modal-room-rent').value = '';
+      document.getElementById('modal-room-status').value = 'AVAILABLE';
+      document.getElementById('room-modal').classList.add('show');
+    }
+
+    function openEditRoomModal(roomId) {
+      const r = landlordRooms.find(item => item.room_id === roomId);
+      if (!r) return;
+
+      document.getElementById('room-modal-title').innerHTML = '<i class="fa-solid fa-pen-to-square me-2" style="color: var(--primary);"></i> Edit Room';
+      document.getElementById('modal-room-id').value = r.room_id;
+      document.getElementById('modal-house-group').style.display = 'none'; // Don't change property parent
+      document.getElementById('modal-room-number').value = r.room_number;
+      document.getElementById('modal-room-type').value = r.room_type;
+      document.getElementById('modal-room-capacity').value = r.capacity;
+      document.getElementById('modal-room-rent').value = r.monthly_rent;
+      document.getElementById('modal-room-status').value = r.status;
+      document.getElementById('room-modal').classList.add('show');
+    }
+
+    function closeRoomModal() {
+      document.getElementById('room-modal').classList.remove('show');
+    }
+
+    async function handleSaveRoom(e) {
+      e.preventDefault();
+      const roomId = document.getElementById('modal-room-id').value;
+      const houseId = document.getElementById('modal-house-id').value;
+      const num = document.getElementById('modal-room-number').value.trim();
+      const type = document.getElementById('modal-room-type').value;
+      const cap = parseInt(document.getElementById('modal-room-capacity').value);
+      const rent = parseFloat(document.getElementById('modal-room-rent').value);
+      const status = document.getElementById('modal-room-status').value;
+
+      const btn = document.getElementById('btn-save-room');
+      btn.disabled = true;
+
+      try {
+        if (roomId) {
+          // Update
+          const res = await API.updateRoom({
+            room_id: parseInt(roomId),
+            room_number: num,
+            room_type: type,
+            capacity: cap,
+            monthly_rent: rent,
+            status: status
+          });
+          if (res.success) {
+            App.toast('Room updated successfully!', 'success');
+            closeRoomModal();
+            loadRooms();
+          } else {
+            App.toast(res.message || 'Failed to update room.', 'error');
+          }
+        } else {
+          // Create
+          if (!houseId) {
+            App.toast('Please select a boarding house.', 'warning');
+            btn.disabled = false;
+            return;
+          }
+          const res = await API.createRoom({
+            house_id: parseInt(houseId),
+            room_number: num,
+            room_type: type,
+            capacity: cap,
+            monthly_rent: rent,
+            status: status
+          });
+          if (res.success) {
+            App.toast('Room created successfully!', 'success');
+            closeRoomModal();
+            loadRooms();
+          } else {
+            App.toast(res.message || 'Failed to create room.', 'error');
+          }
+        }
+      } catch (err) {
+        console.error('Error saving room:', err);
+        App.toast('Error saving room.', 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    async function deleteRoom(roomId, roomNumber) {
+      if (!confirm(`Are you sure you want to delete room "${roomNumber}"?`)) return;
+
+      try {
+        const res = await API.deleteRoom(roomId);
+        if (res.success) {
+          App.toast('Room deleted successfully.', 'success');
+          loadRooms();
+        } else {
+          App.toast(res.message || 'Failed to delete room.', 'error');
+        }
+      } catch (err) {
+        console.error('Error deleting room:', err);
+        App.toast('Error deleting room.', 'error');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', initRoomsManagement);
+  </script>
+</body>
+</html>
